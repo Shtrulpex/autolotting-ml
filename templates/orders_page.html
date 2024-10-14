@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- Header Section -->
     <div class="header">
         <button class="menu-btn" id="menuBtn">☰ Меню заказов</button>
         <h2 class="header-page"><strong>Сервис заказов</strong></h2>
@@ -18,14 +17,12 @@
         </div>
     </div>
 
-    <!-- File Upload Section -->
     <div class="file-upload-section">
         <label for="xml-file" class="file-drop-zone" id="dropZone">Кликните или перетащите XML файл</label>
         <input type="file" id="xml-file" accept=".xml" style="display: none;">
         <button id="loadBtn" onclick="call_back()">Обработать .xml файл</button>
     </div>
 
-    <!-- Table (Initially Hidden) -->
     <div class="table-section" id="tableSection">
         <table>
             <thead>
@@ -36,7 +33,6 @@
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <!-- Rows generated dynamically -->
             </tbody>
         </table>
         <button id="submitOrderBtn">Submit order file</button>
@@ -47,7 +43,6 @@
             <li><a href="#option1">Option 1</a></li>
             <li><a href="#option2">Option 2</a></li>
             <li><a href="#option3">Option 3</a></li>
-            <!-- 20 rows in total -->
         </ul>
         <button id="resizeMenuBtn">Resize Menu</button>
         <div class="arrow-menu"></div>

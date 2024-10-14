@@ -5,7 +5,6 @@ const loadBtn = document.getElementById("loadBtn");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
 
-// Toggle Sidebar
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
         sidebar.style.left = "-300px";
@@ -16,10 +15,8 @@ menuBtn.addEventListener('click', function() {
     }
 });
 
-// Show table after file upload
 loadBtn.addEventListener('click', function() {
     tableSection.style.display = 'block';
-    // Create a 3x20 table
     tableBody.innerHTML = '';
     for (let i = 0; i < 20; i++) {
         const row = document.createElement('tr');

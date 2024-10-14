@@ -1,4 +1,3 @@
-/* General styling */
 :root {
     --header-color: #f4f4f4;
     --header-shadow-color: gray;
@@ -70,7 +69,6 @@ body, html {
     font-size: large;
 }
 
-/* File Upload Section */
 .file-upload-section {
     text-align: center;
     margin-top: 100px;
@@ -108,7 +106,6 @@ body, html {
     border: 0;
 }
 
-/* Table Section */
 .table-section {
     display: none;
     text-align: center;
@@ -137,7 +134,6 @@ table th, table td {
     cursor: pointer;
 }
 
-/* Sidebar styles */
 .sidebar {
     position: absolute;
     left: -300px;
@@ -192,7 +188,6 @@ table th, table td {
     bottom: 10px;
 }
 
-/* Hover interactions */
 .menu-btn:hover {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
@@ -219,7 +214,6 @@ body:hover .sidebar {
     left: -300px;
 }
 
-/* Menu button color change when hovered */
 #menuBtn.active {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
