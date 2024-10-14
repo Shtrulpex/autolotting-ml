@@ -1,7 +1,7 @@
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 const dropZone = document.getElementById("dropZone");
-const fileInput = document.getElementById("xml-file");
+const fileInput = document.getElementById("xlsx-file");
 const loadBtn = document.getElementById("loadBtn");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
@@ -47,8 +47,6 @@ dropZone.addEventListener('drop', function(e) {
       }
     });
 
-
-
 function call_back() {
     fetch('/print-hello', {
         method: 'POST',
@@ -60,4 +58,32 @@ function call_back() {
     .catch(error => {
         console.error('Error', error);
     });
+}
+
+async function uploadFile() {
+    const file = fileInput.files[0]
+
+    if (!file) {
+        alert('Please select the file first');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert('File uploaded successfully! Server Response: '+result.message);
+        } else {
+            alert('Failed to upload file. Server Response: ' + response.status);
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
 }
