@@ -1,5 +1,6 @@
-from flask import Flask, redirect, url_for, render_template, jsonify, request
+from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file
 import os
+from xlsxToCsv import xlxsToDf
 
 app = Flask(__name__)
 
@@ -19,14 +20,9 @@ def orders():
 def lots():
     return render_template("lots_page.html")
 
-@app.route("/print-hello", methods=['POST'])
-def print_hello():
-    print("Hello")
-    return jsonify({"message": "HELLO printed in terminal"}), 200
-
-UPLOAD_FOLDER = './files'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+FILE_FOLDER = './files'
+if not os.path.exists(FILE_FOLDER):
+    os.makedirs(FILE_FOLDER)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -39,12 +35,21 @@ def upload_file():
         return jsonify({'message': 'No file selected for uploading'}), 400
 
     if file and file.filename.endswith('.xlsx'):
-        filepath = os.path.join(UPLOAD_FOLDER, file.filename)
-        file.save(filepath)  # Save the file on the server
+        filepath = os.path.join(FILE_FOLDER, file.filename)
+        file.save(filepath)
+        xlxsToDf(filepath)
 
         return jsonify({'message': f'File successfully uploaded: {file.filename}'}), 200
     else:
         return jsonify({'message': 'Only .xlsx files are allowed'}), 400
+
+@app.route('/download', methods=['GET'])
+def download_file():
+    filepath = os.path.join(FILE_FOLDER, 'enter.xlsx')
+    if os.path.exists(filepath):
+        return send_file(filepath, as_attachment=True, download_name='enter.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    else:
+        return jsonify({"error": "File not found"}), 404
 
 if __name__ == "__main__":
     app.run(debug=True)

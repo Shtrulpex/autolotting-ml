@@ -3,9 +3,6 @@ const sidebar = document.getElementById("sidebar");
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("xlsx-file");
 const loadBtn = document.getElementById("loadBtn");
-const tableSection = document.getElementById("tableSection");
-const tableBody = document.getElementById("tableBody");
-
 // Toggle Sidebar
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
@@ -17,10 +14,18 @@ menuBtn.addEventListener('click', function() {
     }
 });
 
-// Drag and drop functionality for the file input
-// dropZone.addEventListener('click', function() {
-//     fileInput.click();
-// });
+function handleFileSelect(files) {
+    if (files.length > 0) {
+        const fileName = files[0].name;
+        dropZone.textContent = `Выбран файл: ${fileName}`;
+    } else {
+        dropZone.textContent = "Кликните или перетащите XLSX файл";
+    }
+}
+
+fileInput.addEventListener('change', function() {
+    handleFileSelect(fileInput.files);
+})
 
 dropZone.addEventListener('dragover', function(e) {
     e.preventDefault();
@@ -33,42 +38,30 @@ dropZone.addEventListener('dragleave', function() {
 
 dropZone.addEventListener('drop', function(e) {
     event.preventDefault();
-      dropZone.style.borderColor = '#ccc';
-
-      const file = event.dataTransfer.files[0];
-      if (file) {
+    dropZone.style.borderColor = '#ccc';
+    handleFileSelect(event.dataTransfer.files);
+    const file = event.dataTransfer.files[0];
+    if (file) {
         console.log(`File dropped: ${file.name}`);
         let formData = new FormData();
             
         formData.append("file", file);
         fetch('/files/', {method: "POST", body: formData});
-      } else {
+    } else {
         console.log('No file dropped.');
-      }
-    });
-
-function call_back() {
-    fetch('/print-hello', {
-        method: 'POST',
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.message);
-    })
-    .catch(error => {
-        console.error('Error', error);
-    });
-}
+    }
+});
 
 async function uploadFile() {
     const file = fileInput.files[0]
 
     if (!file) {
-        alert('Please select the file first');
+        alert('Файл не выбран.');
         return;
     }
 
     const formData = new FormData();
+    file.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     formData.append('file', file);
 
     try {
@@ -79,11 +72,11 @@ async function uploadFile() {
 
         if (response.ok) {
             const result = await response.json();
-            alert('File uploaded successfully! Server Response: '+result.message);
+            alert('Файл загружен.');// Response: '+result.message);
         } else {
-            alert('Failed to upload file. Server Response: ' + response.status);
+            alert('Ошибка при загрузке файла.');// Response: ' + response.status);
         }
     } catch (error) {
-        alert('Error: ' + error.message);
+        alert('Неизвестная ошибка.');//: ' + error.message);
     }
 }
