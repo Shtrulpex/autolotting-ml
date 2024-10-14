@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- Header Section -->
     <div class="header">
         <button class="menu-btn" id="menuBtn">☰ Меню лотов</button>
         <h2 class="header-page"><strong>Сервис лотирования</strong></h2>
@@ -18,38 +17,8 @@
         </div>
     </div>
 
-    <!-- File Upload Section -->
     <div class="file-upload-section">
         <button id="loadBtn">Создать лоты</button>
-    </div>
-
-    <!-- Table (Initially Hidden) -->
-    <div class="table-section" id="tableSection">
-        <table>
-            <thead>
-                <tr>
-                    <th>Column 1</th>
-                    <th>Column 2</th>
-                    <th>Column 3</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <!-- Rows generated dynamically -->
-            </tbody>
-        </table>
-        <button id="submitOrderBtn">Скачать лоты</button>
-    </div>
-
-    <div id="sidebar" class="sidebar">
-        <ul class="sidebar-menu-scroll">
-            <li><a href="#option1">Option 1</a></li>
-            <li><a href="#option2">Option 2</a></li>
-            <li><a href="#option3">Option 3</a></li>
-            <!-- 20 rows in total -->
-        </ul>
-        <button id="resizeMenuBtn">Resize Menu</button>
-        <div class="arrow-menu"></div>
-        <div class="menu-top"></div>
     </div>
 
     <script src="{{ url_for('static',filename='/static3/script.js') }}"></script>
