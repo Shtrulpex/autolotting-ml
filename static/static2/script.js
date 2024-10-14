@@ -42,44 +42,11 @@ dropZone.addEventListener('drop', function(e) {
             
         formData.append("file", file);
         fetch('/files/', {method: "POST", body: formData});
-
-        // const reader = new FileReader();
-        // reader.onload = function(event) {
-        //   const fileContent = event.target.result;
-
-        //   // Trigger file download
-        //   const downloadLink = document.createElement('a');
-        //   downloadLink.href = URL.createObjectURL(new Blob([fileContent], { type: file.type }));
-        //   downloadLink.download = file.name;
-        //   document.body.appendChild(downloadLink);
-        //   downloadLink.click();
-        //   document.body.removeChild(downloadLink);
-
-        //   console.log('File download triggered successfully.');
-        // };
-        // reader.readAsArrayBuffer(file); // Read the file
       } else {
         console.log('No file dropped.');
       }
     });
 
-// Show table after file upload
-loadBtn.addEventListener('click', function() {
-    tableSection.style.display = 'block';
-    // Create a 3x20 table
-    tableBody.innerHTML = '';
-    for (let i = 0; i < 20; i++) {
-        const row = document.createElement('tr');
-        for (let j = 0; j < 3; j++) {
-            const cell = document.createElement('td');
-            cell.textContent = `Row ${i + 1}, Col ${j + 1}`;
-            cell.contentEditable = true; // Make cell content editable
-            row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
-    }
-    sidebar.style.height = "1194px"; //Need to fix afterwords
-});
 
 
 function call_back() {

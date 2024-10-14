@@ -15,21 +15,3 @@ menuBtn.addEventListener('click', function() {
         menuBtn.classList.add("active");
     }
 });
-
-// Show table after file upload
-loadBtn.addEventListener('click', function() {
-    tableSection.style.display = 'block';
-    // Create a 3x20 table
-    tableBody.innerHTML = '';
-    for (let i = 0; i < 20; i++) {
-        const row = document.createElement('tr');
-        for (let j = 0; j < 3; j++) {
-            const cell = document.createElement('td');
-            cell.textContent = `Row ${i + 1}, Col ${j + 1}`;
-            cell.contentEditable = true; // Make cell content editable
-            row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
-    }
-    sidebar.style.height = "1194px"; //Need to fix afterwords
-});
