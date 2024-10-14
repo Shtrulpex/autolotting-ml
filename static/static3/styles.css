@@ -135,51 +135,33 @@ table th, table td {
 }
 
 .sidebar {
-    position: absolute;
+    position: fixed;
     left: -300px;
-    top: 100px;
+    top: 100px; 
     width: 300px;
     height: calc(100% - 100px);
-    /* background-color: #444; */
-    color: white;
-    overflow: hidden;
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
     transition: left 0.5s ease;
-    padding-bottom: 0;
-    padding-top: 10px;
+    padding-top: 20px;
 }
 
 .sidebar ul {
     list-style-type: none;
     padding: 0;
-    padding-left: 30px;
     margin: 0;
 }
 
 .sidebar ul li {
-    padding: 10px;
+    padding: 20px;
     border-bottom: 1px solid #555;
 }
 
 .sidebar ul li a {
-    color: white;
+    color: var(--bright-text-color);
     text-decoration: none;
     display: block;
     font-size: 18px;
-}
-
-.arrow-menu {
-    width: 300px;
-    height: calc(100% + 10px);
-    background-color: var(--menu-color);
-    margin-top: -135px;
-    padding: 0;
-    margin-bottom: 0;
-}
-
-.sidebar-menu-scroll {
-    overflow-y: scroll;
-    position: relative;
-    right: 30px;
 }
 
 #resizeMenuBtn {
@@ -194,18 +176,6 @@ table th, table td {
     opacity: 1;
 }
 
-#menuBtn:hover + #sidebar-menu {
-    left: 0;
-}
-
-body:hover .sidebar-menu {
-    left: -270px;
-}
-
-.sidebar-menu:hover {
-    left: 0px;
-}
-
 #menuBtn:hover + #sidebar {
     left: 0;
 }
@@ -218,10 +188,6 @@ body:hover .sidebar {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
     opacity: 1;
-}
-
-#menuBtn.active + #sidebar-menu {
-    left: -300px;
 }
 
 .header {
