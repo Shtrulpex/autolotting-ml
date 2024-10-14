@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/static1/styles.css') }}">
+</head>
+<body>
+
+    <!-- Header Section with Menu Button and Action Buttons -->
+    <div class="header">
+        <button class="menu-btn" id="menuBtn">☰ Главное меню</button>
+        <h2 class="header-text"><strong>Газпром</strong></h2>
+        <div class="header-buttons">
+            <a href="/orders_page.html">Сделать заказ</a>
+            <a href="lots_page.html">Создать лоты</a>
+        </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li><a href="/home.html"><strong>Главная страница</strong></a></li>
+            <li><a href="/orders_page.html">Страница заказов</a></li>
+            <li><a href="/lots_page.html">Страница лотов</a></li>
+        </ul>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <h2><strong>Сервис по автоматическому лотированию</strong></h2>
+        <div class="center-buttons">
+            <button onclick="window.location.href='/orders_page.html'">Сделать заказ</button>
+            <button onclick="window.location.href='/lots_page.html'">Создать лоты</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='/static1/script.js') }}"></script>
+</body>
+</html>
