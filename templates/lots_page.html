@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Uploader</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/static3/styles.css') }}">
+</head>
+<body>
+
+    <div class="header">
+        <button class="menu-btn" id="menuBtn">☰ Меню лотов</button>
+        <h2 class="header-page"><strong>Сервис лотирования</strong></h2>
+        <div class="header-buttons">
+            <a href="/home.html">Главная страница</a>
+            <a href="/orders_page.html">Страница заказов</a>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li><a href="/home.html">Главная страница</a></li>
+            <li><a href="/orders_page.html">Страница заказов</a></li>
+            <li><a href="/lots_page.html"><strong>Страница лотов</strong></a></li>
+        </ul>
+    </div>
+
+    <div class="file-upload-section">
+        <button id="loadBtn">Создать лоты</button>
+    </div>
+
+    <script src="{{ url_for('static',filename='/static3/script.js') }}"></script>
+</body>
+</html>

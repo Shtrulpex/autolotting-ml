@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Uploader</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/static2/styles.css') }}">
+</head>
+<body>
+
+    <div class="header">
+        <button class="menu-btn" id="menuBtn">☰ Меню заказов</button>
+        <h2 class="header-page"><strong>Сервис заказов</strong></h2>
+        <div class="header-buttons">
+            <a href="/home.html">Главная страница</a>
+            <a href="/lots_page.html">Страница лотов</a>
+        </div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li><a href="/home.html">Главная страница</a></li>
+            <li><a href="/orders_page.html"><strong>Страница заказов</strong></a></li>
+            <li><a href="/lots_page.html">Страница лотов</a></li>
+        </ul>
+    </div>
+
+    <div class="file-upload-section">
+        <label for="xlsx-file" class="file-drop-zone" id="dropZone">Кликните или перетащите XLSX файл</label>
+        <input type="file" id="xlsx-file" accept=".xlsx" style="display: none;">
+        <button id="loadBtn" onclick="uploadFile()">Обработать .xlsx файл</button>
+    </div>
+
+    <script src="{{ url_for('static',filename='/static2/script.js') }}"></script>
+</body>
+</html>

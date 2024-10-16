@@ -1,0 +1,219 @@
+:root {
+    --header-color: #f4f4f4;
+    --header-shadow-color: gray;
+    --menu-color: #333;
+    --bright-text-color: white;
+    --dark-text-color: black;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-image: url("gaz.jpg");
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(244, 244, 244, 0.5);;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    box-shadow: 0 4px 2px -2px gray;
+}
+
+.header-page {
+    margin-right: -120px;
+}
+
+.header-buttons a {
+    margin-left: 0px;
+    margin-right: 20px;
+    text-decoration: none;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 10px 20px -10px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 15px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+.menu-btn {
+    background-color: rgba(244, 244, 244, 0.005);
+    color: var(--dark-text-color);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 100px;
+    width: 300px;
+    font-family: Arial, sans-serif;
+    font-size: large;
+}
+
+.file-upload-section {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.file-drop-zone {
+    display: inline-block;
+    width: 300px;
+    height: 150px;
+    border: 2px dashed #333;
+    padding: 20px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+#loadBtn {
+    display: block;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    /* padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer; */
+
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 10px 20px -10px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 15px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+/* Table Section */
+.table-section {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
+
+table {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#submitOrderBtn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar {
+    position: fixed;
+    left: -300px;
+    top: 100px; 
+    width: 300px;
+    height: calc(100% - 100px);
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    transition: left 0.5s ease;
+    padding-top: 20px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    padding: 20px;
+    border-bottom: 1px solid #555;
+}
+
+.sidebar ul li a {
+    color: var(--bright-text-color);
+    text-decoration: none;
+    display: block;
+    font-size: 18px;
+}
+
+#resizeMenuBtn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+.menu-btn:hover {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+#menuBtn:hover + #sidebar-menu {
+    left: 0;
+}
+
+body:hover .sidebar-menu {
+    left: -270px;
+}
+
+.sidebar-menu:hover {
+    left: 0px;
+}
+
+#menuBtn:hover + #sidebar {
+    left: 0;
+}
+
+body:hover .sidebar {
+    left: -300px;
+}
+
+#menuBtn.active {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+.header {
+    position: relative;
+    z-index: 2;
+}
