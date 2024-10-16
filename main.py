@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file
 import os
 from xlsxToCsv import xlxsToDf
+from Aglomerative.AglomerativeCluster import Solver
 
 app = Flask(__name__)
 
@@ -61,6 +62,8 @@ def download_file():
     # здесь заказ проверяет Inspector
     # здесь заказ загружается в БД
     # здесь заказы за месяц выгружаются из БД
+    lotter = Solver()
+    lotter.get_lots(csvpath, csvpath)
     # здесь заказы за месяц отправляются в autolotting-ml а сформированные лоты попадают в файл по пути csvpath
     # здесь сформироанные лоты загружаются в БД а сами лоты отправляются пользователю
     # здесь Scorer считает целевые бизнес-метрики

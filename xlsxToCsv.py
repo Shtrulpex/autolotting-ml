@@ -7,5 +7,5 @@ def xlxsToDf(filepath):
     # Зесь добавляете соединение со своими методами проверки df
     csvname = '.'.join(filepath.split('.')[:-1])+'.csv'
     os.remove(filepath)
-    df.to_csv(csvname)
+    df.to_csv(csvname, index=False)
     return csvname
