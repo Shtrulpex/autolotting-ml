@@ -45,9 +45,15 @@ def upload_file():
 
 @app.route('/download', methods=['GET'])
 def download_file():
-    filepath = os.path.join(FILE_FOLDER, 'enter.xlsx')
-    if os.path.exists(filepath):
-        return send_file(filepath, as_attachment=True, download_name='enter.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    csvpath = ""
+    for file in os.listdir("./files"):
+        if file.split('.')[-1] == "csv":
+            csvpath = "./files/"+file
+            break
+    #Здесь добавляете ваш обработчик ML, путь к файлу лежит в csvpath, его же потом сайт и пытается выгрузить пользователю
+    if os.path.exists(csvpath):
+        print(csvpath)
+        return send_file(csvpath, as_attachment=True, download_name="lots.csv", mimetype='text/csv')
     else:
         return jsonify({"error": "File not found"}), 404
 
