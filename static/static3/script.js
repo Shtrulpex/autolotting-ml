@@ -22,10 +22,10 @@ loadBtn.addEventListener('click', function() {
         return response.blob();
     })
     .then(blob => {
-        const file = new Blob([blob], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+        const file = new Blob([blob], {type: "text/csv"});
         const url = URL.createObjectURL(file);
         const link = document.createElement('a');
-        link.download = "enter.xlsx";
+        link.download = "lots.csv";
         link.href = url;
         document.body.appendChild(link);
         link.click();
