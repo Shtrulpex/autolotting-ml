@@ -1,0 +1,163 @@
+:root {
+    --header-color: #f4f4f4;
+    --header-shadow-color: gray;
+    --menu-color: #333;
+    --bright-text-color: white;
+    --dark-text-color: black;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-image: url("gaz.jpg");
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(244, 244, 244, 0.5);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    box-shadow: 0 4px 2px -2px var(--header-shadow-color);
+}
+
+.header-text {
+    margin-left: 80px;
+}
+
+.menu-btn {
+    background-color: rgba(244, 244, 244, 0.005);
+    color: var(--dark-text-color);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 100px;
+    width: 300px;
+    font-family: Arial, sans-serif;
+    font-size: large;
+}
+
+.sidebar {
+    position: fixed;
+    left: -300px;
+    top: 100px; 
+    width: 300px;
+    height: calc(100% - 100px);
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    transition: left 0.5s ease;
+    padding-top: 20px;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    padding: 20px;
+    border-bottom: 1px solid #555;
+}
+
+.sidebar ul li a {
+    color: var(--bright-text-color);
+    text-decoration: none;
+    display: block;
+    font-size: 18px;
+}
+
+.main-content {
+    text-align: center;
+    margin-top: 100px; 
+    color: #FFFFFF;
+}
+
+.center-buttons button {
+    margin: 10px;
+    /* padding: 10px 20px;
+    font-size: 16px; */
+
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 10px 20px -10px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 15px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+.header-buttons {
+    display: flex;
+}
+
+.header-buttons a {
+    margin-left: 0px;
+    margin-right: 20px;
+    text-decoration: none;
+    /* padding: 10px;
+    font-size: 14px; */
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 10px 20px -10px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 15px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+.menu-btn:hover {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+#menuBtn:hover + #sidebar {
+    left: 0;
+}
+
+body:hover .sidebar {
+    left: -300px;
+}
+
+#menuBtn.active {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+.header {
+    position: relative;
+    z-index: 2;
+}
