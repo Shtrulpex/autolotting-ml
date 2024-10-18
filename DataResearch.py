@@ -33,7 +33,33 @@ class ExtraColumnError(ValidationError):
         super().__init__(f"Ошибка: Найдена лишняя колонка '{column}'")
 
 
-class Inspector:
+class Scaler:
+    def __init__(self):
+        pass
+
+    def output_transform(self, lots: pd.DataFrame, inplace: bool = True) -> pd.DataFrame:
+        if not inplace:
+            lots = lots.copy()
+        lots['Планируемая сумма'] = lots['Общее количество'] * lots['Цена']
+        return lots
+
+    def input_transform(self, requests: pd.DataFrame, inplace: bool = True) -> pd.DataFrame:
+        if not inplace:
+            requests = requests.copy()
+        requests['latitude'] = requests['Адрес'].apply(self._get_latitude)
+        requests['longitude'] = requests['Адрес'].apply(self._get_longitude)
+        return requests
+
+    @staticmethod
+    def _get_latitude(address: str) -> float:
+        return 0.0
+
+    @staticmethod
+    def _get_longitude(address: str) -> float:
+        return 0.0
+
+
+class Validator:
     STANDART_INPUT_TEMPLATE = {
         'Клиент': 'int64',
         'Материал': 'int64',
@@ -105,40 +131,100 @@ class Scorer:
     def __init__(self):
         pass
 
-    # def mq_score(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
-    #     """
-    #     Подсчитывает метрику MQ
-    #     :param lots: датафрейм сформированных алгоритмом лотов
-    #     :param human_lots: датафрейм лотов, сформированных человеком
-    #     :return: float — значение метрики MQ in [0, 1]
-    #     """
-    #     mq = 0
-    #     return mq
-    #
-    # def ms_score(self, lots: pd.DataFrame, class_suppliers: pd.DataFrame) -> float:
-    #     """
-    #     Подсчитывает метрику MS
-    #     :param lots: датафрейм сформированных алгоритмом лотов
-    #     :param class_suppliers: датафрейм классов МТР и возможных поставщиков.
-    #     :return: float — значение метрики MS
-    #     """
-    #     # Пример расчета MS: процент классов, которые могут быть покрыты поставщиками
-    #     matched_classes = pd.merge(lots[['Класс МТР']], class_suppliers, on='Класс МТР', how='inner')
-    #     ms = len(matched_classes['Класс МТР'].unique()) / len(lots['Класс МТР'].unique())
-    #     return ms
-    #
-    # def lot_mean_cost_score(self, lots: pd.DataFrame) -> float:
-    #     """
-    #     Возвращает среднюю стоимость лотов.
-    #     :param lots: датафрейм сформированных лотов.
-    #     :return: float — средняя стоимость лотов.
-    #     """
-    #     return lots['Цена'].mean()
-    #
-    # def n_lot_score(self, lots: pd.DataFrame) -> int:
-    #     """
-    #     Возвращает количество лотов.
-    #     :param lots: датафрейм сформированных лотов.
-    #     :return: int — количество уникальных лотов.
-    #     """
-    #     return lots['id лота'].nunique()
+    def mq_score(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
+        """Calculate MQ (quality of lotting)"""
+
+        mq = (self.get_A(lots, human_lots) + self.get_B(lots, human_lots)) / 2
+        return mq
+
+    def ms_score(self, lots: pd.DataFrame, class_suppliers: pd.DataFrame) -> float:
+        """Calculate MS (quality of clustering MTR by supplier intersection)"""
+
+        merged_df = pd.merge(lots, class_suppliers, on='Материал')
+        # Разворачиваем поставщиков (делаем по одной строке для каждого поставщика)
+        merged_df = merged_df.explode('Поставщики')
+        merged_df = merged_df.rename(columns={'Поставщики': 'Поставщик'})
+
+        # Считаем количество классов МТР для каждого лота
+        lot_class_counts = merged_df.groupby('ID Лота')['Класс'].nunique().reset_index()
+        lot_class_counts.columns = ['ID Лота', 'Классы МТР']
+
+        # Считаем количество классов внутри лотов, которые покрывают поставщики
+        supplier_class_coverage = merged_df.groupby(['ID Лота', 'Поставщик'])['Класс'].nunique().reset_index()
+        supplier_class_coverage.columns = ['ID Лота', 'Поставщик', 'Покрытые классы МТР']
+
+        # Объединяем данные о лотах с количеством классов, которые покрывают поставщики
+        coverage_df = pd.merge(supplier_class_coverage, lot_class_counts, on='ID Лота')
+
+        # Считаем процент покрытия для каждого поставщика в каждом лоте
+        coverage_df['Процент покрытия'] = coverage_df['Покрытые классы МТР'] / coverage_df['Классы МТР']
+
+        # Считаем количество поставщиков, покрывающих более 50%, 80% и 100% классов
+        n_50 = coverage_df[coverage_df['Процент покрытия'] > 0.5].groupby('ID Лота')['Поставщик'].nunique()
+        n_80 = coverage_df[coverage_df['Процент покрытия'] > 0.8].groupby('ID Лота')['Поставщик'].nunique()
+        n_100 = coverage_df[coverage_df['Процент покрытия'] == 1].groupby('ID Лота')['Поставщик'].nunique()
+
+        # Считаем общее количество уникальных поставщиков по лотам
+        total_suppliers = coverage_df.groupby('ID Лота')['Поставщик'].nunique()
+
+        ms = ((2 * n_50 + 3 * n_80 + 4 * n_100) / total_suppliers).mean()
+        return ms
+
+    def ma_score(self, lots: pd.DataFrame) -> float:
+        """Calculate MA (quality of clustering MTR by recipient address)"""
+        # distances = []
+        # for lot_id, group in lots.groupby('ID Лота'):
+        #     coords = group[['latitude', 'longitude']].values
+        #     if len(coords) > 1:
+        #         dist = np.mean([geodesic(coords[i], coords[j]).km
+        #                         for i in range(len(coords)) for j in range(i+1, len(coords))])
+        #         distances.append(dist)
+        #
+        # ma = np.mean(distances) if distances else 0
+        ma = 0
+        return ma
+
+    def ml_score(self, lots: pd.DataFrame, class_suppliers: pd.DataFrame) -> float:
+        """Calculate ML (quality of clustering MTR by logistics cost)"""
+        # logistic_costs = []
+        # for lot_id, group in lots.groupby('ID Лота'):
+        #     suppliers = class_suppliers[class_suppliers['ID Лота'] == lot_id]
+        #     if not suppliers.empty:
+        #         weights = group['weight'].values
+        #         total_weight = weights.sum()
+        #         if total_weight > 0:
+        #             coords_recipient = group[['latitude', 'longitude']].values[0]
+        #             distances = [geodesic((sup['latitude'], sup['longitude']), coords_recipient).km
+        #                          for _, sup in suppliers.iterrows()]
+        #             weighted_dist = np.average(distances, weights=weights)
+        #             logistic_costs.append(weighted_dist)
+        #
+        # ml = np.mean(logistic_costs) if logistic_costs else 0
+        ml = 0
+        return ml
+
+    def get_lot_mean_cost(self, lots: pd.DataFrame) -> float:
+        """Calculate mean cost of lots"""
+
+        return lots.groupby(['ID Лота'])['Планируемая сумма'].sum().mean()
+
+    def get_n_lot(self, lots: pd.DataFrame) -> int:
+        """Get the number of lots"""
+
+        return lots['ID Лота'].nunique()
+
+    def get_A(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
+        """Calculate A (relative number of lots)"""
+
+        n_lots = self.get_n_lot(lots)
+        human_n_lots = self.get_n_lot(human_lots)
+        A = 1 - (n_lots / human_n_lots)
+        return A
+
+    def get_B(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
+        """Calculate B (relative mean cost of lots)"""
+
+        lot_mean_cost = self.get_lot_mean_cost(lots)
+        human_lot_mean_cost = self.get_lot_mean_cost(human_lots)
+        B = 1 - (human_lot_mean_cost / lot_mean_cost)
+        return B
