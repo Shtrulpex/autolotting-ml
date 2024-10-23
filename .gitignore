@@ -5,6 +5,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#secret data ignore
+*.xlsx
+*.csv
+*.db
+
 # C extensions
 *.so
 
