@@ -228,7 +228,7 @@ class DataPipeline:
         '''
         return self._db_processor.get_df(query)
 
-    def get_requests_features(self, human_lots_essential: bool = True, **filters) -> pd.DataFrame:
+    def get_requests_features(self, human_lots_essential: bool = False, **filters) -> pd.DataFrame:
         """
         Выгружает все заявки по зад фильтрам (время + другие) в супер-расширенном формате с указанием всех
          поставщиков заявки
@@ -355,6 +355,7 @@ class DataPipeline:
 #         db_proc.load_df(table_name, df, pk_column=id_columns.get(table_name, None))
 
 
+
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ПРОВЕРКИ РАБОТЫ DataPipeline
 # df = dp.get_requests_features()
 # df.to_csv('requests_features.csv', mode='w', index=False)
@@ -402,3 +403,25 @@ class DataPipeline:
 загрузить распределение по лотам в рамках пака по его имени
 # put_lots
 '''
+
+#
+# # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ ОООБЩЕГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
+#
+# dp = DataPipeline()
+# db_proc = dp._db_processor
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+#
+# df = pd.read_csv('~/Desktop/data.csv')
+# df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
+# human_lots = df['lot_id']
+# df.drop(columns=['lot_id'], inplace=True)
+#
+# dp.put_requests(df, human_lots=human_lots)
+# print(1)
+#
+# df = dp.get_requests_features(human_lots_essential=False)
+# df.to_csv('requests_features.csv', mode='w', index=False)
+# print(df)
+# print(len(df.columns))
+#
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
