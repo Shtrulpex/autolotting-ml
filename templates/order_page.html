@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XLSX Uploader</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/order_page/styles.css') }}">
+    <div id="dataDiv" style="display: none;">{{data}}</div>
 </head>
 <body>
-
     <div class="header">
         <button class="menu-btn" id="menuBtn">☰ Главное меню</button>
         <button class="menu-btn" id="ordersBtn"><<</button>
@@ -20,15 +20,12 @@
         <table>
             <thead>
                 <tr>
-                    <th>Column 1</th>
-                    <th>Column 2</th>
-                    <th>Column 3</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
             </tbody>
         </table>
-        <button id="submitOrderBtn">Submit order file</button>
+        <button id="submitOrderBtn">Сохранить</button>
     </div>
 
     <div id="sidebar" class="sidebar">

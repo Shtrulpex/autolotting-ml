@@ -19,7 +19,8 @@ def load_order():
 
 @app.route("/order_page.html")
 def order():
-    return render_template("order_page.html")
+    dfdata = getOrder().to_json(orient='records')
+    return render_template("order_page.html", data=dfdata)
 
 @app.route("/lots_page.html")
 def lots():
@@ -48,12 +49,6 @@ def upload_file():
         return jsonify({'message': f'File successfully uploaded: {file.filename}'}), 200
     else:
         return jsonify({'message': 'Only .xlsx files are allowed'}), 400
-
-@app.route('/order_number')
-def order_number():
-    data = getOrder().to_dict(orient='records')
-    response = Response(json.dumps(data, ensure_ascii = False), content_type="application/json; charset=utf-8")
-    return response, 200
 
 @app.route('/download', methods=['GET'])
 def download_file():

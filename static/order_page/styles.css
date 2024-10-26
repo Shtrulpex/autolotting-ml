@@ -197,10 +197,6 @@ body:hover .sidebar-orders {
     border: 0;
 }
 
-.filters-box {
-    /* display: none; */
-}
-
 .filters-box ul{
     margin: 0 0 0 auto;
     padding: 0;
@@ -240,7 +236,7 @@ body:hover .sidebar-orders {
 .table-section {
     display: none;
     text-align: center;
-    margin-top: 20px;
+    margin: 10px 10px 10px 10px;
 }
 
 table {
@@ -253,4 +249,27 @@ table {
 table th, table td {
     border: 1px solid #ddd;
     padding: 8px;
+}
+
+#submitOrderBtn {
+    margin-top: 10px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 16px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
 }

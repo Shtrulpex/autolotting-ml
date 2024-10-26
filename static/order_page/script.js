@@ -8,6 +8,8 @@ const filtersUl = document.getElementById("filters-ul");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
 
+const dfData = JSON.parse(document.getElementById("dataDiv").textContent);
+
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
         sidebar.style.left = "-300px";
@@ -44,7 +46,6 @@ filterInput.addEventListener('input', function() {
     }
 });
 
-// Alert the input text after typing
 filterInput.addEventListener('blur', function() {
     if (filterInput.value.trim() !== '') {
         filterInput.style.color = 'black';
@@ -74,41 +75,62 @@ document.addEventListener('click', function(e) {
     }
 })
 
-async function getOrder() {
-    await fetch('/order_number')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return JSON.parse(decodeURIComponent(response));
+if(dfData.length > 0) {
+    tableSection.style.display = 'block';
+    tableBody.innerHTML = '';
+    const headerRow = document.createElement("tr");
+    Object.keys(dfData[0]).forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
     })
-    .then(data => {
-        tableSection.style.display = 'block';
-        tableBody.innerHTML = '';
-        if(data.length > 0) {
-            const headerRow = document.createElement("tr");
-            Object.keys(data[0]).forEach(header => {
-                const th = document.createElement("th");
-                th.textContent = header;
-                headerRow.appendChild(th);
-            });
-
-            tableBody.appendChild(headerRow);
-            data.forEach(row => {
-                const tr = document.createElement("tr");
-                Object.values(row).forEach(cellData => {
-                    const td = document.createElement("td");
-                    td.textContent = cellData;
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('There was a problem with the server:', error);
+    tableBody.appendChild(headerRow);
+    dfData.forEach(row => {
+        const tr = document.createElement("tr");
+        Object.values(row).forEach(cellData => {
+            const td = document.createElement("td");
+            td.textContent = cellData;
+            td.contentEditable = true;
+            tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
     });
 }
+// async function getOrder() {
+//     await fetch('/order_number')
+//     .then(response => {
+//         if (!response.ok) {
+//             throw new Error('Network response was not ok');
+//         }
+//         return JSON.parse(decodeURIComponent(response));
+//     })
+//     .then(data => {
+//         tableSection.style.display = 'block';
+//         tableBody.innerHTML = '';
+//         if(data.length > 0) {
+//             const headerRow = document.createElement("tr");
+//             Object.keys(data[0]).forEach(header => {
+//                 const th = document.createElement("th");
+//                 th.textContent = header;
+//                 headerRow.appendChild(th);
+//             });
+
+//             tableBody.appendChild(headerRow);
+//             data.forEach(row => {
+//                 const tr = document.createElement("tr");
+//                 Object.values(row).forEach(cellData => {
+//                     const td = document.createElement("td");
+//                     td.textContent = cellData;
+//                     tr.appendChild(td);
+//                 });
+//                 tableBody.appendChild(tr);
+//             });
+//         }
+//     })
+//     .catch(error => {
+//         console.error('There was a problem with the server:', error);
+//     });
+// }
 
 getOrder()
 
