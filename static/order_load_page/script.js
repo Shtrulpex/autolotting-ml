@@ -5,8 +5,6 @@ const ordersBtn = document.getElementById("ordersBtn");
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("xml-file");
 const loadBtn = document.getElementById("loadBtn");
-const tableSection = document.getElementById("tableSection");
-const tableBody = document.getElementById("tableBody");
 const filterInput = document.getElementById("filters");
 const filtersDiv = document.getElementById("filters-box");
 const filtersUl = document.getElementById("filters-ul");
@@ -106,21 +104,6 @@ async function uploadFile() {
     }
 }
 
-loadBtn.addEventListener('click', function() {
-    tableSection.style.display = 'block';
-    tableBody.innerHTML = '';
-    for (let i = 0; i < 20; i++) {
-        const row = document.createElement('tr');
-        for (let j = 0; j < 3; j++) {
-            const cell = document.createElement('td');
-            cell.textContent = `Row ${i + 1}, Col ${j + 1}`;
-            cell.contentEditable = true;
-            row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
-    }
-});
-
 filterInput.addEventListener('input', function() {
     if (filterInput.value.trim() === '') {
         filterInput.placeholder = 'Добавить фильтры';
@@ -129,7 +112,6 @@ filterInput.addEventListener('input', function() {
     }
 });
 
-// Alert the input text after typing
 filterInput.addEventListener('blur', function() {
     if (filterInput.value.trim() !== '') {
         filterInput.style.color = 'black';

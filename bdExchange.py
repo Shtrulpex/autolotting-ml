@@ -9,3 +9,7 @@ def xlxsToDf(filepath):
     os.remove(filepath)
     df.to_csv(csvname)
     return csvname
+
+def getOrder():
+    df = pd.read_csv("./files/template.csv")
+    return df

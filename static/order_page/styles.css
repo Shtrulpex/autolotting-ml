@@ -215,8 +215,6 @@ body:hover .sidebar-orders {
     display: inline-block;
 }
 
-
-
 #filters {
     font-family: sans-serif;
     margin: 0 auto;
@@ -237,4 +235,22 @@ body:hover .sidebar-orders {
 
 .header h2 {
     margin: auto;
+}
+
+.table-section {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
+
+table {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
 }

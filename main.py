@@ -1,8 +1,9 @@
-from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file
+from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from xlsxToCsv import xlxsToDf
+from bdExchange import xlxsToDf, getOrder
 
 app = Flask(__name__)
+app.config['JSON_AS_ASCII'] = False
 
 @app.route("/")
 def main():
@@ -19,10 +20,6 @@ def load_order():
 @app.route("/order_page.html")
 def order():
     return render_template("order_page.html")
-
-@app.route("/orders_page.html")
-def orders():
-    return render_template("orders_page.html")
 
 @app.route("/lots_page.html")
 def lots():
@@ -52,6 +49,11 @@ def upload_file():
     else:
         return jsonify({'message': 'Only .xlsx files are allowed'}), 400
 
+@app.route('/order_number')
+def order_number():
+    data = getOrder().to_dict(orient='records')
+    response = Response(json.dumps(data, ensure_ascii = False), content_type="application/json; charset=utf-8")
+    return response, 200
 
 @app.route('/download', methods=['GET'])
 def download_file():
@@ -76,5 +78,6 @@ def download_file():
         return send_file(csvpath, as_attachment=True, download_name="lots.csv", mimetype='text/csv')
     else:
         return jsonify({"error": "File not found"}), 404
+
 if __name__ == "__main__":
     app.run(debug=True)
