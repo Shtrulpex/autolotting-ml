@@ -10,6 +10,14 @@ def main():
 def home():
     return redirect(url_for("main"))
 
+@app.route("/order_load_page.html")
+def load_order():
+    return render_template("order_load_page.html")
+
+@app.route("/order_page.html")
+def order():
+    return render_template("order_page.html")
+
 @app.route("/orders_page.html")
 def orders():
     return render_template("orders_page.html")
