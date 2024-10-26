@@ -24,3 +24,5 @@ pred = clf.fit_predict(X_train)
 df["id_lot"] = pred
 print(df.sample(n=5))
 # df.to_csv("data/KMeans_result_for_1month_only_recievers.csv", index=False)
+
+
