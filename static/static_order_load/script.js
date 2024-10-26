@@ -8,6 +8,8 @@ const loadBtn = document.getElementById("loadBtn");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
 const filterInput = document.getElementById("filters");
+const filtersDiv = document.getElementById("filters-box");
+const filtersUl = document.getElementById("filters-ul");
 
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
@@ -37,10 +39,18 @@ ordersBtn.addEventListener('click', function() {
     }
 })
 
-// Drag and drop functionality for the file input
-// dropZone.addEventListener('click', function() {
-//     fileInput.click();
-// });
+function handleFileSelect(files) {
+    if (files.length > 0) {
+        const fileName = files[0].name;
+        dropZone.textContent = `Выбран файл: ${fileName}`;
+    } else {
+        dropZone.textContent = "Кликните или перетащите XLSX файл";
+    }
+}
+
+fileInput.addEventListener('change', function() {
+    handleFileSelect(fileInput.files);
+})
 
 dropZone.addEventListener('dragover', function(e) {
     e.preventDefault();
@@ -53,35 +63,48 @@ dropZone.addEventListener('dragleave', function() {
 
 dropZone.addEventListener('drop', function(e) {
     event.preventDefault();
-      dropZone.style.borderColor = '#ccc';
-
-      const file = event.dataTransfer.files[0];
-      if (file) {
+    dropZone.style.borderColor = '#ccc';
+    handleFileSelect(event.dataTransfer.files);
+    const file = event.dataTransfer.files[0];
+    if (file) {
         console.log(`File dropped: ${file.name}`);
         let formData = new FormData();
             
         formData.append("file", file);
         fetch('/files/', {method: "POST", body: formData});
-
-        // const reader = new FileReader();
-        // reader.onload = function(event) {
-        //   const fileContent = event.target.result;
-
-        //   // Trigger file download
-        //   const downloadLink = document.createElement('a');
-        //   downloadLink.href = URL.createObjectURL(new Blob([fileContent], { type: file.type }));
-        //   downloadLink.download = file.name;
-        //   document.body.appendChild(downloadLink);
-        //   downloadLink.click();
-        //   document.body.removeChild(downloadLink);
-
-        //   console.log('File download triggered successfully.');
-        // };
-        // reader.readAsArrayBuffer(file); // Read the file
-      } else {
+    } else {
         console.log('No file dropped.');
-      }
-    });
+    }
+});
+
+async function uploadFile() {
+    const file = fileInput.files[0]
+
+    if (!file) {
+        alert('Файл не выбран.');
+        return;
+    }
+
+    const formData = new FormData();
+    file.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    formData.append('file', file);
+
+    try {
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            alert('Файл загружен.');
+        } else {
+            alert('Ошибка при загрузке файла.');
+        }
+    } catch (error) {
+        alert('Неизвестная ошибка.');
+    }
+}
 
 loadBtn.addEventListener('click', function() {
     tableSection.style.display = 'block';
@@ -98,3 +121,40 @@ loadBtn.addEventListener('click', function() {
     }
 });
 
+filterInput.addEventListener('input', function() {
+    if (filterInput.value.trim() === '') {
+        filterInput.placeholder = 'Добавить фильтры';
+    } else {
+        filterInput.placeholder = '';
+    }
+});
+
+// Alert the input text after typing
+filterInput.addEventListener('blur', function() {
+    if (filterInput.value.trim() !== '') {
+        filterInput.style.color = 'black';
+    }
+    else {
+        filterInput.style.color = 'gray';
+    }
+});
+
+filterInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter'){
+        if (filtersDiv.style.display === '') {
+            filtersDiv.style.display = 'block';
+        }
+        const li = document.createElement('li');
+        const button = document.createElement('button');
+        button.textContent = filterInput.value;
+        button.className = 'order_filter';
+        li.appendChild(button);
+        filtersUl.appendChild(li);
+    }
+})
+
+document.addEventListener('click', function(e) {
+    if (e.target && e.target.className === 'order_filter'){
+        e.target.parentElement.remove();
+    }
+})

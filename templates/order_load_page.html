@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XML Uploader</title>
+    <title>XLSX Uploader</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/static_order_load/styles.css') }}">
 </head>
 <body>
@@ -14,9 +14,9 @@
     </div>
 
     <div class="file-upload-section">
-        <label for="xml-file" class="file-drop-zone" id="dropZone">Кликните или перетащите XML файл</label>
+        <label for="xml-file" class="file-drop-zone" id="dropZone">Кликните или перетащите XLSX файл</label>
         <input type="file" id="xml-file" accept=".xml" style="display: none;">
-        <button id="loadBtn" onclick="call_back()">Обработать .xml файл</button>
+        <button id="loadBtn" onclick="uploadFile()">Обработать .xlsx файл</button>
     </div>
 
     <div class="table-section" id="tableSection">
@@ -45,10 +45,10 @@
 
     <div id="sidebar-orders" class="sidebar-orders">
         <ul>
-            <li><input type="text" id="filters" value="Добавить фильтры">
-                <div class="filters-box">
-                    <div>Список фильтров:</div>
-                    <button class="order_filter">Фильтр</button>
+            <li><input type="text" id="filters" placeholder="Добавить фильтры">
+                <div class="filters-box" id="filters-box">
+                    <ul id="filters-ul">
+                    </ul>
                 </div></li>
             <li><a href="/order_load_page.html"><strong>Загрузить заказы</strong></a></li>
             <li><div>Все заказы</div>

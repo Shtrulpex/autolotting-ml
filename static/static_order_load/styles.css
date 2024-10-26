@@ -273,8 +273,24 @@ body:hover .sidebar-orders {
 }
 
 .filters-box {
-    margin-top: 20px;
+    /* display: none; */
 }
+
+.filters-box ul{
+    margin: 0 0 0 auto;
+    padding: 0;
+    list-style: none;
+}
+
+.filters-box ul li{
+    margin: 0 0 0 auto;
+    padding: 0;
+    border-bottom: 0px solid #555;
+    padding-left: -3px;
+    display: inline-block;
+}
+
+
 
 #filters {
     font-family: sans-serif;
@@ -286,4 +302,10 @@ body:hover .sidebar-orders {
     transition: all 0.3s;
     width: 240px;
     margin-left: 0px;
+    color: gray;
+    outline: none;
+}
+
+#filters:focus {
+    color: black;
 }
