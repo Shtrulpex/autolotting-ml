@@ -166,3 +166,4 @@ cython_debug/
 #project_data
 *.xlsx
 *.csv
+*.db
