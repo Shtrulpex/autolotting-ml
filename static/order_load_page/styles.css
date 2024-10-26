@@ -1,0 +1,315 @@
+
+:root {
+    --header-color: #f4f4f4;
+    --header-shadow-color: gray;
+    --menu-color: #333;
+    --bright-text-color: white;
+    --dark-text-color: black;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-image: url("gaz.jpg");
+}
+
+.header {
+    display: flex;
+    background-color: rgba(244, 244, 244, 0.5);;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    box-shadow: 0 4px 2px -2px gray;
+}
+
+.menu-btn {
+    background-color: rgba(244, 244, 244, 0.005);
+    color: var(--dark-text-color);
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    height: 100px;
+    width: 150px;
+    font-family: Arial, sans-serif;
+    font-size: large;
+}
+
+.file-upload-section {
+    text-align: center;
+    margin-top: 100px;
+}
+
+.file-drop-zone {
+    display: inline-block;
+    width: 300px;
+    height: 150px;
+    border: 2px dashed #333;
+    padding: 20px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+}
+
+#loadBtn {
+    display: block;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    /* padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer; */
+
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 10px 20px -10px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 15px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+.table-section {
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
+
+table {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#submitOrderBtn {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.sidebar {
+    position: fixed;
+    left: -300px;
+    top: 100px; /* Starts just below the header */
+    width: 300px;
+    height: calc(100% - 100px); /* Avoid overlap with the header */
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    transition: left 0.5s ease;
+    padding-top: 20px; /* Adds space for the content below header */
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    padding: 20px;
+    border-bottom: 1px solid #555;
+}
+
+.sidebar ul li a {
+    color: var(--bright-text-color);
+    text-decoration: none;
+    display: block;
+    font-size: 18px;
+}
+
+#menuBtn:hover + #sidebar {
+    left: 0;
+}
+
+#menuBtn.active {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+#menuBtn.active + #sidebar-menu {
+    left: -300px;
+}
+
+
+body:hover .sidebar {
+    left: -300px;
+}
+
+.sidebar-orders {
+    position: absolute;
+    left: -300px;
+    top: 100px; /* Starts just be   low the header */
+    width: 300px;
+    height: calc(100% - 100px); /* Avoid overlap with the header */
+    background-color: var(--menu-color);
+    color: white;
+    overflow: hidden;
+    transition: left 0.5s ease;
+    padding-bottom: 0;
+    padding-top: 10px;
+}
+
+.sidebar-orders ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 330px;
+}
+
+.sidebar-orders ul li {
+    padding: 10px;
+    border-bottom: 1px solid #555;
+}
+
+.sidebar-orders ul li a {
+    color: white;
+    text-decoration: none;
+    display: block;
+    font-size: 18px;
+}
+
+.sidebar-orders-menu-scroll {
+    overflow-y: scroll;
+    position: relative;
+    /* right:30px; */
+}
+
+.sidebar-orders-menu-scroll li {
+    border-bottom: 1px solid #555;
+}
+
+.menu-btn:hover {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+#ordersBtn:hover + #sidebar-orders-menu {
+    left: 0;
+}
+
+body:hover .sidebar-orders-menu {
+    left: -300px;
+}
+
+.sidebar-orders-menu:hover {
+    left: 0px;
+}
+
+#ordersBtn:hover + #sidebar-orders {
+    left: 0;
+}
+
+body:hover .sidebar-orders {
+    left: -300px;
+}
+
+#ordersBtn.active {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+#ordersBtn.active + #sidebar-orders-menu {
+    left: -300px;
+}
+
+.header {
+    position: relative;
+    z-index: 2;
+}
+
+.order_filter {
+    display: block;
+    margin-top: 5px;
+    margin-left: 5px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 2px 6px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+.filters-box {
+    /* display: none; */
+}
+
+.filters-box ul{
+    margin: 0 0 0 auto;
+    padding: 0;
+    list-style: none;
+}
+
+.filters-box ul li{
+    margin: 0 0 0 auto;
+    padding: 0;
+    border-bottom: 0px solid #555;
+    padding-left: -3px;
+    display: inline-block;
+}
+
+
+
+#filters {
+    font-family: sans-serif;
+    margin: 0 auto;
+    padding: 1rem 1rem;
+    border-radius: 0.2rem;
+    border: none;
+    display: block;
+    transition: all 0.3s;
+    width: 240px;
+    margin-left: 0px;
+    color: gray;
+    outline: none;
+}
+
+#filters:focus {
+    color: black;
+}
+
+.header h2 {
+    margin: auto;
+}

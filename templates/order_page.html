@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XLSX Uploader</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='/order_load_page/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='/order_page/styles.css') }}">
 </head>
 <body>
 
@@ -16,31 +16,10 @@
         <h2>Лоты</h2>
     </div>
 
-    <div class="file-upload-section">
-        <label for="xml-file" class="file-drop-zone" id="dropZone">Кликните или перетащите XLSX файл</label>
-        <input type="file" id="xml-file" accept=".xml" style="display: none;">
-        <button id="loadBtn" onclick="uploadFile()">Обработать .xlsx файл</button>
-    </div>
-
-    <div class="table-section" id="tableSection">
-        <table>
-            <thead>
-                <tr>
-                    <th>Column 1</th>
-                    <th>Column 2</th>
-                    <th>Column 3</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-            </tbody>
-        </table>
-        <button id="submitOrderBtn">Submit order file</button>
-    </div>
-
     <div id="sidebar" class="sidebar">
         <ul>
             <li><a href="/home.html">Главная страница</a></li>
-            <li><a href="/order_page.html"><strong>Страница заказов</strong></a></li>
+            <li><a href="/order_page.html">Страница заказов</a></li>
             <li><a href="/lots_page.html">Страница формирования лотов</a></li>
             <li><a href="/lots_page.html">Страница лотов</a></li>
         </ul>
@@ -53,7 +32,7 @@
                     <ul id="filters-ul">
                     </ul>
                 </div></li>
-            <li><a href="/order_load_page.html"><strong>Загрузить заказ</strong></a></li>
+            <li><a href="/order_load_page.html">Загрузить заказ</a></li>
             <li><div>Все заказы</div>
                 <div><ul class="sidebar-orders-menu-scroll">
                     <li><a href="#option1">Option 1</a></li>
@@ -63,6 +42,6 @@
         </ul>
     </div>
 
-    <script src="{{ url_for('static',filename='/order_load_page/script.js') }}"></script>
+    <script src="{{ url_for('static',filename='/order_page/script.js') }}"></script>
 </body>
 </html>
