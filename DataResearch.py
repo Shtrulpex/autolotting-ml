@@ -199,6 +199,7 @@ class Scorer:
         #             weighted_dist = np.average(distances, weights=weights)
         #             logistic_costs.append(weighted_dist)
         #
+
         # ml = np.mean(logistic_costs) if logistic_costs else 0
         ml = 0
         return ml
