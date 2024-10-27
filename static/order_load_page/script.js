@@ -9,6 +9,10 @@ const filterInput = document.getElementById("filters");
 const filtersDiv = document.getElementById("filters-box");
 const filtersUl = document.getElementById("filters-ul");
 
+function redirectToOrder() {
+    window.location.href = "order_page.html";
+}
+
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
         sidebar.style.left = "-300px";
@@ -61,34 +65,28 @@ dropZone.addEventListener('dragleave', function() {
 
 dropZone.addEventListener('drop', function(e) {
     event.preventDefault();
-    dropZone.style.borderColor = '#ccc';
     handleFileSelect(event.dataTransfer.files);
     const file = event.dataTransfer.files[0];
-    if (file) {
-        console.log(`File dropped: ${file.name}`);
-        let formData = new FormData();
-            
-        formData.append("file", file);
-        fetch('/files/', {method: "POST", body: formData});
-    } else {
-        console.log('No file dropped.');
-    }
+    uploadFile(file);
 });
 
-async function uploadFile() {
+function checkFile() {
     const file = fileInput.files[0]
 
     if (!file) {
         alert('Файл не выбран.');
         return;
     }
+    uploadFile(file);
+}
 
+async function uploadFile(file) {
     const formData = new FormData();
     file.type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     formData.append('file', file);
 
     try {
-        const response = await fetch('/upload', {
+        const response = await fetch('/api/upload', {
             method: 'POST',
             body: formData
         });
@@ -96,6 +94,7 @@ async function uploadFile() {
         if (response.ok) {
             const result = await response.json();
             alert('Файл загружен.');
+            redirectToOrder();
         } else {
             alert('Ошибка при загрузке файла.');
         }

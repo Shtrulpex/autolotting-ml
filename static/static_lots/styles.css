@@ -137,9 +137,9 @@ table th, table td {
 .sidebar {
     position: absolute;
     left: -300px;
-    top: 100px; /* Starts just be   low the header */
+    top: 100px;
     width: 300px;
-    height: calc(100% - 100px); /* Avoid overlap with the header */
+    height: calc(100% - 110px);
     /* background-color: #444; */
     color: white;
     overflow: hidden;

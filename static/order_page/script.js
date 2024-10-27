@@ -7,8 +7,8 @@ const filtersDiv = document.getElementById("filters-box");
 const filtersUl = document.getElementById("filters-ul");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
-
-const dfData = JSON.parse(document.getElementById("dataDiv").textContent);
+const dfDataDiv = document.getElementById("dataDiv");
+const submitOrderBtn = document.getElementById("submitOrderBtn");
 
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
@@ -67,84 +67,64 @@ filterInput.addEventListener('keypress', function(e) {
         li.appendChild(button);
         filtersUl.appendChild(li);
     }
-})
+});
 
 document.addEventListener('click', function(e) {
     if (e.target && e.target.className === 'order_filter'){
         e.target.parentElement.remove();
     }
-})
+});
 
-if(dfData.length > 0) {
-    tableSection.style.display = 'block';
-    tableBody.innerHTML = '';
-    const headerRow = document.createElement("tr");
-    Object.keys(dfData[0]).forEach(header => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        headerRow.appendChild(th);
-    })
-    tableBody.appendChild(headerRow);
-    dfData.forEach(row => {
-        const tr = document.createElement("tr");
-        Object.values(row).forEach(cellData => {
-            const td = document.createElement("td");
-            td.textContent = cellData;
-            td.contentEditable = true;
-            tr.appendChild(td);
+if (dfDataDiv.textContent !== '') {
+    const dfData = JSON.parse(dfDataDiv.textContent);
+    if (dfData.length > 0) {
+        tableSection.style.display = 'block';
+        tableBody.innerHTML = '';
+        const headerRow = document.createElement("tr");
+        Object.keys(dfData[0]).forEach(header => {
+            const th = document.createElement("th");
+            th.textContent = header;
+            headerRow.appendChild(th);
+        })
+        tableBody.appendChild(headerRow);
+        dfData.forEach(row => {
+            const tr = document.createElement("tr");
+            Object.values(row).forEach(cellData => {
+                const td = document.createElement("td");
+                td.textContent = cellData;
+                td.contentEditable = true;
+                tr.appendChild(td);
+            });
+            tableBody.appendChild(tr);
         });
-        tableBody.appendChild(tr);
-    });
+    }
 }
-// async function getOrder() {
-//     await fetch('/order_number')
-//     .then(response => {
-//         if (!response.ok) {
-//             throw new Error('Network response was not ok');
-//         }
-//         return JSON.parse(decodeURIComponent(response));
-//     })
-//     .then(data => {
-//         tableSection.style.display = 'block';
-//         tableBody.innerHTML = '';
-//         if(data.length > 0) {
-//             const headerRow = document.createElement("tr");
-//             Object.keys(data[0]).forEach(header => {
-//                 const th = document.createElement("th");
-//                 th.textContent = header;
-//                 headerRow.appendChild(th);
-//             });
 
-//             tableBody.appendChild(headerRow);
-//             data.forEach(row => {
-//                 const tr = document.createElement("tr");
-//                 Object.values(row).forEach(cellData => {
-//                     const td = document.createElement("td");
-//                     td.textContent = cellData;
-//                     tr.appendChild(td);
-//                 });
-//                 tableBody.appendChild(tr);
-//             });
-//         }
-//     })
-//     .catch(error => {
-//         console.error('There was a problem with the server:', error);
-//     });
-// }
+submitOrderBtn.addEventListener('click', function() {
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    const headers = Array.from(rows[0].children).map(header => header.textContent);
+    
+    const data = rows.slice(1).map(row => {
+        const cells = Array.from(row.children);
+        const rowData = {};
+        cells.forEach((cell, index) => {
+            rowData[headers[index]] = cell.textContent;
+        });
+        return rowData;
+    });
 
-getOrder()
-
-// loadBtn.addEventListener('click', function() {
-//     tableSection.style.display = 'block';
-//     tableBody.innerHTML = '';
-//     for (let i = 0; i < 20; i++) {
-//         const row = document.createElement('tr');
-//         for (let j = 0; j < 3; j++) {
-//             const cell = document.createElement('td');
-//             cell.textContent = `Row ${i + 1}, Col ${j + 1}`;
-//             cell.contentEditable = true;
-//             row.appendChild(cell);
-//         }
-//         tableBody.appendChild(row);
-//     }
-// });
+    fetch('/api/update_df', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            alert("Error with database");
+        }
+        else {
+            alert("Edited successfully");
+        }
+    })
+    .catch(error => console.error("Error updating CSV data:", error));
+});

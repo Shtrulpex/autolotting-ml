@@ -47,13 +47,13 @@ body, html {
 .sidebar {
     position: fixed;
     left: -300px;
-    top: 100px; /* Starts just below the header */
+    top: 100px;
     width: 300px;
-    height: calc(100% - 100px); /* Avoid overlap with the header */
+    height: calc(100% - 110px);
     background-color: var(--menu-color);
     color: var(--bright-text-color);
     transition: left 0.5s ease;
-    padding-top: 20px; /* Adds space for the content below header */
+    padding-top: 20px;
 }
 
 .sidebar ul {
