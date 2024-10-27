@@ -82,7 +82,10 @@ class DataPipeline:
         """Загружает в БД данные заявки, поданной в формате шаблона"""
 
         df = requests.copy()
-        df['human_lot_id'] = human_lots.astype('Int64')
+        if human_lots is not None:
+            df['human_lot_id'] = human_lots.astype('Int64')
+        else:
+            df['human_lot_id'] = None
         df.rename(columns={'Дата заказа': 'order_dt',
                            '№ заказа': 'order_id',
                            '№ позиции': 'item_id',
@@ -406,7 +409,7 @@ class DataPipeline:
 
 #
 # # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ ОООБЩЕГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
-#
+# #
 # dp = DataPipeline()
 # db_proc = dp._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
@@ -415,10 +418,11 @@ class DataPipeline:
 # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
 # human_lots = df['lot_id']
 # df.drop(columns=['lot_id'], inplace=True)
-#
-# dp.put_requests(df, human_lots=human_lots)
+# #
+# dp.put_requests(df)
 # print(1)
-#
+# print(dp.get_requests())
+# #
 # df = dp.get_requests_features(human_lots_essential=False)
 # df.to_csv('requests_features.csv', mode='w', index=False)
 # print(df)
