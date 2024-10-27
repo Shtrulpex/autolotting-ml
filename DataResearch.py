@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 class ValidationError(Exception):
@@ -131,47 +132,65 @@ class Scorer:
     def __init__(self):
         pass
 
-    def mq_score(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
-        """Calculate MQ (quality of lotting)"""
+    def mq_score(self, requests: pd.DataFrame, lots: pd.DataFrame, human_lots: pd.DataFrame, ) -> float:
+        """
+            Подсчет метрики MQ -- качество лоттирования МТР по средней стоимости лота и количеству лотов относительно
+            лоттироваония человеком (или квазичеловеком)
 
-        mq = (self.get_A(lots, human_lots) + self.get_B(lots, human_lots)) / 2
+            :param requests: заявки на закупку МТР с поставщиками
+            :param lots: распределение по лотам алгоритмом лоттирования
+            :param human_lots: распределение по лотам человеком (или квазичеловеком)
+        """
+
+        # Убираем дубликаты, оставляя первую запись для каждого request_id
+        requests = requests.drop_duplicates(subset='request_id', keep='first')
+
+        n_lots = lots['lot_id'].nunique()
+        n_human_lots = human_lots['human_lot_id'].nunique()
+
+        lot_mean_cost = pd.merge(requests, lots, on='request_id').groupby('lot_id')['item_cost'].sum().mean()
+        human_lot_mean_cost = pd.merge(requests, human_lots, on='request_id').groupby('human_lot_id')[
+            'item_cost'].sum().mean()
+
+        mq = (1 - (n_lots / n_human_lots) + 1 - (human_lot_mean_cost / lot_mean_cost)) / 2
         return mq
 
-    def ms_score(self, lots: pd.DataFrame, class_suppliers: pd.DataFrame) -> float:
-        """Calculate MS (quality of clustering MTR by supplier intersection)"""
+    def ms_score(self, requests: pd.DataFrame, lots: pd.DataFrame) -> float:
+        """
+        Подсчет метрики MS -- качество кластеризации МТР по пересечениям поставщиков лота
+        (Общие поставщики в рамках каждого отдельного лота)
 
-        merged_df = pd.merge(lots, class_suppliers, on='Материал')
-        # Разворачиваем поставщиков (делаем по одной строке для каждого поставщика)
-        merged_df = merged_df.explode('Поставщики')
-        merged_df = merged_df.rename(columns={'Поставщики': 'Поставщик'})
+        :param requests: заявки на закупку МТР
+        :param lots: распределение по лотам алгоритмом лоттирования
+        """
 
-        # Считаем количество классов МТР для каждого лота
-        lot_class_counts = merged_df.groupby('ID Лота')['Класс'].nunique().reset_index()
-        lot_class_counts.columns = ['ID Лота', 'Классы МТР']
+        requests_lots = pd.merge(requests, lots, on='request_id', how='inner')
 
-        # Считаем количество классов внутри лотов, которые покрывают поставщики
-        supplier_class_coverage = merged_df.groupby(['ID Лота', 'Поставщик'])['Класс'].nunique().reset_index()
-        supplier_class_coverage.columns = ['ID Лота', 'Поставщик', 'Покрытые классы МТР']
+        lot_scores = []
+        for _, lot_df in requests_lots.groupby('lot_id'):
+            supplier_coverage = lot_df.groupby('supplier_id')['class_id'].nunique() / lot_df['class_id'].nunique()
 
-        # Объединяем данные о лотах с количеством классов, которые покрывают поставщики
-        coverage_df = pd.merge(supplier_class_coverage, lot_class_counts, on='ID Лота')
+            # Пропустим лот, если нет поставщиков
+            if supplier_coverage.empty:
+                continue
 
-        # Считаем процент покрытия для каждого поставщика в каждом лоте
-        coverage_df['Процент покрытия'] = coverage_df['Покрытые классы МТР'] / coverage_df['Классы МТР']
+            # Подсчитаем количество поставщиков по категориям
+            n_post50 = (supplier_coverage > 0.5).sum()
+            n_post80 = (supplier_coverage > 0.8).sum()
+            n_post100 = (supplier_coverage == 1.0).sum()
 
-        # Считаем количество поставщиков, покрывающих более 50%, 80% и 100% классов
-        n_50 = coverage_df[coverage_df['Процент покрытия'] > 0.5].groupby('ID Лота')['Поставщик'].nunique()
-        n_80 = coverage_df[coverage_df['Процент покрытия'] > 0.8].groupby('ID Лота')['Поставщик'].nunique()
-        n_100 = coverage_df[coverage_df['Процент покрытия'] == 1].groupby('ID Лота')['Поставщик'].nunique()
+            n_post = len(supplier_coverage)
 
-        # Считаем общее количество уникальных поставщиков по лотам
-        total_suppliers = coverage_df.groupby('ID Лота')['Поставщик'].nunique()
+            lot_ms_score = (2 * n_post50 + 3 * n_post80 + 4 * n_post100) / n_post
+            lot_scores.append(lot_ms_score)
 
-        ms = ((2 * n_50 + 3 * n_80 + 4 * n_100) / total_suppliers).mean()
-        return ms
+        # Возвращаем среднее значение, если есть оценки
+        return np.array(lot_scores).mean() if lot_scores else 0.0
 
-    def ma_score(self, lots: pd.DataFrame) -> float:
-        """Calculate MA (quality of clustering MTR by recipient address)"""
+    def ma_score(self, requests: pd.DataFrame, lots: pd.DataFrame, ) -> float:
+        """
+        Подсчет метрики MA -- качество кластеризации МТР по адресу грузополучателя
+        """
         # distances = []
         # for lot_id, group in lots.groupby('ID Лота'):
         #     coords = group[['latitude', 'longitude']].values
@@ -203,29 +222,83 @@ class Scorer:
         # ml = np.mean(logistic_costs) if logistic_costs else 0
         ml = 0
         return ml
-
-    def get_lot_mean_cost(self, lots: pd.DataFrame) -> float:
-        """Calculate mean cost of lots"""
-
-        return lots.groupby(['ID Лота'])['Планируемая сумма'].sum().mean()
-
-    def get_n_lot(self, lots: pd.DataFrame) -> int:
-        """Get the number of lots"""
-
-        return lots['ID Лота'].nunique()
-
-    def get_A(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
-        """Calculate A (relative number of lots)"""
-
-        n_lots = self.get_n_lot(lots)
-        human_n_lots = self.get_n_lot(human_lots)
-        A = 1 - (n_lots / human_n_lots)
-        return A
-
-    def get_B(self, lots: pd.DataFrame, human_lots: pd.DataFrame) -> float:
-        """Calculate B (relative mean cost of lots)"""
-
-        lot_mean_cost = self.get_lot_mean_cost(lots)
-        human_lot_mean_cost = self.get_lot_mean_cost(human_lots)
-        B = 1 - (human_lot_mean_cost / lot_mean_cost)
-        return B
+    #
+    # def lot_info(self, requests: pd.DataFrame, lots: pd.DataFrame) -> pd.DataFrame:
+    #     # Объединяем DataFrame запросов и лотов
+    #     requests_lots = pd.merge(requests, lots, on='request_id', how='inner')
+    #
+    #     # Определяем квантили, которые хотим рассчитать
+    #     quantiles = [0.25, 0.5, 0.75]  # 25-й, 50-й (медиана), 75-й процентиль
+    #
+    #     # Группируем по идентификатору лота и рассчитываем статистические характеристики
+    #     cost_stats = requests_lots.groupby('lot_id')['item_cost'].agg(
+    #         mean_cost='mean',
+    #         min_cost='min',
+    #         max_cost='max',
+    #         range_cost=lambda x: x.max() - x.min(),
+    #         median_cost='median',
+    #         count='count',
+    #         q1=lambda x: x.quantile(0.25),  # 25-й процентиль
+    #         q3=lambda x: x.quantile(0.75),  # 75-й процентиль
+    #         std_dev='std',  # стандартное отклонение
+    #         variance='var'  # дисперсия
+    #     ).reset_index()
+    #
+    #     # Рассчитываем дополнительные статистики по распределению
+    #     cost_stats['iqr'] = cost_stats['q3'] - cost_stats['q1']  # интерквартильный размах
+    #     cost_stats['cv'] = cost_stats['std_dev'] / cost_stats['mean_cost']  # коэффициент вариации
+    #
+    #     return cost_stats
+    #
+    # import matplotlib.pyplot as plt
+    # import seaborn as sns
+    #
+    # def lot_quantity_info(self, requests: pd.DataFrame, lots: pd.DataFrame) -> pd.DataFrame:
+    #     # Объединяем DataFrame запросов и лотов
+    #     requests_lots = pd.merge(requests, lots, on='request_id', how='inner')
+    #
+    #     # Определяем квантили, которые хотим рассчитать
+    #     quantiles = [0.25, 0.5, 0.75]  # 25-й, 50-й (медиана), 75-й процентиль
+    #
+    #     # Группируем по идентификатору лота и рассчитываем статистические характеристики по количеству предметов
+    #     quantity_stats = requests_lots.groupby('lot_id')['item_quantity'].agg(
+    #         mean_quantity='mean',
+    #         min_quantity='min',
+    #         max_quantity='max',
+    #         range_quantity=lambda x: x.max() - x.min(),
+    #         median_quantity='median',
+    #         count='count',
+    #         q1=lambda x: x.quantile(0.25),  # 25-й процентиль
+    #         q3=lambda x: x.quantile(0.75),  # 75-й процентиль
+    #         std_dev='std',  # стандартное отклонение
+    #         variance='var'  # дисперсия
+    #     ).reset_index()
+    #
+    #     # Рассчитываем дополнительные статистики по распределению
+    #     quantity_stats['iqr'] = quantity_stats['q3'] - quantity_stats['q1']  # интерквартильный размах
+    #     quantity_stats['cv'] = quantity_stats['std_dev'] / quantity_stats['mean_quantity']  # коэффициент вариации
+    #
+    #     # Визуализация
+    #     self.visualize_quantity_distribution(requests_lots)
+    #
+    #     return quantity_stats
+    #
+    # def visualize_quantity_distribution(self, requests_lots: pd.DataFrame):
+    #     plt.figure(figsize=(12, 6))
+    #
+    #     # Гистограмма
+    #     sns.histplot(requests_lots['item_quantity'], bins=30, kde=True)
+    #     plt.title('Распределение количества предметов в лотах')
+    #     plt.xlabel('Количество предметов')
+    #     plt.ylabel('Частота')
+    #     plt.grid()
+    #     plt.show()
+    #
+    #     # Ящик с усами (box plot)
+    #     plt.figure(figsize=(12, 6))
+    #     sns.boxplot(x=requests_lots['item_quantity'])
+    #     plt.title('Ящик с усами: Количество предметов в лотах')
+    #     plt.xlabel('Количество предметов')
+    #     plt.grid()
+    #     plt.show()
+    #

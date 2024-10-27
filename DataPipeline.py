@@ -425,3 +425,39 @@ class DataPipeline:
 # print(len(df.columns))
 #
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+
+
+# # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ МЕСЯЧНОГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
+#
+#
+# dp = DataPipeline()
+# db_proc = dp._db_processor
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+#
+# df = pd.read_csv('~/Desktop/data-222.csv')
+# # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
+# human_lots = df['human_lot_id']
+# lots = df['lot_id']
+# df.drop(columns=['lot_id', 'human_lot_id'], inplace=True)
+#
+# dp.put_requests(df, human_lots=human_lots)
+# print(1)
+#
+# df = dp.get_requests_features(human_lots_essential=False)
+# df.to_csv('requests_features.csv', mode='w', index=False)
+# print(df)
+# print(len(df.columns))
+# #
+# requests = dp.get_requests()
+# requests.rename(columns={'№ заявки': 'request_id'}, inplace=True)
+# requests = requests['request_id']
+# # df = pd.read_csv('~/Desktop/2020-2.csv')
+# # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
+# # lots = df['lot_id']
+# lots = pd.concat([requests, lots], axis=1, ignore_index=True)
+# human_lots = pd.concat([requests, human_lots], axis=1, ignore_index=True)
+# lots.to_csv('lots.csv', mode='w', index=False)
+# human_lots.to_csv('human_lots.csv', mode='w', index=False)
+# #
+# #
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
