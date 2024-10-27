@@ -409,7 +409,7 @@ class DataPipeline:
 
 #
 # # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ ОООБЩЕГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
-# #
+#
 # dp = DataPipeline()
 # db_proc = dp._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
