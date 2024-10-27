@@ -92,7 +92,6 @@ if (dfDataDiv.textContent !== '') {
             Object.values(row).forEach(cellData => {
                 const td = document.createElement("td");
                 td.textContent = cellData;
-                td.contentEditable = true;
                 tr.appendChild(td);
             });
             tableBody.appendChild(tr);
@@ -101,30 +100,44 @@ if (dfDataDiv.textContent !== '') {
 }
 
 submitOrderBtn.addEventListener('click', function() {
-    const rows = Array.from(tableBody.querySelectorAll('tr'));
-    const headers = Array.from(rows[0].children).map(header => header.textContent);
-    
-    const data = rows.slice(1).map(row => {
-        const cells = Array.from(row.children);
-        const rowData = {};
-        cells.forEach((cell, index) => {
-            rowData[headers[index]] = cell.textContent;
+    if (submitOrderBtn.textContent === "Редактировать") {
+        submitOrderBtn.textContent = "Сохранить";
+        const cells = tableBody.querySelectorAll('td');
+        cells.forEach(cell => {
+            cell.contentEditable = true;
+        })
+    }
+    else {
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        const headers = Array.from(rows[0].children).map(header => header.textContent);
+        
+        const data = rows.slice(1).map(row => {
+            const cells = Array.from(row.children);
+            const rowData = {};
+            cells.forEach((cell, index) => {
+                rowData[headers[index]] = cell.textContent;
+            });
+            return rowData;
         });
-        return rowData;
-    });
 
-    fetch('/api/update_df', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (!response.ok) {
-            alert("Error with database");
-        }
-        else {
-            alert("Edited successfully");
-        }
-    })
-    .catch(error => console.error("Error updating CSV data:", error));
+        fetch('/api/update_df', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                alert("Error with database");
+            }
+            else {
+                alert("Edited successfully");
+            }
+        })
+        .catch(error => console.error("Error updating CSV data:", error));
+        submitOrderBtn.textContent = "Редактировать";
+        const cells = tableBody.querySelectorAll('td');
+        cells.forEach(cell => {
+            cell.contentEditable = false;
+        })
+    }
 });

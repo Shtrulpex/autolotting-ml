@@ -273,3 +273,40 @@ table th, table td {
     word-break: break-word;
     border: 0;
 }
+
+.header-order {
+    margin: 0;
+    display: inline-block;
+}
+
+.order-info {
+    display: inline-block;
+}
+
+.close-order {
+    display: inline-block;
+}
+
+.edit-save-button {
+    display: inline-block;
+    margin-top: 10px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 16px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
