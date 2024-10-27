@@ -160,7 +160,7 @@ class DataPipeline:
 
         query = f'''
         SELECT DISTINCT
-            requests.request_id AS '№ заявки',
+            requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
             requests.material_id AS "Материал",
             materials.material_name AS "Краткий текст материала",
@@ -409,7 +409,7 @@ class DataPipeline:
 
 #
 # # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ ОООБЩЕГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
-# #
+#
 # dp = DataPipeline()
 # db_proc = dp._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
@@ -431,7 +431,7 @@ class DataPipeline:
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
 
 
-# # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ МЕСЯЧНОГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
+## ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ МЕСЯЧНОГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
 #
 #
 # dp = DataPipeline()
@@ -442,7 +442,7 @@ class DataPipeline:
 # # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
 # human_lots = df['human_lot_id']
 # lots = df['lot_id']
-# df.drop(columns=['lot_id', 'human_lot_id'], inplace=True)
+# df.drop(columns=['lot_id', 'human_lot_id'], inplace=True)  # остается чисто шаблон
 #
 # dp.put_requests(df, human_lots=human_lots)
 # print(1)
