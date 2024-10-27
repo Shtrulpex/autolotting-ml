@@ -82,7 +82,10 @@ class DataPipeline:
         """Загружает в БД данные заявки, поданной в формате шаблона"""
 
         df = requests.copy()
-        df['human_lot_id'] = human_lots.astype('Int64')
+        if human_lots:
+            df['human_lot_id'] = human_lots.astype('Int64')
+        else:
+            df['human_lot_id'] = None
         df.rename(columns={'Дата заказа': 'order_dt',
                            '№ заказа': 'order_id',
                            '№ позиции': 'item_id',
