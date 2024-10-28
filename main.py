@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from bdExchange import xlxsToDf, getOrder, editOrder
+from bdExchange import xlxsToDf, getOrder, editOrder, dfToXlxs
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -17,6 +17,8 @@ def home():
 
 @app.route("/order_load_page.html")
 def load_order():
+    global ORDER_ID
+    ORDER_ID = 0
     return render_template("order_load_page.html")
 
 FILE_FOLDER = './files'
@@ -25,11 +27,13 @@ if not os.path.exists(FILE_FOLDER):
 
 @app.route("/order_page.html")
 def order():
-    # if ORDER_ID == -1:
-        # return render_template("order_page.html")
-    # else:
-    dfdata = getOrder().to_json(orient='records')
-    return render_template("order_page.html", data=dfdata)
+    global ORDER_ID
+    print(ORDER_ID)
+    if ORDER_ID == -1:
+        return render_template("order_page.html")
+    else:
+        dfdata = getOrder().to_json(orient='records')
+        return render_template("order_page.html", data=dfdata)
 
 @app.route("/lots_page.html")
 def lots():
@@ -79,8 +83,8 @@ def download_file():
     # здесь на сайт выводятся метрики, параметры, графики и пр.
 
     if os.path.exists(csvpath):
-        print(csvpath)
-        return send_file(csvpath, as_attachment=True, download_name="lots.csv", mimetype='text/csv')
+        xlsxpath = dfToXlxs(csvpath)
+        return send_file(xlsxpath, as_attachment=True, download_name="excel.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     else:
         return jsonify({"error": "File not found"}), 404
 

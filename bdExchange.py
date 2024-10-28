@@ -16,3 +16,9 @@ def getOrder():
 def editOrder(data):
     df = pd.DataFrame(data)
     df.to_csv("./files/enter.csv", index=False)
+
+def dfToXlxs(filepath):
+    df = pd.read_csv(filepath)
+    xlsxpath = '.'.join(filepath.split('.')[:-1])+".xlsx"
+    df.to_excel(xlsxpath, sheet_name="Sheet1")
+    return xlsxpath
