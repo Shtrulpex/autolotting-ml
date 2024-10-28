@@ -40,7 +40,7 @@ ordersBtn.addEventListener('click', function() {
 
 filterInput.addEventListener('input', function() {
     if (filterInput.value.trim() === '') {
-        filterInput.placeholder = 'Добавить фильтры';
+        filterInput.placeholder = 'Поиск заказа';
     } else {
         filterInput.placeholder = '';
     }

@@ -39,15 +39,22 @@
 
     <div id="sidebar-orders" class="sidebar-orders">
         <ul>
-            <li><input type="text" id="filters" placeholder="Добавить фильтры">
-                <div class="filters-box" id="filters-box">
-                    <ul id="filters-ul">
-                    </ul>
-                </div></li>
+            <li>
+                <h2>Фильтры</h2>
+                <ul class="sidebar-filters-menu-scroll">
+                    {% for i in range(1, 21) %}
+                    <li><input type="checkbox" id="option{{i}}"><label for="option{{i}}">Option {{i}}</label></li>
+                    {% endfor %}
+                    <li><button>Применить фильтры</button></li>
+                </ul>
+            </li>
             <li><a href="/order_load_page.html">Загрузить заказ</a></li>
-            <li><div>Все заказы</div>
+            <li><div><h2>Все заказы</h2></div>
+                <input type="text" id="filters" placeholder="Поиск заказа">
                 <div><ul class="sidebar-orders-menu-scroll">
-                    <li><a href="#option1">Option 1</a></li>
+                    {% for i in range(1, 21) %}
+                    <li><h4>Option {{i}}</h4></li>
+                    {% endfor %}
                 </ul></div></li>
         </ul>
     </div>

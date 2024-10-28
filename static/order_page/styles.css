@@ -121,15 +121,49 @@ body:hover .sidebar {
     font-size: 18px;
 }
 
-.sidebar-orders-menu-scroll {
+.sidebar-filters-menu-scroll {
+    height: 270px;
+    overflow-y: hidden;
+    padding: 10px;
+    margin: 20px 0;
+}
+
+.sidebar-filters-menu-scroll:hover {
     overflow-y: scroll;
-    position: relative;
-    /* right:30px; */
+}
+
+.sidebar-filters-menu-scroll li {
+    border-bottom: 1px solid #555;
+    list-style-type: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-filters-menu-scroll li label {
+    margin-left: 10px;
+}
+
+
+.sidebar-orders-menu-scroll {
+    height: 270px;
+    overflow-y: hidden;
+    padding: 10px;
+    margin: 20px 0;
+}
+
+.sidebar-orders-menu-scroll:hover {
+    overflow-y: scroll;
 }
 
 .sidebar-orders-menu-scroll li {
     border-bottom: 1px solid #555;
+    list-style-type: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
 }
+
 
 .menu-btn:hover {
     background-color: var(--menu-color);
