@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from main_logic import xlxsToDf, getOrder, editOrder, dfToXlxs
+from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs
 from Aglomerative.AglomerativeCluster import Solver
 
 app = Flask(__name__)
@@ -33,10 +33,12 @@ def order():
     global ORDER_ID
     print(ORDER_ID)
     if ORDER_ID == -1:
-        return render_template("order_page.html")
+        df_orders = getOrders().to_json(orient='records')
+        return render_template("order_page.html", all_orders=df_orders)
     else:
-        dfdata = getOrder().to_json(orient='records')
-        return render_template("order_page.html", data=dfdata)
+        # dfdata = getOrders().to_json(orient='records')
+        df_orders = getOrders().to_json(orient='records')
+        return render_template("order_page.html", all_orders=df_orders)#, data=dfdata)
 
 @app.route("/lots_page.html")
 def lots():
@@ -60,9 +62,11 @@ def upload_file():
     if file and file.filename.endswith('.xlsx'):
         filepath = os.path.join(FILE_FOLDER, file.filename)
         file.save(filepath)
-        xlxsToDf(filepath)
-
-        return jsonify({'message': f'File successfully uploaded: {file.filename}'}), 200
+        success = xlxsToDf(filepath)
+        if success:
+            return jsonify({'message': f'File successfully uploaded: {file.filename}'}), 200
+        else:
+            return jsonify({'message': f'File does not match template'}), 400
     else:
         return jsonify({'message': 'Only .xlsx files are allowed'}), 400
 
@@ -104,8 +108,8 @@ def submit_dates():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     print(f"Start Date: {start_date}, End Date: {end_date}")
-    return jsonify({"message": "Dates received", "start_date": start_date, "end_date": end_date})
-
+    df = getOrders().to_json(orient='records')
+    return jsonify({"message": df})
 
 if __name__ == "__main__":
     app.run(debug=True)

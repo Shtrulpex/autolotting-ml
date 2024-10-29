@@ -6,6 +6,7 @@
     <title>XLSX Uploader</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/order_page/styles.css') }}">
     <div id="dataDiv" style="display: none;">{{data}}</div>
+    <div id="all-data-div" style="display: none;">{{all_orders}}</div>
 </head>
 <body>
     <div class="header">
@@ -52,10 +53,7 @@
             <li><a href="/order_load_page.html">Загрузить заказ</a></li>
             <li><div><h2>Все заказы</h2></div>
                 <input type="text" id="filters" placeholder="Поиск заказа">
-                <div><ul class="sidebar-orders-menu-scroll">
-                    {% for i in range(1, 21) %}
-                    <li><h4>Option {{i}}</h4></li>
-                    {% endfor %}
+                <div><ul class="sidebar-orders-menu-scroll" id="all-orders-ul">
                 </ul></div></li>
         </ul>
     </div>

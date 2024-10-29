@@ -8,6 +8,8 @@ const filtersUl = document.getElementById("filters-ul");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
 const dfDataDiv = document.getElementById("dataDiv");
+const allDfDiv = document.getElementById("all-data-div");
+const ulSidebarAllDf = document.getElementById("all-orders-ul");
 const submitOrderBtn = document.getElementById("submitOrderBtn");
 
 menuBtn.addEventListener('click', function() {
@@ -96,6 +98,22 @@ if (dfDataDiv.textContent !== '') {
             });
             tableBody.appendChild(tr);
         });
+    }
+}
+
+if (allDfDiv.textContent !== '') {
+    const allDfData = JSON.parse(allDfDiv.textContent);
+    if (allDfData.length > 0) {
+        allDfData.forEach(row => {
+            const li = document.createElement("li");
+            Object.values(row).forEach(cellData => {
+                const h5 = document.createElement("h5");
+                h5.textContent = cellData;
+                h5.textContent
+                li.appendChild(h5);
+            })
+            ulSidebarAllDf.appendChild(li);
+        })
     }
 }
 

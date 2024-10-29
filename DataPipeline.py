@@ -416,7 +416,7 @@ class DataPipeline:
 #
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
 # db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
-# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;') С ПОМОЩЬЮ ЭТОГО МОЖНО ДРОПНУТЬ ВСЕ ТАБЛИЦЫ ПЕРЕД ЗАПУСКОМ
 #
 # df = pd.read_csv('~/Desktop/data-222.csv')
 # lots = df['lot_id']
