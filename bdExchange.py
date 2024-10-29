@@ -4,6 +4,7 @@ import os
 def xlxsToDf(filepath):
     df = pd.read_excel(filepath, "Sheet1")
     # Зесь методы проверки на шаблон df
+    # Зесь методы проверки на шаблон df
     # валидация
     #
     csvname = '.'.join(filepath.split('.')[:-1])+'.csv'
@@ -28,4 +29,4 @@ def dfToXlxs(filepath):
     df.to_excel(xlsxpath, sheet_name="Sheet1")
     return xlsxpath
 
-# фнукиця вызывать по кнопке и тп
+# функция вызывать по кнопке и тп

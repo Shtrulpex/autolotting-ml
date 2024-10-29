@@ -145,6 +145,22 @@ body:hover .sidebar {
     left: -300px;
 }
 
+.menu-btn:hover {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    opacity: 1;
+}
+
+.header {
+    position: relative;
+    z-index: 2;
+}
+
+.header h2 {
+    margin: auto;
+}
+
+
 .sidebar-orders {
     position: absolute;
     left: -300px;
@@ -157,6 +173,8 @@ body:hover .sidebar {
     transition: left 0.5s ease;
     padding-bottom: 0;
     padding-top: 10px;
+    flex-direction: column;
+    align-items: center;
 }
 
 .sidebar-orders ul {
@@ -178,20 +196,72 @@ body:hover .sidebar {
     font-size: 18px;
 }
 
-.sidebar-orders-menu-scroll {
+.sidebar-filters-menu-scroll {
+    height: 240px;
+    overflow-y: hidden;
+    padding: 10px;
+    margin: 20px 0;
+}
+
+.sidebar-filters-menu-scroll:hover {
     overflow-y: scroll;
-    position: relative;
-    /* right:30px; */
+}
+
+.sidebar-filters-menu-scroll li {
+    border-bottom: 1px solid #555;
+    list-style-type: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-filters-menu-scroll li label {
+    margin-left: 10px;
+}
+
+
+.sidebar-orders-menu-scroll {
+    height: 270px;
+    overflow-y: hidden;
+    padding: 10px;
+    margin: 20px 0;
+}
+
+.sidebar-orders-menu-scroll:hover {
+    overflow-y: scroll;
 }
 
 .sidebar-orders-menu-scroll li {
     border-bottom: 1px solid #555;
+    list-style-type: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
 }
 
-.menu-btn:hover {
-    background-color: var(--menu-color);
-    color: var(--bright-text-color);
+.order_filter {
+    display: block;
+    margin-top: 5px;
+    margin-left: 5px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 24px;
     opacity: 1;
+    outline: 0 solid transparent;
+    padding: 2px 6px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
 }
 
 #ordersBtn:hover + #sidebar-orders-menu {
@@ -224,40 +294,6 @@ body:hover .sidebar-orders {
     left: -300px;
 }
 
-.header {
-    position: relative;
-    z-index: 2;
-}
-
-.order_filter {
-    display: block;
-    margin-top: 5px;
-    margin-left: 5px;
-    background: #5E5DF0;
-    border-radius: 999px;
-    box-shadow: #5E5DF0 0 5px 5px -5px;
-    box-sizing: border-box;
-    color: #FFFFFF;
-    cursor: pointer;
-    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 24px;
-    opacity: 1;
-    outline: 0 solid transparent;
-    padding: 2px 6px;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: manipulation;
-    width: fit-content;
-    word-break: break-word;
-    border: 0;
-}
-
-.filters-box {
-    /* display: none; */
-}
-
 .filters-box ul{
     margin: 0 0 0 auto;
     padding: 0;
@@ -271,8 +307,6 @@ body:hover .sidebar-orders {
     padding-left: -3px;
     display: inline-block;
 }
-
-
 
 #filters {
     font-family: sans-serif;
@@ -292,6 +326,115 @@ body:hover .sidebar-orders {
     color: black;
 }
 
-.header h2 {
-    margin: auto;
+
+#submitOrderBtn {
+    margin-top: 10px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 16px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+#calendarBtn, #submitDatesBtn, #submitFilters {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 18px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 8px 15px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+.hidden-calendar {
+    display: none;
+}
+
+#calendarMenu {
+    position: absolute;
+    top: 220px;
+    left: 90px;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    overflow: visible;
+}
+
+#calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-date {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.calendar-date:hover, .selected-date {
+    background-color: #87CEEB;
+    color: white;
+}
+
+.range-date {
+    background-color: #d0e7ff;
+}
+
+.close-btn {
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    position: absolute;
+    right: -5px;
+    top: -5px;
+}
+
+.close-btn:hover {
+    color: #555;
 }

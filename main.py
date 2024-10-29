@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from bdExchange import xlxsToDf, getOrder, editOrder, dfToXlxs
+from dbExchange import xlxsToDf, getOrder, editOrder, dfToXlxs
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -87,6 +87,15 @@ def download_file():
         return send_file(xlsxpath, as_attachment=True, download_name="excel.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     else:
         return jsonify({"error": "File not found"}), 404
+
+@app.route('/api/submit-dates', methods=['POST'])
+def submit_dates():
+    data = request.get_json()
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+    print(f"Start Date: {start_date}, End Date: {end_date}")
+    return jsonify({"message": "Dates received", "start_date": start_date, "end_date": end_date})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
