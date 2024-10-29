@@ -3,6 +3,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from typing import Tuple, Optional, Union, List
 
 
 class DBProcessor:
@@ -54,26 +55,11 @@ class DBProcessor:
 
 
 class DataPipeline:
-    '''
+    """
     Класс является связующим звеном между БД и остальной программой.
     Выгружает из БД данные и формируюет pd.DataFrame'ы под определенные нужды программ.
     Загружает в БД pd.DataFrame'ы
-    '''
-
-    TRANSLATE = {
-        'client_id': 'Клиент',
-        'material_id': 'Материал',
-        'material_name': 'Краткий текст материала',
-        'measure_unit': 'ЕИ',
-        'materials_amount': 'Общее количество',
-        'delivery_dt': 'Срок поставки',
-        'receiver_id': 'Грузополучатель',
-        'material_price': 'Цена',
-        'purchase_method': 'Способ закупки',
-        'item_id': '№ заказа',
-        'order_id': '№ позиции',
-        'order_dt': 'Дата заказа'
-    }
+    """
 
     def __init__(self):
         self._db_processor = DBProcessor()
@@ -82,7 +68,10 @@ class DataPipeline:
         """Загружает в БД данные заявки, поданной в формате шаблона"""
 
         df = requests.copy()
-        df['human_lot_id'] = human_lots.astype('Int64')
+        if human_lots is not None:
+            df['human_lot_id'] = human_lots.astype('Int64')
+        else:
+            df['human_lot_id'] = None
         df.rename(columns={'Дата заказа': 'order_dt',
                            '№ заказа': 'order_id',
                            '№ позиции': 'item_id',
@@ -122,7 +111,7 @@ class DataPipeline:
         query_new_ids = f'''
               SELECT request_id FROM requests WHERE request_id > {last_id_before_insert}
           '''
-        request_ids = pd.Series(np.array(self._db_processor.run_query(query_new_ids).fetchall()).flatten())
+        request_ids = pd.Series(np.array(self._db_processor.run_query(query_new_ids).fetchall()).flatten(), name='request_id')
         return request_ids
 
     def put_pack(self, pack_name: str, lots: pd.DataFrame) -> int:
@@ -152,12 +141,39 @@ class DataPipeline:
 
         return pack_id
 
-    def get_requests(self, **filters) -> pd.DataFrame:
-        """Выгружает все загруженные заявки по заданным фильтрам в формате входного шаблона + request_id"""
+    def get_orders(self, from_dt: Optional[str] = None, to_dt: Optional[str] = None) -> pd.DataFrame:
+        """Выгружает все заказы по заданным фильтрам"""
+
+        query = '''
+        SELECT DISTINCT
+            requests.order_id AS "№ заказа",
+            requests.order_dt AS "Дата заказа",
+            requests.client_id AS "Клиент"
+        FROM requests
+        '''
+
+        conditions = []
+        if from_dt:
+            conditions.append(f"requests.order_dt >= '{from_dt}'")
+        if to_dt:
+            conditions.append(f"requests.order_dt <= '{to_dt}'")
+
+        if conditions:
+            query += "\nWHERE\n\t" + "\n\tAND ".join(conditions)
+
+        return self._db_processor.get_df(query)
+
+    def get_requests(self, order_id: Union[int, List[int]]) -> pd.DataFrame:
+        """Выгружает все загруженные заявки по заданному/нескольким номеру(ам) заказа."""
+
+        if isinstance(order_id, list):
+            order_condition = f"requests.order_id IN ({', '.join(map(str, order_id))})"
+        else:
+            order_condition = f"requests.order_id = {order_id}"
 
         query = f'''
         SELECT DISTINCT
-            requests.request_id AS '№ заявки',
+            requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
             requests.material_id AS "Материал",
             materials.material_name AS "Краткий текст материала",
@@ -166,7 +182,7 @@ class DataPipeline:
             strftime('%m', requests.delivery_dt) AS "Месяц поставки",
             strftime('%Y', requests.delivery_dt) AS "Год поставки",
             CASE 
-            	WHEN strftime('%m', requests.delivery_dt) <= 6 THEN 1
+                WHEN strftime('%m', requests.delivery_dt) <= 6 THEN 1
                 ELSE 2
             END AS "Полугодие",
             requests.delivery_dt AS "Срок поставки",
@@ -179,10 +195,13 @@ class DataPipeline:
         FROM requests
         INNER JOIN materials
             ON requests.material_id = materials.material_id
+        WHERE {order_condition}
         '''
+
         return self._db_processor.get_df(query)
 
-    def get_packs(self, **filters) -> pd.DataFrame:
+    def get_packs(self, from_dttm: Optional[str] = None, to_dttm: Optional[str] = None,
+                  algorithm: Optional[str] = None) -> pd.DataFrame:
         """Выгружает все паки лотов по заданным фильтрам"""
 
         query = f'''
@@ -192,6 +211,17 @@ class DataPipeline:
             packs.formation_dttm
         FROM packs
         '''
+        conditions = []
+        if from_dttm:
+            conditions.append(f"packs.formation_dttm >= '{from_dttm}'")
+        if to_dttm:
+            conditions.append(f"packs.formation_dttm <= '{to_dttm}'")
+        if algorithm:
+            conditions.append(f"packs.pack_name LIKE %{algorithm}%")
+
+        if conditions:
+            query += "\nWHERE\n\t" + "\n\tAND ".join(conditions)
+
         return self._db_processor.get_df(query)
 
     def get_lots(self, pack_id: int) -> pd.DataFrame:
@@ -224,21 +254,28 @@ class DataPipeline:
             ON requests.material_id = materials.material_id
         INNER JOIN lottings
             ON lottings.request_id = requests.request_id
-            AND lottings.pack_id = {pack_id}
+        WHERE lottings.pack_id = {pack_id}
         '''
         return self._db_processor.get_df(query)
 
-    def get_requests_features(self, human_lots_essential: bool = False, **filters) -> pd.DataFrame:
+    def get_requests_features(self, human_lots_essential: bool = True, **filters):
         """
         Выгружает все заявки по зад фильтрам (время + другие) в супер-расширенном формате с указанием всех
          поставщиков заявки
         Если human_lots_essential = True, то выгружает только заявки с известными лотами человека, иначе - все заявки
         """
 
-        query = f'''
+        query_human_lots = f'''
+        SELECT DISTINCT
+            requests.request_id,
+            requests.human_lot_id
+        FROM requests
+        {'WHERE human_lot_id IS NOT NULL' if human_lots_essential else ''}
+        '''
+
+        query_request_features = f'''
         WITH t1 AS (
             SELECT DISTINCT
-                human_lot_id,
                 requests.request_id,
                 requests.order_dt,
                 requests.delivery_dt,
@@ -300,7 +337,10 @@ class DataPipeline:
         LEFT JOIN t2
             ON t1.class_id = t2.class_id;
         '''
-        return self._db_processor.get_df(query)
+
+        request_features = self._db_processor.get_df(query_request_features)
+        human_lots = self._db_processor.get_df(query_human_lots)
+        return request_features, human_lots
 
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ФОРМИРОВАНИЯ БД ИЗ CSV ФАЙЛОВ
@@ -355,27 +395,52 @@ class DataPipeline:
 #         db_proc.load_df(table_name, df, pk_column=id_columns.get(table_name, None))
 
 
-
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ПРОВЕРКИ РАБОТЫ DataPipeline
-# df = dp.get_requests_features()
-# df.to_csv('requests_features.csv', mode='w', index=False)
-# print(df)
-# print(len(df.columns))
-#
-# df = dp.get_requests()
-# df.to_csv('requests_features.csv', mode='w', index=False)
-# print(df)
-# print(len(df.columns))
 
-# df = dp.get_packs()
-# print(df)
+# dp = DataPipeline()
+# db_proc = dp._db_processor
 #
-# pack_id = df['pack_id'].iloc[-1]
-# df = dp.get_lots(pack_id)
-# print(df)
-# print(df.info())
-# df.to_csv('requests_features.csv', mode='w', index=False)
-
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
+#
+# df = pd.read_csv('~/Desktop/data-222.csv')
+# lots = df['lot_id']
+# human_lots = df['human_lot_id']
+# df.drop(columns=['human_lot_id', 'lot_id'], inplace=True)
+#
+# request_ids = dp.put_requests(df, human_lots)
+# print(0)
+#
+# features, human_lots = dp.get_requests_features()
+# features.to_csv('requests_features.csv', mode='w', index=False)
+# human_lots.to_csv('human_lots.csv', mode='w', index=False)
+# print(1)
+#
+# orders = dp.get_orders()
+# orders.to_csv('orders.csv', mode='w', index=False)
+# print(2)
+#
+# requests = dp.get_requests(order_id=orders['№ заказа'].iloc[:2].tolist())
+# requests.to_csv('requests.csv', mode='w', index=False)
+# print(3)
+#
+# lots = pd.concat([lots, request_ids], axis=1)
+# pack_id = dp.put_pack('aglomerative', lots)
+# print(4)
+#
+# packs = dp.get_packs()
+# packs.to_csv('packs.csv', mode='w', index=False)
+# print(5)
+#
+# lots = dp.get_lots(pack_id=pack_id)
+# lots.to_csv('lots.csv', mode='w', index=False)
+# print(6)
+#
+#
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
 
 '''
 ВСЕ ВОЗВРАЩАЕТСЯ В df
@@ -415,10 +480,11 @@ class DataPipeline:
 # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
 # human_lots = df['lot_id']
 # df.drop(columns=['lot_id'], inplace=True)
-#
-# dp.put_requests(df, human_lots=human_lots)
+# #
+# dp.put_requests(df)
 # print(1)
-#
+# print(dp.get_requests())
+# #
 # df = dp.get_requests_features(human_lots_essential=False)
 # df.to_csv('requests_features.csv', mode='w', index=False)
 # print(df)
@@ -427,7 +493,7 @@ class DataPipeline:
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
 
 
-# # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ МЕСЯЧНОГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
+## ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ МЕСЯЧНОГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
 #
 #
 # dp = DataPipeline()
@@ -438,7 +504,7 @@ class DataPipeline:
 # # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
 # human_lots = df['human_lot_id']
 # lots = df['lot_id']
-# df.drop(columns=['lot_id', 'human_lot_id'], inplace=True)
+# df.drop(columns=['lot_id', 'human_lot_id'], inplace=True)  # остается чисто шаблон
 #
 # dp.put_requests(df, human_lots=human_lots)
 # print(1)

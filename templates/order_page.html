@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XLSX Uploader</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/order_page/styles.css') }}">
+    <div id="dataDiv" style="display: none;">{{data}}</div>
+</head>
+<body>
+    <div class="header">
+        <button class="menu-btn" id="menuBtn">☰ Главное меню</button>
+        <button class="menu-btn" id="ordersBtn"><<</button>
+        <h2><u>Заказы</u></h2>
+        <h2>Сформировать</h2>
+        <h2>Лоты</h2>
+    </div>
+
+    <div class="table-section" id="tableSection">
+        <table>
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+        <button id="submitOrderBtn">Сохранить</button>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li><a href="/home.html">Главная страница</a></li>
+            <li><a href="/order_page.html">Страница заказов</a></li>
+            <li><a href="/lots_page.html">Страница формирования лотов</a></li>
+            <li><a href="/lots_page.html">Страница лотов</a></li>
+        </ul>
+    </div>
+
+    <div id="sidebar-orders" class="sidebar-orders">
+        <ul>
+            <li>
+                <h2>Фильтры</h2>
+                <button id="calendarBtn">Открыть календарь</button>
+                <ul class="sidebar-filters-menu-scroll">
+                    {% for i in range(1, 21) %}
+                    <li><input type="checkbox" id="option{{i}}"><label for="option{{i}}">Option {{i}}</label></li>
+                    {% endfor %}
+                    <li><button id="submitFilters">Применить фильтры</button></li>
+                </ul>
+            </li>
+            <li><a href="/order_load_page.html">Загрузить заказ</a></li>
+            <li><div><h2>Все заказы</h2></div>
+                <input type="text" id="filters" placeholder="Поиск заказа">
+                <div><ul class="sidebar-orders-menu-scroll">
+                    {% for i in range(1, 21) %}
+                    <li><h4>Option {{i}}</h4></li>
+                    {% endfor %}
+                </ul></div></li>
+        </ul>
+    </div>
+
+    <div id="calendarMenu" class="hidden-calendar">
+        <div id="calendarHeader">
+            <button id="prevMonth">&lt;</button>
+            <span id="monthYear"></span>
+            <button id="nextMonth">&gt;</button>
+            <button id="closeCalendar" class="close-btn">✕</button>
+        </div>
+        <div id="calendar"></div>
+        <button id="submitDatesBtn">Выбрать даты</button>
+    </div>
+
+    <script src="{{ url_for('static',filename='/order_page/script.js') }}"></script>
+</body>
+</html>
