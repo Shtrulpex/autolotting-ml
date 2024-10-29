@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
 from dbExchange import xlxsToDf, getOrder, editOrder, dfToXlxs
-=======
-from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file
-import os
-from xlsxToCsv import xlxsToDf
 from Aglomerative.AglomerativeCluster import Solver
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -24,7 +18,6 @@ def main():
 def home():
     return redirect(url_for("main"))
 
-<<<<<<< HEAD
 @app.route("/order_load_page.html")
 def load_order():
     global ORDER_ID
@@ -44,29 +37,17 @@ def order():
     else:
         dfdata = getOrder().to_json(orient='records')
         return render_template("order_page.html", data=dfdata)
-=======
-
-@app.route("/orders_page.html")
-def orders():
-    return render_template("orders_page.html")
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b
-
 
 @app.route("/lots_page.html")
 def lots():
     return render_template("lots_page.html")
-
-<<<<<<< HEAD
-@app.route('/api/upload', methods=['POST'])
-=======
 
 FILE_FOLDER = './files'
 if not os.path.exists(FILE_FOLDER):
     os.makedirs(FILE_FOLDER)
 
 
-@app.route('/upload', methods=['POST'])
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b
+@app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'message': 'No file part in the request'}), 400
@@ -85,7 +66,6 @@ def upload_file():
     else:
         return jsonify({'message': 'Only .xlsx files are allowed'}), 400
 
-<<<<<<< HEAD
 @app.route('/api/update_df', methods=['POST'])
 def update_df():
     data = request.get_json()
@@ -93,10 +73,6 @@ def update_df():
     return jsonify({'status': 'success'}), 200
 
 @app.route('/api/download', methods=['GET'])
-=======
-
-@app.route('/download', methods=['GET'])
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b
 def download_file():
     csvpath = ""
     for file in os.listdir("./files"):
@@ -107,11 +83,8 @@ def download_file():
     # здесь заказ проверяет Inspector
     # здесь заказ загружается в БД
     # здесь заказы за месяц выгружаются из БД
-<<<<<<< HEAD
-=======
     lotter = Solver()
     lotter.get_lots(csvpath, csvpath)
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b
     # здесь заказы за месяц отправляются в autolotting-ml а сформированные лоты попадают в файл по пути csvpath
     # здесь сформироанные лоты загружаются в БД а сами лоты отправляются пользователю
     # здесь Scorer считает целевые бизнес-метрики
@@ -120,7 +93,6 @@ def download_file():
     # здесь на сайт выводятся метрики, параметры, графики и пр.
 
     if os.path.exists(csvpath):
-<<<<<<< HEAD
         xlsxpath = dfToXlxs(csvpath)
         return send_file(xlsxpath, as_attachment=True, download_name="excel.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     else:
@@ -137,13 +109,3 @@ def submit_dates():
 
 if __name__ == "__main__":
     app.run(debug=True)
-=======
-        print(csvpath)
-        return send_file(csvpath, as_attachment=True, download_name="lots.csv", mimetype='text/csv')
-    else:
-        return jsonify({"error": "File not found"}), 404
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b

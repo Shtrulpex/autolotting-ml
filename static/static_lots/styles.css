@@ -137,20 +137,12 @@ table th, table td {
 .sidebar {
     position: fixed;
     left: -300px;
-<<<<<<< HEAD:static/static_lots/styles.css
     top: 100px;
     width: 300px;
     height: calc(100% - 110px);
     /* background-color: #444; */
     color: white;
     overflow: hidden;
-=======
-    top: 100px; 
-    width: 300px;
-    height: calc(100% - 100px);
-    background-color: var(--menu-color);
-    color: var(--bright-text-color);
->>>>>>> 63a7536a1cf395dadf8733dcc2ad22d214708a9b:static/static3/styles.css
     transition: left 0.5s ease;
     padding-top: 20px;
 }
