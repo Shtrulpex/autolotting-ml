@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 
 class ValidationError(Exception):
@@ -33,30 +34,14 @@ class TypeMismatchError(ValidationError):
         super().__init__(f"Ошибка: Тип в колонке '{column}' ожидается '{expected_type}', найден '{actual_type}'")
 
 
-class Scaler:
-    def __init__(self):
-        pass
-
-    def output_transform(self, lots: pd.DataFrame, inplace: bool = True) -> pd.DataFrame:
-        if not inplace:
-            lots = lots.copy()
-        lots['Планируемая сумма'] = lots['Общее количество'] * lots['Цена']
-        return lots
-
-    def input_transform(self, requests: pd.DataFrame, inplace: bool = True) -> pd.DataFrame:
-        if not inplace:
-            requests = requests.copy()
-        requests['latitude'] = requests['Адрес'].apply(self._get_latitude)
-        requests['longitude'] = requests['Адрес'].apply(self._get_longitude)
-        return requests
-
-    @staticmethod
-    def _get_latitude(address: str) -> float:
-        return 0.0
-
-    @staticmethod
-    def _get_longitude(address: str) -> float:
-        return 0.0
+class DeliveryTimeError(ValidationError):
+    def __init__(self, order_id, position_id, remaining_days, standard_days):
+        self.order_id = order_id
+        self.position_id = position_id
+        self.remaining_days = remaining_days
+        self.standard_days = standard_days
+        super().__init__(f"Ошибка: Мало времени для поставки позиции '{position_id}' заказа '{order_id}'"
+                         f" - осталось {remaining_days} дней, \tстандарт {standard_days} дней.")
 
 
 class Validator:
@@ -123,14 +108,20 @@ class Validator:
                     actual_type = requests[col].dtype
                     raise TypeMismatchError(col, expected_type, actual_type)
 
-        return True
+        # Проверка нормативных сроков поставки
+        now = pd.Timestamp(datetime.now())
+        for index, request in requests.iterrows():
+            material_id = request['Материал']
+            standard_shipping = self._delivery_standards.loc[self._delivery_standards['material_id'] == material_id,
+                                                             'standard_shipping']
+            if not standard_shipping.empty:
+                standard_time = standard_shipping.values[0]
+                delivery_time = request['Срок поставки']
+                time_diff = (delivery_time - now).days
+                if time_diff < standard_time:
+                    raise DeliveryTimeError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
 
-        # # проверка нормативных сроков поставки
-        # for idx, row in requests.iterrows():
-        #     mtr_class = row['MTR_class']  # Предполагается, что в заявках есть столбец с классом МТР
-        #     delivery_time = row['delivery_time']  # И столбец с указанным сроком поставки
-        #
-        #     # Найдем нормативный срок для
+        return True
 
 
 class Scorer:
