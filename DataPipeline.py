@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 from typing import Optional, Union, List
+from tqdm import tqdm
 
 
 class DBProcessor:
@@ -15,7 +16,7 @@ class DBProcessor:
         elif pd.api.types.is_float_dtype(dtype):
             return 'FLOAT'
         elif pd.api.types.is_datetime64_any_dtype(dtype):
-            return 'DATETIME'
+            return 'DATE'
         else:
             return 'TEXT'
 
@@ -212,8 +213,8 @@ class DataPipeline:
         """Выгружает все заказы по заданным фильтрам"""
 
         query = '''
-        SELECT DISTINCT
-            requests.order_id AS "№ заказа",
+        SELECT 
+            DISTINCT requests.order_id AS "№ заказа",
             requests.order_dt AS "Дата заказа",
             requests.client_id AS "Клиент"
         FROM requests
@@ -221,9 +222,9 @@ class DataPipeline:
 
         conditions = []
         if from_dt:
-            conditions.append(f"requests.order_dt >= '{from_dt}'")
+            conditions.append(f'DATE(requests.order_dt) >= DATE("{from_dt}")')
         if to_dt:
-            conditions.append(f"requests.order_dt <= '{to_dt}'")
+            conditions.append(f'DATE(requests.order_dt) <= DATE("{to_dt}")')
 
         if conditions:
             query += "\nWHERE\n\t" + "\n\tAND ".join(conditions)
@@ -280,11 +281,11 @@ class DataPipeline:
         '''
         conditions = []
         if from_dttm:
-            conditions.append(f"packs.formation_dttm >= '{from_dttm}'")
+            conditions.append(f'DATETIME(packs.formation_dttm) >=DATETIME( "{from_dttm}")')
         if to_dttm:
-            conditions.append(f"packs.formation_dttm <= '{to_dttm}'")
+            conditions.append(f'DATETIME(packs.formation_dttm) <= DATETIME("{to_dttm}")')
         if algorithm:
-            conditions.append(f"packs.pack_name LIKE %{algorithm}%")
+            conditions.append(f'packs.pack_name LIKE %{algorithm}%')
 
         if conditions:
             query += "\nWHERE\n\t" + "\n\tAND ".join(conditions)
@@ -326,33 +327,39 @@ class DataPipeline:
         '''
         return self._db_processor.get_df(query)
 
-    def get_requests_features(self, human_lots_essential: bool = True, **filters):
+    def get_requests_features(self, order_id: Union[int, List[int]], human_lots_essential: bool = True):
         """
         Выгружает все заявки по зад фильтрам (время + другие) в супер-расширенном формате с указанием всех
          поставщиков заявки
         Если human_lots_essential = True, то выгружает только заявки с известными лотами человека, иначе - все заявки
         """
 
+        if isinstance(order_id, list):
+            order_condition = f"requests.order_id IN ({', '.join(map(str, order_id))})"
+        else:
+            order_condition = f"requests.order_id = {order_id}"
+
         query_human_lots = f'''
         SELECT DISTINCT
             requests.request_id,
             requests.human_lot_id
         FROM requests
-        {'WHERE human_lot_id IS NOT NULL' if human_lots_essential else ''}
+        WHERE {order_condition}
+        {'AND human_lot_id IS NOT NULL' if human_lots_essential else ''}
         '''
 
         query_request_features = f'''
         WITH t1 AS (
-            SELECT DISTINCT
-                requests.request_id,
+            SELECT 
+                DISTINCT requests.request_id,
                 requests.order_dt,
                 requests.delivery_dt,
                 requests.receiver_id,
                 receivers.address_id AS receiver_address_id,
-                addresses.address AS receiver_address,
-                addresses.latitude AS receiver_address_latitude,
-                addresses.longitude AS receiver_address_longitude,
-                addresses.geo_coords_confidence AS receiver_address_coords_geo_confidence,
+                receiver_address.address AS receiver_address,
+                receiver_address.latitude AS receiver_address_latitude,
+                receiver_address.longitude AS receiver_address_longitude,
+                receiver_address.geo_coords_confidence AS receiver_address_coords_geo_confidence,
                 classes.class_id,
                 classes.class_name,
                 classes.standard_shipping,
@@ -367,34 +374,29 @@ class DataPipeline:
                 requests.item_id,
                 requests.client_id
             FROM requests
-            INNER JOIN materials
-                ON requests.material_id = materials.material_id
-            INNER JOIN classes
-                ON materials.class_id = classes.class_id
-            INNER JOIN receivers
-                ON requests.receiver_id = receivers.receiver_id
-            INNER JOIN addresses
-                ON receivers.address_id = addresses.address_id
-            {'WHERE human_lot_id IS NOT NULL' if human_lots_essential else ''}
+            INNER JOIN materials ON requests.material_id = materials.material_id
+            INNER JOIN classes ON materials.class_id = classes.class_id
+            INNER JOIN receivers ON requests.receiver_id = receivers.receiver_id
+            INNER JOIN addresses AS receiver_address ON receivers.address_id = receiver_address.address_id
+            WHERE {order_condition}
+            {('AND requests.human_lot_id IS NOT NULL') if human_lots_essential else ''}
         ),
 
         t2 AS (
-            SELECT DISTINCT
-                classes_X_suppliers.class_id,
+            SELECT 
+                DISTINCT classes_X_suppliers.class_id,
                 classes_X_suppliers.supplier_id,
                 suppliers.address_id AS supplier_address_id,
-                addresses.address AS supplier_address,
-                addresses.latitude AS supplier_address_latitude,
-                addresses.longitude AS supplier_address_longitude,
-                addresses.geo_coords_confidence AS supplier_address_coords_geo_confidence
+                supplier_address.address AS supplier_address,
+                supplier_address.latitude AS supplier_address_latitude,
+                supplier_address.longitude AS supplier_address_longitude,
+                supplier_address.geo_coords_confidence AS supplier_address_coords_geo_confidence
             FROM classes_X_suppliers
-            INNER JOIN suppliers
-                ON classes_X_suppliers.supplier_id = suppliers.supplier_id
-            INNER JOIN addresses
-                ON suppliers.address_id = addresses.address_id
+            INNER JOIN suppliers ON classes_X_suppliers.supplier_id = suppliers.supplier_id
+            INNER JOIN addresses AS supplier_address ON suppliers.address_id = supplier_address.address_id
         )
 
-        SELECT
+        SELECT 
             t1.*,
             t2.supplier_id,
             t2.supplier_address_id,
@@ -402,9 +404,8 @@ class DataPipeline:
             t2.supplier_address_latitude,
             t2.supplier_address_longitude
         FROM t1
-        LEFT JOIN t2
-            ON t1.class_id = t2.class_id;
-        '''
+        LEFT JOIN t2 ON t1.class_id = t2.class_id;
+                '''
 
         request_features = self._db_processor.get_df(query_request_features)
         human_lots = self._db_processor.get_df(query_human_lots)
@@ -560,7 +561,7 @@ class DataPipeline:
 
 #
 # # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ ОООБЩЕГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
-#
+
 # dp = DataPipeline()
 # db_proc = dp._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
@@ -569,11 +570,26 @@ class DataPipeline:
 # df.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
 # human_lots = df['lot_id']
 # df.drop(columns=['lot_id'], inplace=True)
-# #
-# dp.put_requests(df)
+#
+# dp.put_requests(df, human_lots=human_lots)
 # print(1)
-# print(dp.get_requests())
-# #
+# # print(dp.get_requests())
+#
+# start_date = '2020-01-01'
+# end_date = '2024-01-31'
+# month_starts = pd.date_range(start=start_date, end=end_date, freq='MS')
+# for month_start in tqdm(month_starts):
+#     month_end = month_start + pd.offsets.MonthEnd(1)
+#     start = month_start.strftime('%Y-%m-%d')
+#     end = month_end.strftime('%Y-%m-%d')
+#     orders = dp.get_orders(from_dt=start, to_dt=end)
+#
+#     request_features_by_month, human_lots_by_month = dp.get_requests_features(order_id=orders['№ заказа'].to_list(), human_lots_essential=True)
+#     month_year = month_start.strftime('%m-%Y')
+#     request_features_by_month.to_csv(f'~/Desktop/month_request_features/request_features_{month_year}.csv', mode='w', index=False)
+#     human_lots_by_month.to_csv(f'~/Desktop/month_request_features/human_lots_by_month_{month_year}.csv', mode='w', index=False)
+
+
 # df = dp.get_requests_features(human_lots_essential=False)
 # df.to_csv('requests_features.csv', mode='w', index=False)
 # print(df)
