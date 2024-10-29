@@ -342,6 +342,20 @@ class DataPipeline:
         human_lots = self._db_processor.get_df(query_human_lots)
         return request_features, human_lots
 
+    def get_standard_shipping(self):
+        """Возвращает стандартые сроки доставки для каждого уникального материала по его классу"""
+
+        query = f'''
+        SELECT DISTINCT
+            materials.material_id,
+            classes.class_id,
+            classes.standard_shipping
+        FROM materials
+        INNER JOIN classes
+            ON materials.class_id = classes.class_id
+        '''
+
+        return self._db_processor.get_df(query)
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ФОРМИРОВАНИЯ БД ИЗ CSV ФАЙЛОВ
 # id_columns = {
