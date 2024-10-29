@@ -115,16 +115,18 @@ class Validator:
                                                              'standard_shipping']
             if not standard_shipping.empty:
                 standard_time = standard_shipping.values[0]
-                delivery_time = request['Срок поставки'].astype('datetime64[ns]')
+                delivery_time = pd.to_datetime(request['Срок поставки'])
                 # now = pd.Timestamp(datetime.now())
                 # time_diff = (delivery_time - now).days
-                order_time = requests['Дата заказа'].astype('datetime64[ns]')
-                time_diff = (delivery_time - order_time).days()
+                order_time = pd.to_datetime(request['Дата заказа'])
+                time_diff = (delivery_time - order_time).days
                 if time_diff < standard_time:
                     raise DeliveryTimeError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
 
         return True
 
+    def validate_lots(self, requests: pd.DataFrame, lots: pd.DataFrame) -> bool:
+        pass
 
 class Scorer:
     def __init__(self):
