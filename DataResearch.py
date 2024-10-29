@@ -119,7 +119,7 @@ class Validator:
                 # now = pd.Timestamp(datetime.now())
                 # time_diff = (delivery_time - now).days
                 order_time = pd.to_datetime(request['Дата заказа'])
-                time_diff = (delivery_time - order_time).days()
+                time_diff = (delivery_time - order_time).days
                 if time_diff < standard_time:
                     raise DeliveryTimeError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
 
