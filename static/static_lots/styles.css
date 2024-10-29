@@ -74,16 +74,6 @@ body, html {
     margin-top: 100px;
 }
 
-.file-drop-zone {
-    display: inline-block;
-    width: 300px;
-    height: 150px;
-    border: 2px dashed #333;
-    padding: 20px;
-    cursor: pointer;
-    background-color: #f9f9f9;
-}
-
 #loadBtn {
     display: block;
     margin-top: 20px;
@@ -116,7 +106,6 @@ body, html {
     border: 0;
 }
 
-/* Table Section */
 .table-section {
     display: none;
     text-align: center;
@@ -148,11 +137,12 @@ table th, table td {
 .sidebar {
     position: fixed;
     left: -300px;
-    top: 100px; 
+    top: 100px;
     width: 300px;
-    height: calc(100% - 100px);
-    background-color: var(--menu-color);
-    color: var(--bright-text-color);
+    height: calc(100% - 110px);
+    /* background-color: #444; */
+    color: white;
+    overflow: hidden;
     transition: left 0.5s ease;
     padding-top: 20px;
 }
@@ -185,18 +175,6 @@ table th, table td {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
     opacity: 1;
-}
-
-#menuBtn:hover + #sidebar-menu {
-    left: 0;
-}
-
-body:hover .sidebar-menu {
-    left: -270px;
-}
-
-.sidebar-menu:hover {
-    left: 0px;
 }
 
 #menuBtn:hover + #sidebar {

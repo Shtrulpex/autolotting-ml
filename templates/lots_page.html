@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XML Uploader</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='/static3/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='/static_lots/styles.css') }}">
 </head>
 <body>
 
@@ -17,18 +17,36 @@
         </div>
     </div>
 
-    <div id="sidebar" class="sidebar">
-        <ul>
-            <li><a href="/home.html">Главная страница</a></li>
-            <li><a href="/orders_page.html">Страница заказов</a></li>
-            <li><a href="/lots_page.html"><strong>Страница лотов</strong></a></li>
-        </ul>
-    </div>
-
     <div class="file-upload-section">
         <button id="loadBtn">Создать лоты</button>
     </div>
 
-    <script src="{{ url_for('static',filename='/static3/script.js') }}"></script>
+    <div class="table-section" id="tableSection">
+        <table>
+            <thead>
+                <tr>
+                    <th>Column 1</th>
+                    <th>Column 2</th>
+                    <th>Column 3</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+        <button id="submitOrderBtn">Скачать лоты</button>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <ul class="sidebar-menu-scroll">
+            <li><a href="#option1">Option 1</a></li>
+            <li><a href="#option2">Option 2</a></li>
+            <li><a href="#option3">Option 3</a></li>
+        </ul>
+        <button id="resizeMenuBtn">Resize Menu</button>
+        <div class="arrow-menu"></div>
+        <div class="menu-top"></div>
+    </div>
+
+    <script src="{{ url_for('static',filename='/static_lots/script.js') }}"></script>
 </body>
-</html>
+</html
