@@ -13,15 +13,6 @@ class NullValueError(ValidationError):
         super().__init__(f"Ошибка: Null значение в колонке '{column}' в строке {index}")
 
 
-class ColumnMismatchError(ValidationError):
-    def __init__(self, column, expected_type, actual_type):
-        self.column = column
-        self.expected_type = expected_type
-        self.actual_type = actual_type
-        super().__init__(f"Ошибка: Тип данных в колонке '{column}' не соответствует. "
-                         f"Ожидалось: {expected_type}, получено: {actual_type}")
-
-
 class ColumnMissingError(ValidationError):
     def __init__(self, column):
         self.column = column
@@ -32,6 +23,14 @@ class ExtraColumnError(ValidationError):
     def __init__(self, column):
         self.column = column
         super().__init__(f"Ошибка: Найдена лишняя колонка '{column}'")
+
+
+class TypeMismatchError(ValidationError):
+    def __init__(self, column, expected_type, actual_type):
+        self.column = column
+        self.expected_type = expected_type
+        self.actual_type = actual_type
+        super().__init__(f"Ошибка: Тип в колонке '{column}' ожидается '{expected_type}', найден '{actual_type}'")
 
 
 class Scaler:
@@ -80,43 +79,49 @@ class Validator:
     }
 
     def __init__(self, delivery_standards: pd.DataFrame, template_columns: dict = None):
-        """
-        :param template_columns: словарь, где ключ — это название столбца, а значение — тип данных.
-        :param delivery_standards: датафрейм с нормативными сроками поставки для каждого класса.
-        """
         if template_columns is None:
             self._template_columns = self.STANDART_INPUT_TEMPLATE
         else:
             self._template_columns = template_columns
         self._delivery_standards = delivery_standards
 
+    @staticmethod
+    def _check_type(series: pd.Series, expected_type: str) -> bool:
+        """Проверяет, могут ли значения в серии быть приведены к ожидаемому типу."""
+        try:
+            if expected_type == 'datetime64[ns]':
+                pd.to_datetime(series, errors='raise')
+            else:
+                series.astype(expected_type)
+            return True
+        except (ValueError, TypeError):
+            return False
+
     def validate_requests(self, requests: pd.DataFrame) -> bool:
-        """
-        Проверяет заявки на соответствие шаблону и нормативность сроков поставок МТР.
-        :param requests: датафрейм заявок на закупку МТР.
-        :return: bool — True, если заявки соответствуют требованиям, иначе вызывает ошибку.
-        """
-        # проверка на соответствие
+        # Проверка на наличие необходимых колонок
         for col, expected_type in self._template_columns.items():
             if col not in requests.columns:
                 raise ColumnMissingError(col)
 
-            actual_type = str(requests[col].dtype)
-            if actual_type != expected_type:
-                raise ColumnMismatchError(col, expected_type, actual_type)
-
-        # проверка на пропущенные значения
-        for col in requests.columns:
-            if requests[col].isnull().any():
-                null_indices = requests[col][requests[col].isnull()].index.tolist()
-                for index in null_indices:
-                    raise NullValueError(col, index)
-
-        # проверка на наличие лишних колонок
+        # Проверка на наличие лишних колонок
         extra_columns = set(requests.columns) - set(self._template_columns.keys())
         if extra_columns:
             for col in extra_columns:
                 raise ExtraColumnError(col)
+
+        # Проверка на пропущенные значения
+        for col in requests.drop(columns=['Способ закупки']).columns:
+            if requests[col].isnull().any():
+                null_indices = requests.index[requests[col].isnull()].tolist()
+                for index in null_indices:
+                    raise NullValueError(col, index)
+
+        # Проверка типов данных
+        for col, expected_type in self._template_columns.items():
+            if col in requests.columns:
+                if not self._check_type(requests[col], expected_type):
+                    actual_type = requests[col].dtype
+                    raise TypeMismatchError(col, expected_type, actual_type)
 
         return True
 
