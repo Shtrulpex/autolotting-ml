@@ -3,6 +3,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
+from typing import Tuple
 
 
 class DBProcessor:
@@ -54,26 +55,11 @@ class DBProcessor:
 
 
 class DataPipeline:
-    '''
+    """
     Класс является связующим звеном между БД и остальной программой.
     Выгружает из БД данные и формируюет pd.DataFrame'ы под определенные нужды программ.
     Загружает в БД pd.DataFrame'ы
-    '''
-
-    TRANSLATE = {
-        'client_id': 'Клиент',
-        'material_id': 'Материал',
-        'material_name': 'Краткий текст материала',
-        'measure_unit': 'ЕИ',
-        'materials_amount': 'Общее количество',
-        'delivery_dt': 'Срок поставки',
-        'receiver_id': 'Грузополучатель',
-        'material_price': 'Цена',
-        'purchase_method': 'Способ закупки',
-        'item_id': '№ заказа',
-        'order_id': '№ позиции',
-        'order_dt': 'Дата заказа'
-    }
+    """
 
     def __init__(self):
         self._db_processor = DBProcessor()
@@ -231,17 +217,24 @@ class DataPipeline:
         '''
         return self._db_processor.get_df(query)
 
-    def get_requests_features(self, human_lots_essential: bool = False, **filters) -> pd.DataFrame:
+    def get_requests_features(self, human_lots_essential: bool = True, **filters) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """
         Выгружает все заявки по зад фильтрам (время + другие) в супер-расширенном формате с указанием всех
          поставщиков заявки
         Если human_lots_essential = True, то выгружает только заявки с известными лотами человека, иначе - все заявки
         """
 
-        query = f'''
+        query_human_lots = f'''
+            SELECT DISTINCT
+                requests.request_id,
+                requests.human_lot_id
+            FROM requests
+            {'WHERE human_lot_id IS NOT NULL' if human_lots_essential else ''}
+        '''
+
+        query_request_features = f'''
         WITH t1 AS (
             SELECT DISTINCT
-                human_lot_id,
                 requests.request_id,
                 requests.order_dt,
                 requests.delivery_dt,
@@ -303,7 +296,10 @@ class DataPipeline:
         LEFT JOIN t2
             ON t1.class_id = t2.class_id;
         '''
-        return self._db_processor.get_df(query)
+
+        request_features = self._db_processor.get_df(query_request_features)
+        human_lots = self._db_processor.get_df(query_human_lots)
+        return request_features, human_lots
 
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ФОРМИРОВАНИЯ БД ИЗ CSV ФАЙЛОВ
@@ -356,7 +352,6 @@ class DataPipeline:
 #             # lot_ids = df['lot_id']
 #             continue
 #         db_proc.load_df(table_name, df, pk_column=id_columns.get(table_name, None))
-
 
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ПРОВЕРКИ РАБОТЫ DataPipeline
