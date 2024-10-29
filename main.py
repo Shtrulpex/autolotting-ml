@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from dbExchange import xlxsToDf, getOrder, editOrder, dfToXlxs
+from main_logic import xlxsToDf, getOrder, editOrder, dfToXlxs
 from Aglomerative.AglomerativeCluster import Solver
 
 app = Flask(__name__)

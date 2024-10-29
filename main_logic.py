@@ -1,9 +1,16 @@
 import pandas as pd
 import os
+from DataResearch import Validator, Scorer
+
+validator = Validator()
 
 def xlxsToDf(filepath):
     df = pd.read_excel(filepath, "Sheet1")
+
     # Зесь методы проверки на шаблон df
+
+
+
     csvname = '.'.join(filepath.split('.')[:-1])+'.csv'
     os.remove(filepath)
     df.to_csv(csvname, index=False)
