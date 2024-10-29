@@ -34,14 +34,21 @@ class TypeMismatchError(ValidationError):
         super().__init__(f"Ошибка: Тип в колонке '{column}' ожидается '{expected_type}', найден '{actual_type}'")
 
 
-class DeliveryTimeError(ValidationError):
+class DeliveryTimeStandardError(ValidationError):
     def __init__(self, order_id, position_id, remaining_days, standard_days):
         self.order_id = order_id
         self.position_id = position_id
         self.remaining_days = remaining_days
         self.standard_days = standard_days
-        super().__init__(f"Ошибка: Мало времени для поставки позиции '{position_id}' заказа '{order_id}'"
+        super().__init__(f"Ошибка: Мало времени для заказа '{order_id}', позиция '{position_id}'"
                          f" - осталось {remaining_days} дней, \tстандарт {standard_days} дней.")
+
+
+class DeliveryTimeError(ValidationError):
+    def __init__(self, lot_id):
+        self.lot_id = lot_id
+        super().__init__(f"Лот {lot_id} имеет дату поставки с разбросом более 30 дней.")
+
 
 
 class Validator:
@@ -83,6 +90,11 @@ class Validator:
             return False
 
     def validate_requests(self, requests: pd.DataFrame) -> bool:
+        """
+        Проверяет входные заявки на соответствие следующим критериям:
+        - подаются в формате шаблона (все на месте, ничего лишнего, все в нужном типе)
+        - сроки поставок соответствуют нормативам класса материала
+        """
         # Проверка на наличие необходимых колонок
         for col, expected_type in self._template_columns.items():
             if col not in requests.columns:
@@ -121,12 +133,33 @@ class Validator:
                 order_time = pd.to_datetime(request['Дата заказа'])
                 time_diff = (delivery_time - order_time).days
                 if time_diff < standard_time:
-                    raise DeliveryTimeError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
+                    raise DeliveryTimeStandardError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
 
         return True
 
     def validate_lots(self, requests: pd.DataFrame, lots: pd.DataFrame) -> bool:
-        pass
+        """
+        Проверяет сформированные лоты на соответствие следующим критериям:
+        - Даты поставок заявок внутри лота принадлежат окну разбросом не более чем в 30 дней
+        """
+
+        # Убираем дубликаты, оставляя первую запись для каждого request_id
+        requests = requests.drop_duplicates(subset='request_id', keep='first')
+
+        # Объединяем заявки и лоты по request_id
+        request_lots = pd.merge(requests, lots, on='request_id')
+
+        # Получаем минимальные и максимальные даты поставок для каждого лота
+        min_delivery_dt = request_lots.groupby('lot_id')['delivery_dt'].min()
+        max_delivery_dt = request_lots.groupby('lot_id')['delivery_dt'].max()
+        window = (max_delivery_dt - min_delivery_dt).dt.days
+
+        for lot_id, days in window.items():
+            if days > 30:
+                raise DeliveryTimeError(lot_id)
+
+        return True
+
 
 class Scorer:
     def __init__(self):
