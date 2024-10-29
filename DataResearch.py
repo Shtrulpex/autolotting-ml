@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime
+# from datetime import datetime
 
 
 class ValidationError(Exception):
@@ -109,15 +109,17 @@ class Validator:
                     raise TypeMismatchError(col, expected_type, actual_type)
 
         # Проверка нормативных сроков поставки
-        now = pd.Timestamp(datetime.now())
         for index, request in requests.iterrows():
             material_id = request['Материал']
             standard_shipping = self._delivery_standards.loc[self._delivery_standards['material_id'] == material_id,
                                                              'standard_shipping']
             if not standard_shipping.empty:
                 standard_time = standard_shipping.values[0]
-                delivery_time = request['Срок поставки']
-                time_diff = (delivery_time - now).days
+                delivery_time = request['Срок поставки'].astype('datetime64[ns]')
+                # now = pd.Timestamp(datetime.now())
+                # time_diff = (delivery_time - now).days
+                order_time = requests['Дата заказа'].astype('datetime64[ns]')
+                time_diff = (delivery_time - order_time).days()
                 if time_diff < standard_time:
                     raise DeliveryTimeError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
 
