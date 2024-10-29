@@ -3,7 +3,7 @@ import numpy as np
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
-from typing import Tuple, Optional, Union, List
+from typing import Optional, Union, List
 
 
 class DBProcessor:
@@ -32,7 +32,7 @@ class DBProcessor:
                                                     for col, dtype in df.dtypes.items() if col != pk_column])}
                                     );
                                     """
-                connection.execute(text(create_table_query))
+                self.run_query(create_table_query)
                 if pk_column in df.columns:
                     df.set_index(pk_column, inplace=True)
                     df.to_sql(table_name, con=self.engine, if_exists='append', index=True)
@@ -47,11 +47,30 @@ class DBProcessor:
         except SQLAlchemyError as e:
             print(f'Error while getting data with query: {e}')
 
-    def run_query(self, query: str, *values):
+    def update_records(self, table: str, new_records, pk_column: str, updateable_columns: list):
+        try:
+            with self.engine.connect() as connection:
+                for _, row in new_records.iterrows():
+                    pk_id = row.get(pk_column)
+
+                    # Cловарь обновляемых значений
+                    updates = {col: row[col] for col in updateable_columns if col in row and col != pk_column}
+
+                    # Формируем строку set_clause для SQL-запроса
+                    set_clause = ", ".join([f"{col} = :{col}" for col in updates.keys()])
+                    query = f"UPDATE {table} SET {set_clause} WHERE {pk_column} = :pk_id"
+
+                    updates['pk_id'] = pk_id
+                    self.run_query(query, updates)
+
+        except Exception as e:
+            print(f'Error while updating data with query: {text(query)}')
+
+    def run_query(self, query: str, params: dict = None):
         with self.engine.connect() as connection:
-            if values:
-                return connection.execute(text(query), values)
-            return connection.execute(text(query))
+            result = connection.execute(text(query), params)
+            connection.commit()
+            return result
 
 
 class DataPipeline:
@@ -141,6 +160,54 @@ class DataPipeline:
 
         return pack_id
 
+    def update_requests(self, new_requests: pd.DataFrame):
+
+        updateable_columns = [
+            'order_dt', 'order_id', 'item_id', 'delivery_dt',
+            'material_id', 'receiver_id', 'materials_amount',
+            'material_price', 'purchase_method', 'client_id'
+        ]
+
+        new_requests.rename(columns={
+            'Дата заказа': 'order_dt',
+            '№ заказа': 'order_id',
+            '№ позиции': 'item_id',
+            'Срок поставки': 'delivery_dt',
+            'Материал': 'material_id',
+            'Грузополучатель': 'receiver_id',
+            'Общее количество': 'materials_amount',
+            'Цена': 'material_price',
+            'Способ закупки': 'purchase_method',
+            'Клиент': 'client_id',
+            '№ заявки': 'request_id'
+        }, inplace=True)
+
+        self._db_processor.update_records('requests', new_requests,
+                                          pk_column='request_id', updateable_columns=updateable_columns)
+
+    def update_lots(self, new_lots: pd.DataFrame):
+
+        updateable_columns = ['lot_id']
+
+        new_lots.rename(columns={
+            'Дата заказа': 'order_dt',
+            '№ заказа': 'order_id',
+            '№ позиции': 'item_id',
+            'Срок поставки': 'delivery_dt',
+            'Материал': 'material_id',
+            'Грузополучатель': 'receiver_id',
+            'Общее количество': 'materials_amount',
+            'Цена': 'material_price',
+            'Способ закупки': 'purchase_method',
+            'Клиент': 'client_id',
+            '№ заявки': 'request_id',
+            '№ лота': 'lot_id',
+            '№ лоттировки': 'lotting_id'
+        }, inplace=True)
+
+        self._db_processor.update_records('lottings', new_lots,
+                                          pk_column='lotting_id', updateable_columns=updateable_columns)
+
     def get_orders(self, from_dt: Optional[str] = None, to_dt: Optional[str] = None) -> pd.DataFrame:
         """Выгружает все заказы по заданным фильтрам"""
 
@@ -229,6 +296,7 @@ class DataPipeline:
 
         query = f'''
         SELECT DISTINCT
+            lottings.lotting_id AS '№ лоттировки',
             lottings.lot_id AS "№ лота",
             requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
@@ -410,7 +478,7 @@ class DataPipeline:
 
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ПРОВЕРКИ РАБОТЫ DataPipeline
-
+#
 # dp = DataPipeline()
 # db_proc = dp._db_processor
 #
@@ -424,31 +492,38 @@ class DataPipeline:
 # df.drop(columns=['human_lot_id', 'lot_id'], inplace=True)
 #
 # request_ids = dp.put_requests(df, human_lots)
-# print(0)
+# print(request_ids)
 #
 # features, human_lots = dp.get_requests_features()
-# features.to_csv('requests_features.csv', mode='w', index=False)
-# human_lots.to_csv('human_lots.csv', mode='w', index=False)
+# # features.to_csv('requests_features.csv', mode='w', index=False)
+# # human_lots.to_csv('human_lots.csv', mode='w', index=False)
 # print(1)
 #
 # orders = dp.get_orders()
-# orders.to_csv('orders.csv', mode='w', index=False)
-# print(2)
-#
+# # orders.to_csv('orders.csv', mode='w', index=False)
+# print(orders)
+# #
 # requests = dp.get_requests(order_id=orders['№ заказа'].iloc[:2].tolist())
-# requests.to_csv('requests.csv', mode='w', index=False)
-# print(3)
+# # requests.to_csv('requests.csv', mode='w', index=False)
+# print(requests)
+# requests.loc[0, '№ позиции'] = 40
+# requests.loc[1, 'Клиент'] = 39295
+# print(requests)
+# dp.update_requests(requests)
+# requests = dp.get_requests(order_id=orders['№ заказа'].iloc[:2].tolist())
+# print(requests)
+#
 #
 # lots = pd.concat([lots, request_ids], axis=1)
 # pack_id = dp.put_pack('aglomerative', lots)
 # print(4)
 #
 # packs = dp.get_packs()
-# packs.to_csv('packs.csv', mode='w', index=False)
+# # packs.to_csv('packs.csv', mode='w', index=False)
 # print(5)
 #
 # lots = dp.get_lots(pack_id=pack_id)
-# lots.to_csv('lots.csv', mode='w', index=False)
+# # lots.to_csv('lots.csv', mode='w', index=False)
 # print(6)
 #
 #
