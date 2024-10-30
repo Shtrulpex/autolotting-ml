@@ -48,7 +48,6 @@ def getOrders(from_date=None, to_date=None):
 
 def getRequests(order_id):
     request = data_pipeline.get_requests(order_id=order_id)
-    print(request)
     if not isinstance(request, pd.DataFrame):
         request = pd.DataFrame()
     return request
