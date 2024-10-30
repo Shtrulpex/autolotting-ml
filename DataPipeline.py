@@ -278,7 +278,7 @@ class DataPipeline:
         '''
         conditions = []
         if formation_from_dttm:
-            conditions.append(f'DATETIME(packs.formation_dttm) >=DATETIME( "{formation_from_dttm}")')
+            conditions.append(f'DATETIME(packs.formation_dttm) >= DATETIME("{formation_from_dttm}")')
         if formation_to_dttm:
             conditions.append(f'DATETIME(packs.formation_dttm) <= DATETIME("{formation_to_dttm}")')
         if algorithm:
@@ -558,7 +558,7 @@ class DataPipeline:
 
 #
 # ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ ОООБЩЕГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
-
+#
 # dp = DataPipeline()
 # db_proc = dp._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
@@ -580,9 +580,10 @@ class DataPipeline:
 # lots.columns = ['lot_id', 'request_id']
 # print("After renaming:", lots.columns)
 # print(lots.info())
+# lots.to_csv(f'~/Desktop/cold_lots.csv', mode='w', index=False)
 #
 #
-# pack_id = dp.put_pack('human_lots_example', lots)
+# pack_id = dp.put_pack('example', 'human_lotting', lots, from_dt='2020-01-01', to_dt='2020-01-31')
 # lots = dp.get_lots(pack_id)
 # lots.to_csv(f'~/Desktop/lots.csv', mode='w', index=False)
 # #
