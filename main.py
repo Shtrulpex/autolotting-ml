@@ -26,6 +26,8 @@ def load_order():
 @app.route("/<id>/order_page.html")
 def get_order(id):
     dfdata = getRequests(id).to_json(orient='records')
+    if(dfdata == "[]"):
+        return redirect(url_for("orders"))
     df_orders = getOrders().to_json(orient='records')
     return render_template("order_page.html", all_orders=df_orders, data=dfdata)
 
@@ -46,23 +48,24 @@ if not os.path.exists(FILE_FOLDER):
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
-        return jsonify({'message': 'No file part in the request'}), 400
+        return jsonify({'message': 'Ошибка в выборе файла.'}), 400
 
     file = request.files['file']
 
     if file.filename == '':
-        return jsonify({'message': 'No file selected for uploading'}), 400
+        return jsonify({'message': 'Не выбран файл.'}), 400
 
     if file and file.filename.endswith('.xlsx'):
         filepath = os.path.join(FILE_FOLDER, file.filename)
         file.save(filepath)
-        success = xlxsToDf(filepath)
+        success, response = xlxsToDf(filepath)
         if success:
-            return jsonify({'message': f'File successfully uploaded: {file.filename}'}), 200
+            print(response)
+            return jsonify({'message': f'Файл загружен: {file.filename}, id={response}.'}), 200
         else:
-            return jsonify({'message': f'File does not match template'}), 400
+            return jsonify({'message': f'Ошибка в содержании файла: {response}'}), 400
     else:
-        return jsonify({'message': 'Only .xlsx files are allowed'}), 400
+        return jsonify({'message': 'Только .xlsx файлы должны быть загружены.'}), 400
 
 @app.route('/api/update_df', methods=['POST'])
 def update_df():

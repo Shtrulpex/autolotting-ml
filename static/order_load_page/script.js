@@ -11,10 +11,6 @@ const ulSidebarAllDf = document.getElementById("all-orders-ul");
 const filtersDiv = document.getElementById("filters-box");
 const filtersUl = document.getElementById("filters-ul");
 
-function redirectToOrder() {
-    window.location.href = "order_page.html";
-}
-
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
         sidebar.style.left = "-300px";
@@ -89,18 +85,16 @@ async function uploadFile(file) {
     formData.append('file', file);
 
     try {
-        const response = await fetch('/api/upload', {
+        fetch('/api/upload', {
             method: 'POST',
             body: formData
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            alert('Файл загружен.');
-            redirectToOrder();
-        } else {
-            alert('Ошибка при загрузке файла.');
-        }
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            // window.location.href = `/${row['№ заказа']}/order_page.html`; - куда редиректиться то?
+        })
+        .catch(error => console.error("Ошибка:", error));
     } catch (error) {
         alert('Неизвестная ошибка.');
     }
@@ -317,9 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 calendarMenu.classList.add('hidden-calendar');
             })
-            .catch(error => console.error("Error:", error));
+            .catch(error => console.error("Ошибка:", error));
         } else {
-            alert("Please select a date range.");
+            alert("Пожалуйста, выберете 2 даты");
         }
     });    
 });

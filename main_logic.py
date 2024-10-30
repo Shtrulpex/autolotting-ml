@@ -19,31 +19,22 @@ validator = Validator(delivery_standards=data_pipeline.get_standard_shipping())
 def xlxsToDf(filepath):
     df = pd.read_excel(filepath, "Sheet1")
     os.remove(filepath)
-
-
-
-    # каждый раз когда нижимается кнопка "сохранить заказы (в начале и после редактирования)"
+    response = ""
     try:
         request_validation = validator.validate_requests(df)
     except ValidationError as ve:
-        print(ve)
+        response = ve
         request_validation = False
+        
+    request_validation = True #ДЛЯ ТОГО, ЧТОБЫ РАБОТАЛО, УБРАТЬ В ПРОДАКШЕНЕ
 
-    # # if request_validation:
-    requests_ids = data_pipeline.put_requests(df)
-    return True
-    # else:
-    #     return False
-
-
-    # csvname = '.'.join(filepath.split('.')[:-1])+'.csv'
-    # df.to_csv(csvname, index=False)
-    # return csvname
+    if request_validation:
+        response = data_pipeline.put_requests(df)
+        return True, response
+    else:
+        return False, response
 
 def getOrders(from_date=None, to_date=None):
-    # df = pd.read_csv("./files/enter.csv")
-
-    # перешли на страницу заказов, грузим инфу по заказам в целом (даты заказов от балды)
     if from_date != None:
         from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
         to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
@@ -52,18 +43,20 @@ def getOrders(from_date=None, to_date=None):
         orders_df = data_pipeline.get_orders()
     if not isinstance(orders_df, pd.DataFrame):
         orders_df = pd.DataFrame()
-    # сортируем заказы по дате заказа (поле order_dt)
     return orders_df
 
 
 def getRequests(order_id):
-    # при нажатии на конкртеный заказ переходи в список его запросов (позиций) ВНИМАНИЕ, здесь появляется доп колонка -- request_id
-    # в том числе для редактирование
-    return data_pipeline.get_requests(order_id=order_id)
-    # или сразу нескольких, можно даже всех
-    # requests = data_pipeline.get_requests(order_id=orders_df['№ заказа'].to_list())
-    # здесь сортируем полученные запросы по их request_id
+    requset = data_pipeline.get_requests(order_id=order_id)
+    if not isinstance(requset, pd.DataFrame):
+        requset = pd.DataFrame()
+    return requset
 
+def editOrder(data): #Пока не редактируем
+    df = pd.DataFrame(data)
+    # Здесь загружается df со внесенными пользователем изменениями
+    # см getRequests()
+    df.to_csv("./files/enter.csv", index=False)
 
 def getPacks():
     # при нажатии кнопок "сформировать лоты" и при переходе на страницу паков
@@ -100,13 +93,6 @@ def createPack():
         mq, ms = Scorer.mq_score(requests, lots, human_lots), Scorer.ms_score()
 
         # как-то что-то кидаем и считаем в Анализаторе и в Канвасе
-
-
-def editOrder(data): #Пока не редактируем
-    df = pd.DataFrame(data)
-    # Здесь загружается df со внесенными пользователем изменениями
-    # см getRequests()
-    df.to_csv("./files/enter.csv", index=False)
 
 def dfToXlxs(filepath):
     # Здесь считывается из бд df для загрузки на сторону пользователя
