@@ -294,7 +294,7 @@ class DataPipeline:
 
         query = f'''
         SELECT DISTINCT
-            lottings.lotting_id AS '№ лоттировки',
+            lottings.lotting_id AS '№ лотировки',
             lottings.lot_id AS "№ лота",
             requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
@@ -320,7 +320,7 @@ class DataPipeline:
             ON requests.material_id = materials.material_id
         INNER JOIN lottings
             ON lottings.request_id = requests.request_id
-        WHERE lottings.pack_id = {pack_id}
+        WHERE lottings.pack_id = "{pack_id}"
         '''
         return self._db_processor.get_df(query)
 

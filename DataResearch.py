@@ -256,9 +256,8 @@ class Scorer:
         supplier_coverage = (requests_lots.groupby('supplier_id')['class_id'].nunique() / requests_lots['class_id'].nunique())
 
         # Создаем DataFrame с координатами поставщиков и получателей
-        supplier_coords = requests_lots[['supplier_id', 'supplier_address_latitude', 'supplier_address_longitude']]
-        receiver_coords = requests_lots[
-            ['receiver_id', 'receiver_address_latitude', 'receiver_address_longitude']].drop_duplicates()
+        supplier_coords = requests_lots[['supplier_id', 'supplier_address_latitude', 'supplier_address_longitude']].drop_duplicates()
+        receiver_coords = requests_lots[['receiver_id', 'receiver_address_latitude', 'receiver_address_longitude']].drop_duplicates()
 
         # Переименуем колонки для объединения
         supplier_coords = supplier_coords.rename(columns={
