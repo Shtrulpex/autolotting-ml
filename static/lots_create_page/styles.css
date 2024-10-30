@@ -16,15 +16,23 @@ body, html {
 
 .header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     background-color: rgba(244, 244, 244, 0.5);
-    position: fixed;
+    position: relative;
     width: 100%;
     top: 0;
     left: 0;
     z-index: 2;
-    box-shadow: 0 4px 2px -2px var(--header-shadow-color);
+    box-shadow: 0 4px 2px -2px gray;
+}
+
+.header h2 {
+    margin: auto;
+}
+
+.header h2 a {
+    color: var(--dark-text-color);
+    text-decoration: none;
+    display: block;
 }
 
 .header-text {
@@ -122,9 +130,4 @@ body:hover .sidebar {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
     opacity: 1;
-}
-
-.header {
-    position: relative;
-    z-index: 2;
 }

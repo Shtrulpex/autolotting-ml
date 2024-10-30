@@ -38,6 +38,10 @@ def orders():
 def lots():
     return render_template("lots_page.html")
 
+@app.route("/lots_create_page.html")
+def lots_create():
+    return render_template("lots_create_page.html")
+
 FILE_FOLDER = './files'
 if not os.path.exists(FILE_FOLDER):
     os.makedirs(FILE_FOLDER)

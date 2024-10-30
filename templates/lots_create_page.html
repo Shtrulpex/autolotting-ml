@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/lots_create_page/styles.css') }}">
+</head>
+<body>
+
+    <div class="header">
+        <button class="menu-btn" id="menuBtn">☰ Главное меню</button>
+        <h2><a href="/order_page.html">Заказы</a></h2>
+        <h2><a href="/lots_create_page.html"><u>Сформировать</u></a></h2>
+        <h2><a href="/lots_page.html">Лоты</a></h2>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li><a href="/home.html">Главная страница</a></li>
+            <li><a href="/order_page.html">Страница заказов</a></li>
+            <li><a href="/lots_create_page.html"><strong>Страница формирования лотов</strong></a></li>
+            <li><a href="/lots_page.html">Страница лотов</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="center-buttons">
+            <button onclick="window.location.href='/lots_create_page.html'">Сформировать лоты</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static',filename='/lots_create_page/script.js') }}"></script>
+</body>
+</html>
