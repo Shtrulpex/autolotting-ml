@@ -149,8 +149,7 @@ class Scorer:
         n_human_lots = human_lots['human_lot_id'].nunique()
 
         lot_mean_cost = pd.merge(requests, lots, on='request_id').groupby('lot_id')['item_cost'].sum().mean()
-        human_lot_mean_cost = pd.merge(requests, human_lots, on='request_id').groupby('human_lot_id')[
-            'item_cost'].sum().mean()
+        human_lot_mean_cost = pd.merge(requests, human_lots, on='request_id').groupby('human_lot_id')['item_cost'].sum().mean()
 
         mq = (1 - (n_lots / n_human_lots) + 1 - (human_lot_mean_cost / lot_mean_cost)) / 2
         return mq
