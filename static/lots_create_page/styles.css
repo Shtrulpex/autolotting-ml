@@ -88,7 +88,7 @@ body, html {
     color: #FFFFFF;
 }
 
-.center-buttons button {
+.center-buttons button, #submitDatesBtn, .orders-filters button {
     margin: 10px;
 
     background: #5E5DF0;
@@ -130,4 +130,75 @@ body:hover .sidebar {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
     opacity: 1;
+}
+
+.orders-filters h2{
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.hidden-calendar {
+    display: none;
+}
+
+#calendarMenu {
+    position: absolute;
+    top: 240px;
+    left: 1100px;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    overflow: visible;
+}
+
+#calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-date {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.calendar-date:hover, .selected-date {
+    background-color: #87CEEB;
+    color: white;
+}
+
+.range-date {
+    background-color: #d0e7ff;
+}
+
+.close-btn {
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    position: absolute;
+    right: -5px;
+    top: -5px;
+}
+
+.close-btn:hover {
+    color: #555;
 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>Формирование лотов</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/lots_create_page/styles.css') }}">
 </head>
 <body>
@@ -25,9 +25,28 @@
     </div>
 
     <div class="main-content">
+        <div class="orders-filters">
+            <h2>Заказы</h2>
+            <h2 id="start-date">_</h2>
+            <h2>по</h2>
+            <h2 id="end-date">_</h2>
+            <button id="btn-calendar-1">Выберете дату</button>
+        </div>
         <div class="center-buttons">
             <button onclick="window.location.href='/lots_create_page.html'">Сформировать лоты</button>
         </div>
+    </div>
+
+    <div id="calendarMenu" class="hidden-calendar">
+        <div id="calendarHeader">
+            <select id="yearSelector"></select>
+            <button id="prevMonth">&lt;</button>
+            <span id="monthYear"></span>
+            <button id="nextMonth">&gt;</button>
+            <button id="closeCalendar" class="close-btn">✕</button>
+        </div>
+        <div id="calendar"></div>
+        <button id="submitDatesBtn">Выбрать даты</button>
     </div>
 
     <script src="{{ url_for('static',filename='/lots_create_page/script.js') }}"></script>
