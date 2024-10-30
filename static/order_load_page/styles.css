@@ -196,32 +196,8 @@ body:hover .sidebar {
     font-size: 18px;
 }
 
-.sidebar-filters-menu-scroll {
-    height: 240px;
-    overflow-y: hidden;
-    padding: 10px;
-    margin: 20px 0;
-}
-
-.sidebar-filters-menu-scroll:hover {
-    overflow-y: scroll;
-}
-
-.sidebar-filters-menu-scroll li {
-    border-bottom: 1px solid #555;
-    list-style-type: none;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-}
-
-.sidebar-filters-menu-scroll li label {
-    margin-left: 10px;
-}
-
-
 .sidebar-orders-menu-scroll {
-    height: 270px;
+    height: 500px;
     overflow-y: hidden;
     padding: 10px;
     margin: 20px 0;
@@ -355,7 +331,7 @@ body:hover .sidebar-orders {
     border: 0;
 }
 
-#calendarBtn, #submitDatesBtn, #submitFilters {
+#calendarBtn, #submitDatesBtn {
     margin-top: 2px;
     margin-bottom: 2px;
     background: #5E5DF0;

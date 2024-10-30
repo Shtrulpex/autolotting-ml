@@ -7,10 +7,10 @@ from datetime import datetime
 
 data_pipeline = DataPipeline()
 
-db_proc = data_pipeline._db_processor
-db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
-db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
-db_proc.run_query(f'DROP TABLE IF EXISTS lottings;') 
+# db_proc = data_pipeline._db_processor
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;') 
 # С ПОМОЩЬЮ ЭТОГО МОЖНО ДРОПНУТЬ ВСЕ ТАБЛИЦЫ ПЕРЕД ЗАПУСКОМ
 
 validator = Validator(delivery_standards=data_pipeline.get_standard_shipping())
