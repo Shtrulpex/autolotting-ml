@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+# from datetime import datetime
 
 
 class ValidationError(Exception):
@@ -11,15 +12,6 @@ class NullValueError(ValidationError):
         self.column = column
         self.index = index
         super().__init__(f"Ошибка: Null значение в колонке '{column}' в строке {index}")
-
-
-class ColumnMismatchError(ValidationError):
-    def __init__(self, column, expected_type, actual_type):
-        self.column = column
-        self.expected_type = expected_type
-        self.actual_type = actual_type
-        super().__init__(f"Ошибка: Тип данных в колонке '{column}' не соответствует. "
-                         f"Ожидалось: {expected_type}, получено: {actual_type}")
 
 
 class ColumnMissingError(ValidationError):
@@ -34,30 +26,29 @@ class ExtraColumnError(ValidationError):
         super().__init__(f"Ошибка: Найдена лишняя колонка '{column}'")
 
 
-class Scaler:
-    def __init__(self):
-        pass
+class TypeMismatchError(ValidationError):
+    def __init__(self, column, expected_type, actual_type):
+        self.column = column
+        self.expected_type = expected_type
+        self.actual_type = actual_type
+        super().__init__(f"Ошибка: Тип в колонке '{column}' ожидается '{expected_type}', найден '{actual_type}'")
 
-    def output_transform(self, lots: pd.DataFrame, inplace: bool = True) -> pd.DataFrame:
-        if not inplace:
-            lots = lots.copy()
-        lots['Планируемая сумма'] = lots['Общее количество'] * lots['Цена']
-        return lots
 
-    def input_transform(self, requests: pd.DataFrame, inplace: bool = True) -> pd.DataFrame:
-        if not inplace:
-            requests = requests.copy()
-        requests['latitude'] = requests['Адрес'].apply(self._get_latitude)
-        requests['longitude'] = requests['Адрес'].apply(self._get_longitude)
-        return requests
+class DeliveryTimeStandardError(ValidationError):
+    def __init__(self, order_id, position_id, remaining_days, standard_days):
+        self.order_id = order_id
+        self.position_id = position_id
+        self.remaining_days = remaining_days
+        self.standard_days = standard_days
+        super().__init__(f"Ошибка: Мало времени для заказа '{order_id}', позиция '{position_id}'"
+                         f" - осталось {remaining_days} дней, \tстандарт {standard_days} дней.")
 
-    @staticmethod
-    def _get_latitude(address: str) -> float:
-        return 0.0
 
-    @staticmethod
-    def _get_longitude(address: str) -> float:
-        return 0.0
+class DeliveryTimeError(ValidationError):
+    def __init__(self, lot_id):
+        self.lot_id = lot_id
+        super().__init__(f"Лот {lot_id} имеет дату поставки с разбросом более 30 дней.")
+
 
 
 class Validator:
@@ -80,52 +71,94 @@ class Validator:
     }
 
     def __init__(self, delivery_standards: pd.DataFrame, template_columns: dict = None):
-        """
-        :param template_columns: словарь, где ключ — это название столбца, а значение — тип данных.
-        :param delivery_standards: датафрейм с нормативными сроками поставки для каждого класса.
-        """
         if template_columns is None:
             self._template_columns = self.STANDART_INPUT_TEMPLATE
         else:
             self._template_columns = template_columns
         self._delivery_standards = delivery_standards
 
+    @staticmethod
+    def _check_type(series: pd.Series, expected_type: str) -> bool:
+        """Проверяет, могут ли значения в серии быть приведены к ожидаемому типу."""
+        try:
+            if expected_type == 'datetime64[ns]':
+                pd.to_datetime(series, errors='raise')
+            else:
+                series.astype(expected_type)
+            return True
+        except (ValueError, TypeError):
+            return False
+
     def validate_requests(self, requests: pd.DataFrame) -> bool:
         """
-        Проверяет заявки на соответствие шаблону и нормативность сроков поставок МТР.
-        :param requests: датафрейм заявок на закупку МТР.
-        :return: bool — True, если заявки соответствуют требованиям, иначе вызывает ошибку.
+        Проверяет входные заявки на соответствие следующим критериям:
+        - подаются в формате шаблона (все на месте, ничего лишнего, все в нужном типе)
+        - сроки поставок соответствуют нормативам класса материала
         """
-        # проверка на соответствие
+        # Проверка на наличие необходимых колонок
         for col, expected_type in self._template_columns.items():
             if col not in requests.columns:
                 raise ColumnMissingError(col)
 
-            actual_type = str(requests[col].dtype)
-            if actual_type != expected_type:
-                raise ColumnMismatchError(col, expected_type, actual_type)
-
-        # проверка на пропущенные значения
-        for col in requests.columns:
-            if requests[col].isnull().any():
-                null_indices = requests[col][requests[col].isnull()].index.tolist()
-                for index in null_indices:
-                    raise NullValueError(col, index)
-
-        # проверка на наличие лишних колонок
+        # Проверка на наличие лишних колонок
         extra_columns = set(requests.columns) - set(self._template_columns.keys())
         if extra_columns:
             for col in extra_columns:
                 raise ExtraColumnError(col)
 
+        # Проверка на пропущенные значения
+        for col in requests.drop(columns=['Способ закупки']).columns:
+            if requests[col].isnull().any():
+                null_indices = requests.index[requests[col].isnull()].tolist()
+                for index in null_indices:
+                    raise NullValueError(col, index)
+
+        # Проверка типов данных
+        for col, expected_type in self._template_columns.items():
+            if col in requests.columns:
+                if not self._check_type(requests[col], expected_type):
+                    actual_type = requests[col].dtype
+                    raise TypeMismatchError(col, expected_type, actual_type)
+
+        # Проверка нормативных сроков поставки
+        for index, request in requests.iterrows():
+            material_id = request['Материал']
+            standard_shipping = self._delivery_standards.loc[self._delivery_standards['material_id'] == material_id,
+                                                             'standard_shipping']
+            if not standard_shipping.empty:
+                standard_time = standard_shipping.values[0]
+                delivery_time = pd.to_datetime(request['Срок поставки'])
+                # now = pd.Timestamp(datetime.now())
+                # time_diff = (delivery_time - now).days
+                order_time = pd.to_datetime(request['Дата заказа'])
+                time_diff = (delivery_time - order_time).days
+                if time_diff < standard_time:
+                    raise DeliveryTimeStandardError(request['№ заказа'], request['№ позиции'], time_diff, standard_time)
+
         return True
 
-        # # проверка нормативных сроков поставки
-        # for idx, row in requests.iterrows():
-        #     mtr_class = row['MTR_class']  # Предполагается, что в заявках есть столбец с классом МТР
-        #     delivery_time = row['delivery_time']  # И столбец с указанным сроком поставки
-        #
-        #     # Найдем нормативный срок для
+    def validate_lots(self, requests: pd.DataFrame, lots: pd.DataFrame) -> bool:
+        """
+        Проверяет сформированные лоты на соответствие следующим критериям:
+        - Даты поставок заявок внутри лота принадлежат окну разбросом не более чем в 30 дней
+        """
+
+        # Убираем дубликаты, оставляя первую запись для каждого request_id
+        requests = requests.drop_duplicates(subset='request_id', keep='first')
+
+        # Объединяем заявки и лоты по request_id
+        request_lots = pd.merge(requests, lots, on='request_id')
+
+        # Получаем минимальные и максимальные даты поставок для каждого лота
+        min_delivery_dt = request_lots.groupby('lot_id')['delivery_dt'].min()
+        max_delivery_dt = request_lots.groupby('lot_id')['delivery_dt'].max()
+        window = (max_delivery_dt - min_delivery_dt).dt.days
+
+        for lot_id, days in window.items():
+            if days > 30:
+                raise DeliveryTimeError(lot_id)
+
+        return True
 
 
 class Scorer:
