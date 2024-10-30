@@ -229,7 +229,9 @@ class DataPipeline:
         if conditions:
             query += "\nWHERE\n\t" + "\n\tAND ".join(conditions)
 
-        return self._db_processor.get_df(query)
+        orders = self._db_processor.get_df(query)
+        orders['Дата заказа'] = orders['Дата заказа'].dt.strftime('%d.%m.%Y')
+        return orders
 
     def get_requests(self, order_id: Union[int, List[int]]) -> pd.DataFrame:
         """Выгружает все загруженные заявки по заданному/нескольким номеру(ам) заказа."""
@@ -266,7 +268,10 @@ class DataPipeline:
         WHERE {order_condition}
         '''
 
-        return self._db_processor.get_df(query)
+        requests = self._db_processor.get_df(query)
+        requests['Срок поставки'] = requests['Срок поставки'].dt.strftime('%d.%m.%Y')
+        requests['Дата заказа'] = requests['Дата заказа'].dt.strftime('%d.%m.%Y')
+        return requests
 
     def get_packs(self, from_dttm: Optional[str] = None, to_dttm: Optional[str] = None,
                   algorithm: Optional[str] = None) -> pd.DataFrame:
