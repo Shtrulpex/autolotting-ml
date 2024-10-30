@@ -42,6 +42,10 @@ def lots():
 def lots_create():
     return render_template("lots_create_page.html")
 
+@app.route("/packs_page.html")
+def packs_page():
+    return render_template("packs_page.html")
+
 FILE_FOLDER = './files'
 if not os.path.exists(FILE_FOLDER):
     os.makedirs(FILE_FOLDER)
@@ -73,6 +77,17 @@ def update_df():
     editOrder(data)
     return jsonify({'status': 'success'}), 200
 
+@app.route('/api/upload_lots', methods=['POST'])
+def upload_lots():
+    data = request.get_json()
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+    # df = getOrders(start_date, end_date)
+    # lotter = Solver() ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
+    # result_df = lotter.get_lots(df)
+    # print(result_df)
+    return jsonify({'status': 'success'}), 200
+
 @app.route('/api/download', methods=['GET'])
 def download_file():
     csvpath = ""
@@ -84,8 +99,6 @@ def download_file():
     # здесь заказ проверяет Inspector
     # здесь заказ загружается в БД
     # здесь заказы за месяц выгружаются из БД
-    lotter = Solver()
-    lotter.get_lots(csvpath, csvpath)
     # здесь заказы за месяц отправляются в autolotting-ml а сформированные лоты попадают в файл по пути csvpath
     # здесь сформироанные лоты загружаются в БД а сами лоты отправляются пользователю
     # здесь Scorer считает целевые бизнес-метрики
@@ -105,7 +118,7 @@ def submit_dates():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     df = getOrders(start_date, end_date).to_json(orient='records')
-    return jsonify(df)
+    return jsonify(df), 200
 
 @app.route('/api/fetch-dates', methods=['POST'])
 def fetch_dates():
@@ -113,7 +126,7 @@ def fetch_dates():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     df = getOrders(start_date, end_date)
-    return jsonify({'numberOrders': len(df['№ заказа'].unique()), 'numberPositions': len(df)})
+    return jsonify({'numberOrders': len(df['№ заказа'].unique()), 'numberPositions': len(df)}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

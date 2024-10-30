@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Страница заказов</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='/lots_page/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='/packs_page/styles.css') }}">
     <div id="all-data-div" style="display: none;">{{all_packs}}</div>
 </head>
 <body>
@@ -21,7 +21,7 @@
             <li><a href="/home.html">Главная страница</a></li>
             <li><a href="/order_page.html">Страница заказов</a></li>
             <li><a href="/lots_create_page.html">Страница формирования лотов</a></li>
-            <li><a href="/packs_page.html">Страница паков</a></li>
+            <li><a href="/packs_page.html"><strong>Страница паков</strong></a></li>
         </ul>
     </div>
 
@@ -39,6 +39,6 @@
         <p>Здесь будет информация о паке</p>
     </div>
 
-    <script src="{{ url_for('static',filename='/lots_page/script.js') }}"></script>
+    <script src="{{ url_for('static',filename='/packs_page/script.js') }}"></script>
 </body>
 </html>

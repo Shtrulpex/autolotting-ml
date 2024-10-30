@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const secondDateH2 = document.getElementById('end-date')
     const h2NumberOfOrders = document.getElementById('number-of-orders');
     const h2NumberOfPositions = document.getElementById('number-of-positions');
+    const formLotsBtn = document.getElementById('form-lots-btn');
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
     let startDate = null;
@@ -169,4 +170,23 @@ document.addEventListener('DOMContentLoaded', () => {
     submitDatesBtn.addEventListener('click', () => {
         calendarMenu.classList.add('hidden-calendar');
     });
+
+    formLotsBtn.addEventListener('click', () => {
+        if (startDate && endDate) {
+            fetch('/api/upload_lots', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ start_date: startDate, end_date: endDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => console.error("Error:", error));
+        } else {
+            alert("Please select a date range.");
+        }
+    })
 });

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XLSX Uploader</title>
+    <title>Страница заказов</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/order_page/styles.css') }}">
     <div id="dataDiv" style="display: none;">{{data}}</div>
     <div id="all-data-div" style="display: none;">{{all_orders}}</div>
@@ -14,7 +14,7 @@
         <button class="menu-btn" id="ordersBtn"><<</button>
         <h2><a href="/order_page.html"><u>Заказы</u></a></h2>
         <h2><a href="/lots_create_page.html">Сформировать</a></h2>
-        <h2><a href="/lots_page.html">Лоты</a></h2>
+        <h2><a href="/packs_page.html">Лоты</a></h2>
     </div>
 
     <div class="table-section" id="tableSection">
@@ -32,9 +32,9 @@
     <div id="sidebar" class="sidebar">
         <ul>
             <li><a href="/home.html">Главная страница</a></li>
-            <li><a href="/order_page.html">Страница заказов</a></li>
+            <li><a href="/order_page.html"><strong>Страница заказов</strong></a></li>
             <li><a href="/lots_create_page.html">Страница формирования лотов</a></li>
-            <li><a href="/lots_page.html">Страница лотов</a></li>
+            <li><a href="/packs_page.html">Страница паков</a></li>
         </ul>
     </div>
 
