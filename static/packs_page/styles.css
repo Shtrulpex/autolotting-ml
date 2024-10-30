@@ -256,6 +256,32 @@ body:hover .sidebar-orders {
     border: 0;
 }
 
+#calendarBtn, #submitDatesBtn {
+    display: flex;
+    margin-top: 10px;
+    margin-left: 0px;
+    margin-bottom: 15px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 15px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 7px 15px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
 .filters-box ul{
     margin: 0 0 0 auto;
     padding: 0;
@@ -290,4 +316,87 @@ body:hover .sidebar-orders {
 
 .header h2 {
     margin: auto;
+}
+
+.table-section {
+    display: none;
+    text-align: center;
+    margin: 10px 10px 10px 10px;
+}
+
+table {
+    background-color: var(--menu-color);
+    color: var(--bright-text-color);
+    margin: auto;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.hidden-calendar {
+    display: none;
+}
+
+#calendarMenu {
+    position: absolute;
+    top: 210px;
+    left: 90px;
+    background-color: white;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    overflow: visible;
+}
+
+#calendarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-date {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.calendar-date:hover, .selected-date {
+    background-color: #87CEEB;
+    color: white;
+}
+
+.range-date {
+    background-color: #d0e7ff;
+}
+
+.close-btn {
+    border: none;
+    background: transparent;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    position: absolute;
+    right: -5px;
+    top: -5px;
+}
+
+.close-btn:hover {
+    color: #555;
 }

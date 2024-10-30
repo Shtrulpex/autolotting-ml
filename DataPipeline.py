@@ -320,7 +320,7 @@ class DataPipeline:
             ON requests.material_id = materials.material_id
         INNER JOIN lottings
             ON lottings.request_id = requests.request_id
-        WHERE lottings.pack_id = {pack_id}
+        WHERE lottings.pack_id = "{pack_id}"
         '''
         return self._db_processor.get_df(query)
 

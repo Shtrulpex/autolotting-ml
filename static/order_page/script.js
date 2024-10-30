@@ -136,7 +136,7 @@ filterInput.addEventListener('input', () => {
 
 submitOrderBtn.addEventListener('click', function() {
 
-    const editableColumns = ['Дата заказа', '№ заказа', '№ позиции', 'Срок поставки', 'Материал', 'Грузополучатель', 'Общее количество', 'Цена', 'Способ закупки', 'Клиент']
+    const editableColumns = ['Дата заказа', '№ заказа', '№ позиции', 'Срок поставки', 'Материал', 'Грузополучатель', 'Общее количество', 'Цена', 'Способ закупки', 'Клиент'];
 
     if (submitOrderBtn.textContent === "Редактировать") {
         submitOrderBtn.textContent = "Сохранить";

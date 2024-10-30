@@ -208,3 +208,14 @@ body:hover .sidebar {
 .close-btn:hover {
     color: #555;
 }
+
+#input-name {
+    font-family: sans-serif;
+    padding: 1rem 1rem;
+    border-radius: 0.2rem;
+    border: none;
+    transition: all 0.3s;
+    width: 240px;
+    margin-left: 0px;
+    outline: 1px solid #333;
+}

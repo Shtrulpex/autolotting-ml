@@ -56,11 +56,22 @@ def editOrder(data):
     df = pd.DataFrame(data)
     data_pipeline.update_requests(df)
 
-def getPacks():
-    # при нажатии кнопок "сформировать лоты" и при переходе на страницу паков
+def getPacks(id=None):
+    if id != None:
+        print(id)
+        lots = data_pipeline.get_lots(id)
+        print(lots)
+        return lots
+    else:
+        packs = data_pipeline.get_packs()
+        return packs
 
-    packs = data_pipeline.get_packs(from_dttm='01.11.2020 00:00:00', to_dttm='31.11.2020 23:59:59', algorithm='aglomerative')
 
+def putPack(pack_name, lotting_algorytm, lots, from_date, to_date):
+    from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
+    to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
+    pack_id = data_pipeline.put_pack(pack_name, lotting_algorytm, lots, from_date, to_date)
+    return pack_id
 
 def createPack():
 

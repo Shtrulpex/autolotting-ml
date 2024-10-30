@@ -1,7 +1,8 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests
+from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks
 from Aglomerative.AglomerativeCluster import Solver
+import pandas as pd
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -44,7 +45,16 @@ def lots_create():
 
 @app.route("/packs_page.html")
 def packs_page():
-    return render_template("packs_page.html")
+    id = request.args.getlist('id')
+    start_date = request.args.getlist('start_date')
+    end_date = request.args.getlist('end_date')
+    df_packs = getPacks().to_json(orient='records')
+    if(id != []):
+        id = list(map(int, id[0].split(',')))
+        dfdata = getPacks(id[0]).to_json(orient='records')
+        return render_template("packs_page.html", all_packs=df_packs, data=dfdata)
+    else:
+        return render_template("packs_page.html", all_packs=df_packs)
 
 FILE_FOLDER = './files'
 if not os.path.exists(FILE_FOLDER):
@@ -82,11 +92,14 @@ def upload_lots():
     data = request.get_json()
     start_date = data.get('start_date')
     end_date = data.get('end_date')
-    df = getOrders(start_date, end_date)
-    lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
-    result_df = lotter.get_lots(df)
-    print(result_df)
-    return jsonify({'status': 'success'}), 200
+    name = data.get('name')
+    df = pd.read_csv('./files/cold_lots.csv')
+    # df = getOrders(start_date, end_date)
+    # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
+    # result_df = lotter.get_lots(df)
+    # print(result_df)
+    pack_id = putPack(name, "none_algorythm_yet", df, start_date, end_date)
+    return jsonify({'id': pack_id}), 200
 
 @app.route('/api/download', methods=['GET'])
 def download_file():
@@ -126,7 +139,10 @@ def fetch_dates():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     df = getOrders(start_date, end_date)
-    return jsonify({'numberOrders': len(df['№ заказа'].unique()), 'numberPositions': len(df)}), 200
+    if df.empty:
+        return jsonify({'numberOrders': 0, 'numberPositions': 0}), 200
+    else:
+        return jsonify({'numberOrders': len(df['№ заказа'].unique()), 'numberPositions': len(df)}), 200
 
 if __name__ == "__main__":
     app.run(debug=True)

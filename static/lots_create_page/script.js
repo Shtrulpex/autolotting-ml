@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const h2NumberOfOrders = document.getElementById('number-of-orders');
     const h2NumberOfPositions = document.getElementById('number-of-positions');
     const formLotsBtn = document.getElementById('form-lots-btn');
+    const inputName = document.getElementById('input-name')
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
     let startDate = null;
@@ -173,20 +174,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     formLotsBtn.addEventListener('click', () => {
         if (startDate && endDate) {
-            fetch('/api/upload_lots', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ start_date: startDate, end_date: endDate })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(error => console.error("Error:", error));
+            if (inputName.value) {
+                fetch('/api/upload_lots', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ start_date: startDate, end_date: endDate, name: inputName.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href=`/packs_page.html?id=${data.id}`;
+                })
+                .catch(error => console.error("Error:", error));
+            } else {
+                alert('Пожалуйста, впишите название пака.')
+            }
         } else {
-            alert("Please select a date range.");
+            alert("Пожалуйста, выберете даты заказов.");
         }
     })
 });
