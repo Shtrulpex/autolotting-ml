@@ -92,7 +92,7 @@ async function uploadFile(file) {
         .then(response => response.json())
         .then(data => {
             alert(data.message);
-            // window.location.href = `/${row['№ заказа']}/order_page.html`; - куда редиректиться то?
+            window.location.href = `/order_page.html?id=${data.ids}`;
         })
         .catch(error => console.error("Ошибка:", error));
     } catch (error) {
@@ -148,7 +148,7 @@ if (allDfDiv.textContent !== '') {
                 li.appendChild(p);
             }
             li.addEventListener('click', () => {
-                window.location.href = `/${row['№ заказа']}/order_page.html`;
+                window.location.href = `/order_page.html?id=${row['№ заказа']}`;
             });
             ulSidebarAllDf.appendChild(li);
         })
@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             li.appendChild(p);
                         }
                         li.addEventListener('click', () => {
-                            window.location.href = `/${row['№ заказа']}/order_page.html`;
+                            window.location.href = `/order_page.html?id=${row['№ заказа']}`;
                         });
                         ulSidebarAllDf.appendChild(li);
                     })

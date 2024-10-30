@@ -47,10 +47,11 @@ def getOrders(from_date=None, to_date=None):
 
 
 def getRequests(order_id):
-    requset = data_pipeline.get_requests(order_id=order_id)
-    if not isinstance(requset, pd.DataFrame):
-        requset = pd.DataFrame()
-    return requset
+    request = data_pipeline.get_requests(order_id=order_id)
+    print(request)
+    if not isinstance(request, pd.DataFrame):
+        request = pd.DataFrame()
+    return request
 
 def editOrder(data): #Пока не редактируем
     df = pd.DataFrame(data)

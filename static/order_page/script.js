@@ -113,7 +113,7 @@ if (allDfDiv.textContent !== '') {
                 li.appendChild(p);
             }
             li.addEventListener('click', () => {
-                window.location.href = `/${row['№ заказа']}/order_page.html`;
+                window.location.href = `/order_page.html?id=${row['№ заказа']}`;
             });
             ulSidebarAllDf.appendChild(li);
         })
@@ -162,10 +162,10 @@ submitOrderBtn.addEventListener('click', function() {
         })
         .then(response => {
             if (!response.ok) {
-                alert("Error with database");
+                alert("Ошибка со стороны базы данных");
             }
             else {
-                alert("Edited successfully");
+                alert("Изменения загружены");
             }
         })
         .catch(error => console.error("Error updating CSV data:", error));
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             li.appendChild(p);
                         }
                         li.addEventListener('click', () => {
-                            window.location.href = `/${row['№ заказа']}/order_page.html`;
+                            window.location.href = `/order_page.html?id=${row['№ заказа']}`;
                         });
                         ulSidebarAllDf.appendChild(li);
                     })

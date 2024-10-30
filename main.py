@@ -23,18 +23,28 @@ def load_order():
     df_orders = getOrders().to_json(orient='records')
     return render_template("order_load_page.html", all_orders=df_orders)
 
-@app.route("/<id>/order_page.html")
-def get_order(id):
-    dfdata = getRequests(id).to_json(orient='records')
-    if(dfdata == "[]"):
-        return redirect(url_for("orders"))
-    df_orders = getOrders().to_json(orient='records')
-    return render_template("order_page.html", all_orders=df_orders, data=dfdata)
+# @app.route("/order_page.html")
+# def get_order():
+#     id = request.args.getlist('id')
+#     dfdata = getRequests(id).to_json(orient='records')
+#     if(dfdata == "[]"):
+#         return redirect(url_for("orders"))
+#     df_orders = getOrders().to_json(orient='records')
+#     return render_template("order_page.html", all_orders=df_orders, data=dfdata)
 
 @app.route("/order_page.html")
 def orders():
+    id = request.args.getlist('id')
     df_orders = getOrders().to_json(orient='records')
-    return render_template("order_page.html", all_orders=df_orders)
+    id = list(map(int, id[0].split(',')))
+    if(id != []):
+        print(id)
+        dfdata = getRequests(id).to_json(orient='records')
+        print(dfdata)
+        return render_template("order_page.html", all_orders=df_orders, data=dfdata)
+    else:
+        return render_template("order_page.html", all_orders=df_orders)
+    
 
 @app.route("/lots_page.html")
 def lots():
@@ -60,8 +70,7 @@ def upload_file():
         file.save(filepath)
         success, response = xlxsToDf(filepath)
         if success:
-            print(response)
-            return jsonify({'message': f'Файл загружен: {file.filename}, id={response}.'}), 200
+            return jsonify({'message': f'Файл загружен: {file.filename}.', 'ids':response.to_list()}), 200
         else:
             return jsonify({'message': f'Ошибка в содержании файла: {response}'}), 400
     else:
