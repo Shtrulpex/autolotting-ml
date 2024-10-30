@@ -127,12 +127,12 @@ class DataPipeline:
             last_id_before_insert = 0
         self._db_processor.load_df('requests', df, 'request_id')
 
-        # Получаем только новые request_id
+        # Получаем только новые order_id по только новым request_id
         query_new_ids = f'''
-              SELECT request_id FROM requests WHERE request_id > {last_id_before_insert}
+              SELECT DISTINCT order_id FROM requests WHERE request_id > {last_id_before_insert}
           '''
-        request_ids = pd.Series(np.array(self._db_processor.run_query(query_new_ids).fetchall()).flatten(), name='request_id')
-        return request_ids
+        order_ids = pd.Series(np.array(self._db_processor.run_query(query_new_ids).fetchall()).flatten(), name='order_id')
+        return order_ids
 
     def put_pack(self, pack_name: str, lots: pd.DataFrame) -> int:
         """
