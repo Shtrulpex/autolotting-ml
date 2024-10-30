@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextMonthBtn = document.getElementById('nextMonth');
     const firstDateH2 = document.getElementById('start-date');
     const secondDateH2 = document.getElementById('end-date')
+    const h2NumberOfOrders = document.getElementById('number-of-orders');
+    const h2NumberOfPositions = document.getElementById('number-of-positions');
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
     let startDate = null;
@@ -95,6 +97,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function fetchOrders() {
+        if (startDate && endDate) {
+            await fetch('/api/fetch-dates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ start_date: startDate, end_date: endDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                h2NumberOfOrders.textContent = data.numberOrders;
+                h2NumberOfPositions.textContent = data.numberPositions;
+            })
+            .catch(error => console.error("Error:", error));
+        } else {
+            alert("Please select a date range.");
+        }
+    }
+
     function selectDate(year, month, day) {
         const selectedDate = new Date(year, month, day);
         if (!startDate || (startDate && endDate)) {
@@ -105,10 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
             endDate = startDate;
             startDate = selectedDate;
             firstDateH2.textContent = startDate.getFullYear()+'-'+(startDate.getMonth()+1)+'-'+startDate.getDate();
-            secondDateH2.textContent = endDate.getFullYear()+'-'+(endDate.getMonth()+1)+'-'+endDate.getDate();;
+            secondDateH2.textContent = endDate.getFullYear()+'-'+(endDate.getMonth()+1)+'-'+endDate.getDate();
+            fetchOrders();
         } else {
             endDate = selectedDate;
-            secondDateH2.textContent = endDate.getFullYear()+'-'+(endDate.getMonth()+1)+'-'+endDate.getDate();;
+            secondDateH2.textContent = endDate.getFullYear()+'-'+(endDate.getMonth()+1)+'-'+endDate.getDate();
+            fetchOrders();
         }
         updateCalendarDisplay();
     }

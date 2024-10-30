@@ -107,5 +107,13 @@ def submit_dates():
     df = getOrders(start_date, end_date).to_json(orient='records')
     return jsonify(df)
 
+@app.route('/api/fetch-dates', methods=['POST'])
+def fetch_dates():
+    data = request.get_json()
+    start_date = data.get('start_date')
+    end_date = data.get('end_date')
+    df = getOrders(start_date, end_date)
+    return jsonify({'numberOrders': len(df['№ заказа'].unique()), 'numberPositions': len(df)})
+
 if __name__ == "__main__":
     app.run(debug=True)

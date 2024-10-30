@@ -138,6 +138,12 @@ body:hover .sidebar {
     margin-right: 20px;
 }
 
+.orders-statistics h2{
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
 .hidden-calendar {
     display: none;
 }
