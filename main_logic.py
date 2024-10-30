@@ -58,14 +58,15 @@ def editOrder(data):
 
 def getPacks(id=None):
     if id != None:
-        print(id)
         lots = data_pipeline.get_lots(id)
-        print(lots)
         return lots
     else:
         packs = data_pipeline.get_packs()
         return packs
 
+def editLot(data):
+    df = pd.DataFrame(data)
+    data_pipeline.update_lots(df)
 
 def putPack(pack_name, lotting_algorytm, lots, from_date, to_date):
     from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")

@@ -1,6 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks
+from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks, editLot
 from Aglomerative.AglomerativeCluster import Solver
 import pandas as pd
 
@@ -37,7 +37,16 @@ def orders():
 
 @app.route("/lots_page.html")
 def lots():
-    return render_template("lots_page.html")
+    id = request.args.getlist('id')
+    if(id != []):
+        dfdata = getPacks(id[0]).to_json(orient='records')
+        lot_id = request.args.getlist('lot_id')
+        if(lot_id != []):
+            return render_template("lots_page.html", data=dfdata, id=int(id[0]), lot_id=int(lot_id[0]))
+        else:
+            return render_template("lots_page.html", data=dfdata, id=int(id[0]))
+    else:
+        return render_template("lots_page.html")
 
 @app.route("/lots_create_page.html")
 def lots_create():
@@ -81,10 +90,16 @@ def upload_file():
     else:
         return jsonify({'message': 'Только .xlsx файлы должны быть загружены.'}), 400
 
-@app.route('/api/update_df', methods=['POST'])
-def update_df():
+@app.route('/api/update_order', methods=['POST'])
+def update_order():
     data = request.get_json()
     editOrder(data)
+    return jsonify({'status': 'success'}), 200
+
+@app.route('/api/update_lot', methods=['POST'])
+def update_lot():
+    data = request.get_json()
+    editLot(data)
     return jsonify({'status': 'success'}), 200
 
 @app.route('/api/upload_lots', methods=['POST'])

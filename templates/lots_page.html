@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Страница заказов</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/lots_page/styles.css') }}">
-    <div id="all-data-div" style="display: none;">{{all_packs}}</div>
+    <div id="data" style="display: none;">{{data}}</div>
+    <div id="id_pack" style="display: none;">{{id}}</div>
+    <div id="lot_id" style="display: none;">{{lot_id}}</div>
 </head>
 <body>
     <div class="header">
@@ -34,9 +36,16 @@
         </ul>
     </div>
 
-    <div class="main-content">
-        <button id="btn-to-lots" onclick="window.location.href='/lots_page.html'">Перейти к лотам</button>
-        <p>Здесь будет информация о паке</p>
+    <div class="table-section" id="tableSection">
+        <button id="submitOrderBtn">Редактировать</button>
+        <table>
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
     </div>
 
     <script src="{{ url_for('static',filename='/lots_page/script.js') }}"></script>

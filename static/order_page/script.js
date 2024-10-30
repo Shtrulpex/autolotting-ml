@@ -167,7 +167,7 @@ submitOrderBtn.addEventListener('click', function() {
             return rowData;
         });
 
-        fetch('/api/update_df', {
+        fetch('/api/update_order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
