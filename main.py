@@ -82,10 +82,10 @@ def upload_lots():
     data = request.get_json()
     start_date = data.get('start_date')
     end_date = data.get('end_date')
-    # df = getOrders(start_date, end_date)
-    # lotter = Solver() ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
-    # result_df = lotter.get_lots(df)
-    # print(result_df)
+    df = getOrders(start_date, end_date)
+    lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
+    result_df = lotter.get_lots(df)
+    print(result_df)
     return jsonify({'status': 'success'}), 200
 
 @app.route('/api/download', methods=['GET'])
