@@ -96,6 +96,7 @@ if (allDfDiv.textContent !== '') {
 }
 
 if (dfDataDiv.textContent !== '') {
+    document.getElementById('btn-to-lots').style.display = '';
     const dfData = JSON.parse(dfDataDiv.textContent);
     if (dfData.length > 0) {
         tableSection.style.display = 'block';

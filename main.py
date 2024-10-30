@@ -52,7 +52,7 @@ def packs_page():
     if(id != []):
         id = list(map(int, id[0].split(',')))
         dfdata = getPacks(id[0]).to_json(orient='records')
-        return render_template("packs_page.html", all_packs=df_packs, data=dfdata)
+        return render_template("packs_page.html", all_packs=df_packs, data=dfdata, id=id[0])
     else:
         return render_template("packs_page.html", all_packs=df_packs)
 
