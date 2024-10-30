@@ -36,11 +36,9 @@ def load_order():
 def orders():
     id = request.args.getlist('id')
     df_orders = getOrders().to_json(orient='records')
-    id = list(map(int, id[0].split(',')))
     if(id != []):
-        print(id)
+        id = list(map(int, id[0].split(',')))
         dfdata = getRequests(id).to_json(orient='records')
-        print(dfdata)
         return render_template("order_page.html", all_orders=df_orders, data=dfdata)
     else:
         return render_template("order_page.html", all_orders=df_orders)
