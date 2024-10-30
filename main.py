@@ -23,15 +23,6 @@ def load_order():
     df_orders = getOrders().to_json(orient='records')
     return render_template("order_load_page.html", all_orders=df_orders)
 
-# @app.route("/order_page.html")
-# def get_order():
-#     id = request.args.getlist('id')
-#     dfdata = getRequests(id).to_json(orient='records')
-#     if(dfdata == "[]"):
-#         return redirect(url_for("orders"))
-#     df_orders = getOrders().to_json(orient='records')
-#     return render_template("order_page.html", all_orders=df_orders, data=dfdata)
-
 @app.route("/order_page.html")
 def orders():
     id = request.args.getlist('id')
@@ -42,7 +33,6 @@ def orders():
         return render_template("order_page.html", all_orders=df_orders, data=dfdata)
     else:
         return render_template("order_page.html", all_orders=df_orders)
-    
 
 @app.route("/lots_page.html")
 def lots():
@@ -51,7 +41,6 @@ def lots():
 FILE_FOLDER = './files'
 if not os.path.exists(FILE_FOLDER):
     os.makedirs(FILE_FOLDER)
-
 
 @app.route('/api/upload', methods=['POST'])
 def upload_file():

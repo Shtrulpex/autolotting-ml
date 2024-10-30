@@ -145,12 +145,10 @@ submitOrderBtn.addEventListener('click', function() {
         Array.from(rows).forEach((row, row_index) => {
             if (row_index != 0) {
                 Array.from(row.cells).forEach((cell, index) => {
-                    // Check if the column is in the editable columns list
                     const columnName = document.querySelectorAll('th')[index].innerText;
                     if (editableColumns.includes(columnName)) {
-                        // Toggle contenteditable attribute
                         cell.contentEditable = cell.isContentEditable ? "false" : "true";
-                        cell.style.backgroundColor = cell.isContentEditable ? "#666" : ""; // Highlight if editable
+                        cell.style.backgroundColor = cell.isContentEditable ? "#666" : "";
                     }
                 });
             }   

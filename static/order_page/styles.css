@@ -26,6 +26,17 @@ body, html {
     box-shadow: 0 4px 2px -2px gray;
 }
 
+.header {
+    position: relative;
+    z-index: 2;
+}
+
+.header h2 a {
+    color: var(--dark-text-color);
+    text-decoration: none;
+    display: block;
+}
+
 .menu-btn {
     background-color: rgba(244, 244, 244, 0.005);
     color: var(--dark-text-color);
@@ -184,10 +195,6 @@ body:hover .sidebar-orders {
     left: -300px;
 }
 
-.header {
-    position: relative;
-    z-index: 2;
-}
 
 .order_filter {
     display: block;
