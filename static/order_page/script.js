@@ -135,12 +135,26 @@ filterInput.addEventListener('input', () => {
 });
 
 submitOrderBtn.addEventListener('click', function() {
+
+    const editableColumns = ['Дата заказа', '№ заказа', '№ позиции', 'Срок поставки', 'Материал', 'Грузополучатель', 'Общее количество', 'Цена', 'Способ закупки', 'Клиент']
+
     if (submitOrderBtn.textContent === "Редактировать") {
         submitOrderBtn.textContent = "Сохранить";
-        const cells = tableBody.querySelectorAll('td');
-        cells.forEach(cell => {
-            cell.contentEditable = true;
-        })
+        const rows = tableBody.querySelectorAll('tr');
+        const columnNames = tableBody.querySelectorAll('th');
+        Array.from(rows).forEach((row, row_index) => {
+            if (row_index != 0) {
+                Array.from(row.cells).forEach((cell, index) => {
+                    // Check if the column is in the editable columns list
+                    const columnName = document.querySelectorAll('th')[index].innerText;
+                    if (editableColumns.includes(columnName)) {
+                        // Toggle contenteditable attribute
+                        cell.contentEditable = cell.isContentEditable ? "false" : "true";
+                        cell.style.backgroundColor = cell.isContentEditable ? "#666" : ""; // Highlight if editable
+                    }
+                });
+            }   
+        });
     }
     else {
         const rows = Array.from(tableBody.querySelectorAll('tr'));
@@ -173,6 +187,7 @@ submitOrderBtn.addEventListener('click', function() {
         const cells = tableBody.querySelectorAll('td');
         cells.forEach(cell => {
             cell.contentEditable = false;
+            cell.style.backgroundColor = "";
         })
     }
 });

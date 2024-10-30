@@ -54,10 +54,10 @@ def getRequests(order_id):
 
 def editOrder(data): #Пока не редактируем
     df = pd.DataFrame(data)
-    # data_pipeline.update_requests(df)
+    data_pipeline.update_requests(df)
     # Здесь загружается df со внесенными пользователем изменениями
     # см getRequests()
-    df.to_csv("./files/enter.csv", index=False)
+    # df.to_csv("./files/enter.csv", index=False)
 
 def getPacks():
     # при нажатии кнопок "сформировать лоты" и при переходе на страницу паков
