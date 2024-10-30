@@ -162,8 +162,13 @@ body:hover .sidebar {
     border-bottom: 1px solid #555;
     list-style-type: none;
     padding: 8px;
-    display: flex;
-    align-items: center;
+    display: block;
+    text-align: left;
+    cursor: pointer;
+}
+
+.sidebar-orders-menu-scroll li:hover {
+    background-color: #666;
 }
 
 

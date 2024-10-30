@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XLSX Uploader</title>
     <link rel="stylesheet" href="{{ url_for('static',filename='/order_load_page/styles.css') }}">
+    <div id="all-data-div" style="display: none;">{{all_orders}}</div>
 </head>
 <body>
 
@@ -25,28 +26,11 @@
     <div id="sidebar" class="sidebar">
         <ul>
             <li><a href="/home.html">Главная страница</a></li>
-            <li><a href="/order_page.html"><strong>Страница заказов</strong></a></li>
+            <li><a href="/order_page.html">Страница заказов</a></li>
             <li><a href="/lots_page.html">Страница формирования лотов</a></li>
             <li><a href="/lots_page.html">Страница лотов</a></li>
         </ul>
     </div>
-
-    <!-- <div id="sidebar-orders" class="sidebar-orders">
-        <ul>
-            <li><input type="text" id="filters" placeholder="Добавить фильтры">
-                <div class="filters-box" id="filters-box">
-                    <ul id="filters-ul">
-                    </ul>
-                </div></li>
-            <li><a href="/order_load_page.html"><strong>Загрузить заказ</strong></a></li>
-            <li><div>Все заказы</div>
-                <div><ul class="sidebar-orders-menu-scroll">
-                    <li><a href="#option1">Option 1</a></li>
-                    <li><a href="#option2">Option 2</a></li>
-                    <li><a href="#option3">Option 3</a></li>
-                </ul></div></li>
-        </ul>
-    </div> -->
 
     <div id="sidebar-orders" class="sidebar-orders">
         <ul>
@@ -60,36 +44,17 @@
                     <li><button id="submitFilters">Применить фильтры</button></li>
                 </ul>
             </li>
-            <li><a href="/order_load_page.html">Загрузить заказ</a></li>
+            <li><a href="/order_load_page.html"><strong>Загрузить заказ</strong></a></li>
             <li><div><h2>Все заказы</h2></div>
                 <input type="text" id="filters" placeholder="Поиск заказа">
-                <div><ul class="sidebar-orders-menu-scroll" id="orders-list">
-                    <li>Apple</li>
-                    <li>Apricot</li>
-                    <li>Avocado</li>
-                    <li>Banana</li>
-                    <li>Blackberry</li>
-                    <li>Blueberry</li>
-                    <li>Cantaloupe</li>
-                    <li>Cherry</li>
-                    <li>Coconut</li>
-                    <li>Grape</li>
-                    <li>Grapefruit</li>
-                    <li>Kiwi</li>
-                    <li>Lemon</li>
-                    <li>Lime</li>
-                    <li>Mango</li>
-                    <li>Orange</li>
-                    <li>Peach</li>
-                    <li>Pineapple</li>
-                    <li>Raspberry</li>
-                    <li>Watermelon</li>
+                <div><ul class="sidebar-orders-menu-scroll" id="all-orders-ul">
                 </ul></div></li>
         </ul>
     </div>
 
     <div id="calendarMenu" class="hidden-calendar">
         <div id="calendarHeader">
+            <select id="yearSelector"></select>
             <button id="prevMonth">&lt;</button>
             <span id="monthYear"></span>
             <button id="nextMonth">&gt;</button>

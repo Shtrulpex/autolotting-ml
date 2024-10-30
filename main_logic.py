@@ -7,9 +7,10 @@ from datetime import datetime
 
 data_pipeline = DataPipeline()
 
-# data_pipeline.db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
-# data_pipeline.db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
-# data_pipeline.db_proc.run_query(f'DROP TABLE IF EXISTS lottings;') 
+db_proc = data_pipeline._db_processor
+db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+db_proc.run_query(f'DROP TABLE IF EXISTS lottings;') 
 # С ПОМОЩЬЮ ЭТОГО МОЖНО ДРОПНУТЬ ВСЕ ТАБЛИЦЫ ПЕРЕД ЗАПУСКОМ
 
 validator = Validator(delivery_standards=data_pipeline.get_standard_shipping())
@@ -22,11 +23,11 @@ def xlxsToDf(filepath):
 
 
     # каждый раз когда нижимается кнопка "сохранить заказы (в начале и после редактирования)"
-    # try:
-    #     request_validation = validator.validate_requests(df)
-    # except ValidationError as ve:
-    #     print(ve)
-    #     request_validation = False
+    try:
+        request_validation = validator.validate_requests(df)
+    except ValidationError as ve:
+        print(ve)
+        request_validation = False
 
     # # if request_validation:
     requests_ids = data_pipeline.put_requests(df)
@@ -39,27 +40,28 @@ def xlxsToDf(filepath):
     # df.to_csv(csvname, index=False)
     # return csvname
 
-def getOrders(from_data=None, to_data=None):
+def getOrders(from_date=None, to_date=None):
     # df = pd.read_csv("./files/enter.csv")
 
     # перешли на страницу заказов, грузим инфу по заказам в целом (даты заказов от балды)
-    # if from_data != None:
-    #     orders_df = data_pipeline.get_orders(from_dt=from_data, to_dt=to_data)
-    # else:
-    global orders_df
-    orders_df = data_pipeline.get_orders()
+    if from_date != None:
+        from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
+        to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
+        orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
+    else:
+        orders_df = data_pipeline.get_orders()
+    if not isinstance(orders_df, pd.DataFrame):
+        orders_df = pd.DataFrame()
     # сортируем заказы по дате заказа (поле order_dt)
-
     return orders_df
 
 
-def getRequests():
+def getRequests(order_id):
     # при нажатии на конкртеный заказ переходи в список его запросов (позиций) ВНИМАНИЕ, здесь появляется доп колонка -- request_id
     # в том числе для редактирование
-    global orders_df
-    requests = data_pipeline.get_requests(order_id=1)
+    return data_pipeline.get_requests(order_id=order_id)
     # или сразу нескольких, можно даже всех
-    requests = data_pipeline.get_requests(order_id=orders_df['№ заказа'].to_list())
+    # requests = data_pipeline.get_requests(order_id=orders_df['№ заказа'].to_list())
     # здесь сортируем полученные запросы по их request_id
 
 

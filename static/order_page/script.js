@@ -27,6 +27,7 @@ menuBtn.addEventListener('click', function() {
 });
 
 ordersBtn.addEventListener('click', function() {
+    calendarMenu.classList.add('hidden-calendar');
     if (sidebarOrders.style.left === "0px") {
         sidebarOrders.style.left = "-300px";
         ordersBtn.classList.remove("active");
@@ -106,16 +107,32 @@ if (allDfDiv.textContent !== '') {
     if (allDfData.length > 0) {
         allDfData.forEach(row => {
             const li = document.createElement("li");
-            Object.values(row).forEach(cellData => {
-                const h5 = document.createElement("h5");
-                h5.textContent = cellData;
-                h5.textContent
-                li.appendChild(h5);
-            })
+            for (let key in row) {
+                const p = document.createElement("p");
+                p.textContent = key + ": " + row[key];
+                li.appendChild(p);
+            }
+            li.addEventListener('click', () => {
+                window.location.href = `/${row['№ заказа']}/order_page.html`;
+            });
             ulSidebarAllDf.appendChild(li);
         })
     }
 }
+
+filterInput.addEventListener('input', () => {
+    const filterText = filterInput.value.toLowerCase();
+    const listItems = ulSidebarAllDf.getElementsByTagName('li');
+
+    Array.from(listItems).forEach(item => {
+        const itemText = item.textContent.toLowerCase();
+        if (itemText.includes(filterText)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
 
 submitOrderBtn.addEventListener('click', function() {
     if (submitOrderBtn.textContent === "Редактировать") {
@@ -163,6 +180,7 @@ submitOrderBtn.addEventListener('click', function() {
 document.addEventListener('DOMContentLoaded', () => {
     const calendarBtn = document.getElementById('calendarBtn');
     const calendarMenu = document.getElementById('calendarMenu');
+    const yearSelector = document.getElementById('yearSelector');
     const submitDatesBtn = document.getElementById('submitDatesBtn');
     const closeCalendarBtn = document.getElementById('closeCalendar');
     const calendar = document.getElementById('calendar');
@@ -174,9 +192,21 @@ document.addEventListener('DOMContentLoaded', () => {
     let startDate = null;
     let endDate = null;
 
+    for (let year = 2000; year <= currentYear; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelector.appendChild(option);
+    }
+    yearSelector.value = currentYear;
+
+    yearSelector.addEventListener('change', () => {
+        renderCalendar(yearSelector.value, currentMonth);
+    });
+
     calendarBtn.addEventListener('click', () => {
         calendarMenu.classList.toggle('hidden-calendar');
-        renderCalendar(currentYear, currentMonth);
+        renderCalendar(yearSelector.value, currentMonth);
     });
 
     closeCalendarBtn.addEventListener('click', () => {
@@ -187,18 +217,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentMonth--;
         if (currentMonth < 0) {
             currentMonth = 11;
-            currentYear--;
+            yearSelector.value--;
         }
-        renderCalendar(currentYear, currentMonth);
+        renderCalendar(yearSelector.value, currentMonth);
     });
 
     nextMonthBtn.addEventListener('click', () => {
         currentMonth++;
         if (currentMonth > 11) {
             currentMonth = 0;
-            currentYear++;
+            yearSelector.value++;
         }
-        renderCalendar(currentYear, currentMonth);
+        renderCalendar(yearSelector.value, currentMonth);
     });
 
     function renderCalendar(year, month) {
@@ -250,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dates = document.querySelectorAll('.calendar-date');
         dates.forEach(date => {
             const dateValue = parseInt(date.textContent);
-            const dateObj = new Date(currentYear, currentMonth, dateValue);
+            const dateObj = new Date(yearSelector.value, currentMonth, dateValue);
             date.classList.remove('selected-date', 'range-date');
             if (dateObj.getTime() === startDate?.getTime() || dateObj.getTime() === endDate?.getTime()) {
                 date.classList.add('selected-date');
@@ -271,7 +301,22 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message);
+                const allDfData = JSON.parse(data);
+                if (allDfData.length > 0) {
+                    ulSidebarAllDf.innerHTML = "";
+                    allDfData.forEach(row => {
+                        const li = document.createElement("li");
+                        for (let key in row) {
+                            const p = document.createElement("p");
+                            p.textContent = key + ": " + row[key];
+                            li.appendChild(p);
+                        }
+                        li.addEventListener('click', () => {
+                            window.location.href = `/${row['№ заказа']}/order_page.html`;
+                        });
+                        ulSidebarAllDf.appendChild(li);
+                    })
+                }
                 calendarMenu.classList.add('hidden-calendar');
             })
             .catch(error => console.error("Error:", error));

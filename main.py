@@ -1,18 +1,18 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs
+from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests
 from Aglomerative.AglomerativeCluster import Solver
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
-ORDER_ID = -1
-
+FILE_FOLDER = './files'
+if not os.path.exists(FILE_FOLDER):
+    os.makedirs(FILE_FOLDER)
 
 @app.route("/")
 def main():
     return render_template("home.html")
-
 
 @app.route("/home.html")
 def home():
@@ -20,25 +20,19 @@ def home():
 
 @app.route("/order_load_page.html")
 def load_order():
-    global ORDER_ID
-    ORDER_ID = 0
-    return render_template("order_load_page.html")
+    df_orders = getOrders().to_json(orient='records')
+    return render_template("order_load_page.html", all_orders=df_orders)
 
-FILE_FOLDER = './files'
-if not os.path.exists(FILE_FOLDER):
-    os.makedirs(FILE_FOLDER)
+@app.route("/<id>/order_page.html")
+def get_order(id):
+    dfdata = getRequests(id).to_json(orient='records')
+    df_orders = getOrders().to_json(orient='records')
+    return render_template("order_page.html", all_orders=df_orders, data=dfdata)
 
 @app.route("/order_page.html")
-def order():
-    global ORDER_ID
-    print(ORDER_ID)
-    if ORDER_ID == -1:
-        df_orders = getOrders().to_json(orient='records')
-        return render_template("order_page.html", all_orders=df_orders)
-    else:
-        # dfdata = getOrders().to_json(orient='records')
-        df_orders = getOrders().to_json(orient='records')
-        return render_template("order_page.html", all_orders=df_orders)#, data=dfdata)
+def orders():
+    df_orders = getOrders().to_json(orient='records')
+    return render_template("order_page.html", all_orders=df_orders)
 
 @app.route("/lots_page.html")
 def lots():
@@ -107,9 +101,8 @@ def submit_dates():
     data = request.get_json()
     start_date = data.get('start_date')
     end_date = data.get('end_date')
-    print(f"Start Date: {start_date}, End Date: {end_date}")
-    df = getOrders().to_json(orient='records')
-    return jsonify({"message": df})
+    df = getOrders(start_date, end_date).to_json(orient='records')
+    return jsonify(df)
 
 if __name__ == "__main__":
     app.run(debug=True)
