@@ -278,7 +278,9 @@ class DataPipeline:
             packs.formation_dttm,
             packs.from_dt,
             packs.to_dt,
-            packs.human_pack_id
+            packs.human_pack_id,
+            packs.mq,
+            packs.ms
         FROM packs
         '''
         conditions = []
