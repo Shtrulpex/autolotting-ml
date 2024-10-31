@@ -134,7 +134,9 @@ class DataPipeline:
         order_ids = pd.Series(np.array(self._db_processor.run_query(query_new_ids).fetchall()).flatten(), name='order_id')
         return order_ids
 
-    def put_pack(self, pack_name: str, lotting_algorithm: str, lots: pd.DataFrame, from_dt: str, to_dt: str) -> int:
+    def put_pack(self, pack_name: str, lotting_algorithm: str,
+                 lots: pd.DataFrame, from_dt: str, to_dt: str,
+                 human_pack_id: int = None,) -> int:
         """
             Загружает в БД пак лотов и обновляет зависимые таблицы (packs, lottings)
             Возвращает id пака в БД
@@ -147,7 +149,8 @@ class DataPipeline:
             'lotting_algorithm': [lotting_algorithm],
             'formation_dttm': [formation_dttm],
             'from_dt': [from_dt],
-            'to_dt': [to_dt]
+            'to_dt': [to_dt],
+            'human_pack_id': [human_pack_id]
         })
         packs_df['formation_dttm'] = packs_df['formation_dttm'].astype('datetime64[ns]')
         packs_df['from_dt'] = packs_df['from_dt'].astype('datetime64[ns]')
@@ -197,7 +200,7 @@ class DataPipeline:
         updateable_columns = ['lot_id']
 
         new_lots.rename(columns={
-            '№ лотировки': 'lotting_id',
+            '№ лоттировки': 'lotting_id',
             '№ лота': 'lot_id'
         }, inplace=True)
 
@@ -274,7 +277,8 @@ class DataPipeline:
             packs.lotting_algorithm,
             packs.formation_dttm,
             packs.from_dt,
-            packs.to_dt
+            packs.to_dt,
+            packs.human_pack_id
         FROM packs
         '''
         conditions = []
@@ -295,7 +299,7 @@ class DataPipeline:
 
         query = f'''
         SELECT DISTINCT
-            lottings.lotting_id AS '№ лотировки',
+            lottings.lotting_id AS '№ лоттировки',
             lottings.lot_id AS "№ лота",
             requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
