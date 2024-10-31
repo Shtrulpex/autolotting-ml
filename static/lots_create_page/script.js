@@ -200,8 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const countingMethod = document.querySelector("input[name='countingMethod']:checked").value;
         const field1 = inputParam1.value;
+        if (field1 === '') {
+            field1 = null;
+        }
         const field2 = inputParam2.value;
-
+        if (field2 === '') {
+            field2 = null;
+        }
         if (countingMethod === '1' & (field1 === '' | field2 === '')) {
             alert('Введите параметры подсчета')
         } else {
@@ -216,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        window.location.href=`/packs_page.html?id=${data.id}`;
+                        // window.location.href=`/packs_page.html?id=${data.id}`;
                     })
                     .catch(error => console.error("Error:", error));
                 } else {

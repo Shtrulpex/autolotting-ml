@@ -46,6 +46,12 @@ def getOrders(from_date=None, to_date=None):
         orders_df = pd.DataFrame()
     return orders_df
 
+def getForLots(from_date=None, to_date=None):
+    orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
+    orders_ids = orders_df['№ заказа'].to_list()
+    request_features, _ = data_pipeline.get_requests_features(orders_ids)
+    return request_features
+
 
 def getRequests(order_id):
     request = data_pipeline.get_requests(order_id=order_id)

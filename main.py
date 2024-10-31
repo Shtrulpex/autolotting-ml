@@ -1,7 +1,7 @@
 from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
 import os
-from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks, editLot
-from Aglomerative.AglomerativeCluster import Solver
+from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks, editLot, getForLots
+from Aglomerative.AgglomerativeCluster import Solver
 import pandas as pd
 
 app = Flask(__name__)
@@ -113,17 +113,29 @@ def upload_lots():
     end_date = data.get('end_date')
     name = data.get('name')
     dist_coeff = data.get('dist_coeff')
-    # if dist_coeff != None:
+    if dist_coeff != None:
+        dist_coeff = int(dist_coeff)
+    else:
+        dist_coeff = 1e-4
     count_method = data.get('count_method')
-    param_1 = data.get('param_1')
-    param_2 = data.get('param_2')
-    df = pd.read_csv('./files/cold_lots.csv') #Времянка
-    # df = getOrders(start_date, end_date)
+    count_method = int(count_method)
+    if count_method == 1:
+        count_method = True
+    else:
+        count_method = False
+    param_1 = float(data.get('param_1'))
+    param_2 = float(data.get('param_2'))
+    print(param_1)
+    # df = pd.read_csv('./files/cold_lots.csv') #Времянка
+    df = getForLots(start_date, end_date)
+    solver = Solver()
+    # lots = solver.get_lots(df)
+    # print(lots)
     # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
     # result_df = lotter.get_lots(df)
     # print(result_df)
-    pack_id = putPack(name, "none_algorythm_yet", df, start_date, end_date)
-    return jsonify({'id': pack_id}), 200
+    # pack_id = putPack(name, "count_method", df, start_date, end_date)
+    return jsonify({'id': 200}), 200
     # return jsonify({'success': 1}), 200
 
 @app.route('/api/download', methods=['POST', 'GET'])

@@ -76,7 +76,12 @@ class Solver():
     """
     Модель 1. Агломеративная кластеризация
     """
-    
+    # podgon - коэффициент дистанции
+    # find_optimal - способ подсчета, если False, то первый, если True, то второй
+    # prod_percent - первый параметр - для False
+    # prov_percent - второй параметр
+    # min_lots_percent первый параметр - для True
+    # min_ms второй параметр
     def __init__(self, prod_percent = 50, prov_percent = 50, podgon = 1e-4, find_optimal = False, min_lots_percent = None, min_ms = None):
         """
         Модель агломеративной клстеризации
