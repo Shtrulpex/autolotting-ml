@@ -123,14 +123,20 @@ def upload_lots():
         count_method = True
     else:
         count_method = False
-    param_1 = float(data.get('param_1'))
-    param_2 = float(data.get('param_2'))
-    print(param_1)
+    if data.get('param_1') == '':
+        param_1 = None
+    else:
+        param_1 = float(data.get('param_1'))
+    if data.get('param_2') == '':
+        param_2 = None
+    else:
+        param_22 = float(data.get('param_2'))
     # df = pd.read_csv('./files/cold_lots.csv') #Времянка
     df = getForLots(start_date, end_date)
+    print(df)
     solver = Solver()
-    # lots = solver.get_lots(df)
-    # print(lots)
+    lots = solver.get_lots(df)
+    print(lots)
     # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
     # result_df = lotter.get_lots(df)
     # print(result_df)
