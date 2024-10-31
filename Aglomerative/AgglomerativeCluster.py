@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import copy
 from Aglomerative.GeoSolver import GeoSolver
 from DataResearch import Scorer
 
