@@ -278,9 +278,7 @@ class DataPipeline:
             packs.formation_dttm,
             packs.from_dt,
             packs.to_dt,
-            packs.human_pack_id,
-            packs.mq,
-            packs.ms
+            packs.human_pack_id
         FROM packs
         '''
         conditions = []
@@ -469,12 +467,12 @@ class DataPipeline:
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
 # db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
 # db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
-
+#
 # dp = DataPipeline()
 # dp._db_processor = db_proc
-
+#
 # import os
-
+#
 # # Указываем путь к директории с CSV-файлами (9 файлов)
 # csv_folder = os.path.expanduser('~/Desktop/HakatonData')
 # for filename in os.listdir(csv_folder):
