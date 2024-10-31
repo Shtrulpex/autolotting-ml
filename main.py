@@ -42,7 +42,10 @@ def lots():
         dfdata = getPacks(id[0]).to_json(orient='records')
         lot_id = request.args.getlist('lot_id')
         if(lot_id != []):
-            return render_template("lots_page.html", data=dfdata, id=int(id[0]), lot_id=int(lot_id[0]))
+            lot_id = list(map(int, lot_id[0].split(',')))
+            for i in range(len(lot_id)):
+                lot_id[i] = lot_id[i] - 1
+            return render_template("lots_page.html", data=dfdata, id=int(id[0]), lot_id=lot_id)
         else:
             return render_template("lots_page.html", data=dfdata, id=int(id[0]))
     else:
@@ -108,7 +111,8 @@ def upload_lots():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     name = data.get('name')
-    df = pd.read_csv('./files/cold_lots.csv')
+
+    df = pd.read_csv('./files/cold_lots.csv') #Времянка
     # df = getOrders(start_date, end_date)
     # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
     # result_df = lotter.get_lots(df)
@@ -116,29 +120,19 @@ def upload_lots():
     pack_id = putPack(name, "none_algorythm_yet", df, start_date, end_date)
     return jsonify({'id': pack_id}), 200
 
-@app.route('/api/download', methods=['GET'])
+@app.route('/api/download', methods=['POST', 'GET'])
 def download_file():
-    csvpath = ""
-    for file in os.listdir("./files"):
-        if file.split('.')[-1] == "csv":
-            csvpath = "./files/"+file
-            break
-
-    # здесь заказ проверяет Inspector
-    # здесь заказ загружается в БД
-    # здесь заказы за месяц выгружаются из БД
-    # здесь заказы за месяц отправляются в autolotting-ml а сформированные лоты попадают в файл по пути csvpath
-    # здесь сформироанные лоты загружаются в БД а сами лоты отправляются пользователю
-    # здесь Scorer считает целевые бизнес-метрики
-    # здесь Analyzer анализирует результаты работы и выдает интересные статистики
-    # здесь Canvas строит графики и настраивает dashboard'ы
-    # здесь на сайт выводятся метрики, параметры, графики и пр.
-
-    if os.path.exists(csvpath):
-        xlsxpath = dfToXlxs(csvpath)
+    data = request.get_json()
+    id = int(data['id'])
+    dfdata = getPacks(id)
+    lot_id = data['lot_id']
+    if lot_id != '' and ',' not in lot_id:
+        lot_id = int(lot_id[1:-1])+1
+        xlsxpath = dfToXlxs(dfdata[dfdata['№ лоттировки'] == lot_id], f"Lot_{lot_id}_pack_{id}")
         return send_file(xlsxpath, as_attachment=True, download_name="excel.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     else:
-        return jsonify({"error": "File not found"}), 404
+        xlsxpath = dfToXlxs(dfdata, f"All_lots_pack_{id}")
+        return send_file(xlsxpath, as_attachment=True, download_name="excel.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 @app.route('/api/submit-dates', methods=['POST'])
 def submit_dates():

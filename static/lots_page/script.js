@@ -10,6 +10,8 @@ const ulSidebarAllDf = document.getElementById("all-orders-ul");
 const tableSection = document.getElementById("tableSection");
 const tableBody = document.getElementById("tableBody");
 const submitOrderBtn = document.getElementById("submitOrderBtn");
+const allLotsBtn = document.getElementById('all-lots-btn');
+const downloadBtn = document.getElementById('downloadBtn');
 
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
@@ -82,8 +84,8 @@ if (document.getElementById('lot_id').textContent === '') {
 
 if (allDfDiv.textContent !== '') {
     const allDfData = JSON.parse(allDfDiv.textContent);
-    const id = document.getElementById('id_pack').textContent;
-    const lot_id = parseInt(document.getElementById('lot_id').textContent);
+    const id = document.getElementById('id_pack').textContent;  
+
     if (allDfData.length > 0) {
         allDfData.forEach(row => {
             const li = document.createElement("li");
@@ -93,23 +95,27 @@ if (allDfDiv.textContent !== '') {
             });
             ulSidebarAllDf.appendChild(li);
         });
-        tableSection.style.display = 'block';
-        tableBody.innerHTML = '';
-        const headerRow = document.createElement("tr");
-        Object.keys(allDfData[0]).forEach(header => {
-            const th = document.createElement("th");
-            th.textContent = header;
-            headerRow.appendChild(th);
-        })
-        tableBody.appendChild(headerRow);
-        
-        const tr = document.createElement("tr");
-        Object.values(allDfData[lot_id]).forEach(cellData => {
-            const td = document.createElement("td");
-            td.textContent = cellData;
-            tr.appendChild(td);
-        });
-        tableBody.appendChild(tr);
+        if (document.getElementById('lot_id').textContent !== '') {
+            const lot_ids = JSON.parse(document.getElementById('lot_id').textContent);
+            tableSection.style.display = 'block';
+            tableBody.innerHTML = '';
+            const headerRow = document.createElement("tr");
+            Object.keys(allDfData[0]).forEach(header => {
+                const th = document.createElement("th");
+                th.textContent = header;
+                headerRow.appendChild(th);
+            })
+            tableBody.appendChild(headerRow);
+            lot_ids.forEach(lot_id => {
+                const tr = document.createElement("tr");
+                Object.values(allDfData[lot_id]).forEach(cellData => {
+                    const td = document.createElement("td");
+                    td.textContent = cellData;
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+        }
     }
 }
 
@@ -182,3 +188,59 @@ submitOrderBtn.addEventListener('click', function() {
         })
     }
 });
+
+allLotsBtn.addEventListener('click', function() {
+    if (allDfDiv.textContent !== '') {
+        const allDfData = JSON.parse(allDfDiv.textContent);
+        const id = document.getElementById('id_pack').textContent;
+
+        var resultLotsId = '';
+        if (allDfData.length > 0) {
+            allDfData.forEach(row => {
+                resultLotsId = resultLotsId + row['№ лоттировки'] + ',';
+            });
+            resultLotsId = resultLotsId.slice(0, -1);
+            window.location.href = `/lots_page.html?id=${id}&lot_id=${resultLotsId}`
+        }
+    }
+});
+
+downloadBtn.addEventListener('click', function() {
+    const id = document.getElementById('id_pack').textContent;
+    const lot_id = document.getElementById('lot_id').textContent;
+    var data;
+    if (lot_id === '') {
+        data = {'id':id};
+    } else {
+        data = {'id':id, 'lot_id':lot_id};
+    }
+    fetch('/api/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        const file = new Blob([blob], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+        const url = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        if (lot_id === '' | lot_id.includes(',')) {
+            link.download = `All_lots_pack_${id}`;
+        } else {
+            var lot_name = parseInt(lot_id.substr(1, lot_id.length-2))+1;
+            link.download = `Lot_${lot_name}_pack_${id}`;
+        }
+        link.href = url;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    })
+    .catch(error => {
+        console.error('There was a problem with the download:', error);
+    });
+})

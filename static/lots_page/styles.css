@@ -266,6 +266,11 @@ body:hover .sidebar-orders {
     margin: 10px 10px 10px 10px;
 }
 
+.btn-section {
+    text-align: center;
+    margin: 10px 10px 10px 10px;
+}
+
 table {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
@@ -278,7 +283,7 @@ table th, table td {
     padding: 8px;
 }
 
-#submitOrderBtn {
+#submitOrderBtn, #downloadBtn {
     margin-top: 10px;
     margin-bottom: 10px;
     background: #5E5DF0;
@@ -294,6 +299,30 @@ table th, table td {
     opacity: 1;
     outline: 0 solid transparent;
     padding: 16px 30px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    width: fit-content;
+    word-break: break-word;
+    border: 0;
+}
+
+#all-lots-btn {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: #5E5DF0;
+    border-radius: 999px;
+    box-shadow: #5E5DF0 0 5px 5px -5px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-family: Inter,Helvetica,"Apple Color Emoji","Segoe UI Emoji",NotoColorEmoji,"Noto Color Emoji","Segoe UI Symbol","Android Emoji",EmojiSymbols,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    opacity: 1;
+    outline: 0 solid transparent;
+    padding: 8px 15px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;

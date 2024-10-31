@@ -66,6 +66,7 @@ def getPacks(id=None):
 
 def editLot(data):
     df = pd.DataFrame(data)
+    print(df)
     data_pipeline.update_lots(df)
 
 def putPack(pack_name, lotting_algorytm, lots, from_date, to_date):
@@ -104,13 +105,7 @@ def createPack():
 
         # как-то что-то кидаем и считаем в Анализаторе и в Канвасе
 
-def dfToXlxs(filepath):
-    # Здесь считывается из бд df для загрузки на сторону пользователя
-    df = pd.read_csv(filepath)
-
-    df = data_pipeline.get_lots(pack_id=pack_id) # pack_id можно получить из таблицы по запросу get_packs()
-
-
-    xlsxpath = '.'.join(filepath.split('.')[:-1])+".xlsx"
+def dfToXlxs(df, name):
+    xlsxpath = "./files/"+name+".xlsx"
     df.to_excel(xlsxpath, sheet_name="Sheet1")
     return xlsxpath
