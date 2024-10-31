@@ -64,10 +64,10 @@ def getPacks(id=None, dates = False):
             from_date = datetime.strptime(packs[packs['pack_id'] == id]['from_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
             to_date = datetime.strptime(packs[packs['pack_id'] == id]['to_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
             orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
-            request_features, human_lots = data_pipeline.get_requests_features(orders_df)
+            orders_ids = orders_df['№ заказа'].to_list()
+            request_features, human_lots = data_pipeline.get_requests_features(orders_ids)
             lots = data_pipeline.get_lots(id)
-            print(request_features, human_lots, lots)
-            make_dashboard(request_features, lots, human_lots, Scorer())
+            # make_dashboard(request_features, lots, human_lots, Scorer())
             return lots
         else:
             lots = data_pipeline.get_lots(id)
