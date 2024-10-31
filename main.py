@@ -1,12 +1,9 @@
-from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file, json, Response
+from flask import Flask, redirect, url_for, render_template, jsonify, request, send_file
 import os
-from main_logic import xlxsToDf, getOrder, editOrder, dfToXlxs
+from xlsxToCsv import xlxsToDf
 from Aglomerative.AglomerativeCluster import Solver
 
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False
-
-ORDER_ID = -1
 
 
 @app.route("/")
@@ -18,36 +15,23 @@ def main():
 def home():
     return redirect(url_for("main"))
 
-@app.route("/order_load_page.html")
-def load_order():
-    global ORDER_ID
-    ORDER_ID = 0
-    return render_template("order_load_page.html")
 
-FILE_FOLDER = './files'
-if not os.path.exists(FILE_FOLDER):
-    os.makedirs(FILE_FOLDER)
+@app.route("/orders_page.html")
+def orders():
+    return render_template("orders_page.html")
 
-@app.route("/order_page.html")
-def order():
-    global ORDER_ID
-    print(ORDER_ID)
-    if ORDER_ID == -1:
-        return render_template("order_page.html")
-    else:
-        dfdata = getOrder().to_json(orient='records')
-        return render_template("order_page.html", data=dfdata)
 
 @app.route("/lots_page.html")
 def lots():
     return render_template("lots_page.html")
 
+
 FILE_FOLDER = './files'
 if not os.path.exists(FILE_FOLDER):
     os.makedirs(FILE_FOLDER)
 
 
-@app.route('/api/upload', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
         return jsonify({'message': 'No file part in the request'}), 400
@@ -66,13 +50,8 @@ def upload_file():
     else:
         return jsonify({'message': 'Only .xlsx files are allowed'}), 400
 
-@app.route('/api/update_df', methods=['POST'])
-def update_df():
-    data = request.get_json()
-    editOrder(data)
-    return jsonify({'status': 'success'}), 200
 
-@app.route('/api/download', methods=['GET'])
+@app.route('/download', methods=['GET'])
 def download_file():
     csvpath = ""
     for file in os.listdir("./files"):
@@ -93,18 +72,10 @@ def download_file():
     # здесь на сайт выводятся метрики, параметры, графики и пр.
 
     if os.path.exists(csvpath):
-        xlsxpath = dfToXlxs(csvpath)
-        return send_file(xlsxpath, as_attachment=True, download_name="excel.xlsx", mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        print(csvpath)
+        return send_file(csvpath, as_attachment=True, download_name="lots.csv", mimetype='text/csv')
     else:
         return jsonify({"error": "File not found"}), 404
-
-@app.route('/api/submit-dates', methods=['POST'])
-def submit_dates():
-    data = request.get_json()
-    start_date = data.get('start_date')
-    end_date = data.get('end_date')
-    print(f"Start Date: {start_date}, End Date: {end_date}")
-    return jsonify({"message": "Dates received", "start_date": start_date, "end_date": end_date})
 
 
 if __name__ == "__main__":
