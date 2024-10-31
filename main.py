@@ -135,10 +135,10 @@ def upload_lots():
     df = getForLots(start_date, end_date)
     print(df)
     if count_method:
-        solver = Solver(find_optimal=count_method, min_lots_percent=param_1, min_ms=param_2)
+        solver = Solver(podgon=dist_coeff, find_optimal=count_method, min_lots_percent=param_1, min_ms=param_2)
     else:
         solver = Solver(prod_percent=param_1, prov_percent=param_2, podgon=dist_coeff, find_optimal=count_method)
-    lots = solver.get_lots(df, )
+    lots = solver.get_lots(df)
     print(lots)
     # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
     # result_df = lotter.get_lots(df)
