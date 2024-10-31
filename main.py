@@ -100,8 +100,11 @@ def update_order():
 @app.route('/api/update_lot', methods=['POST'])
 def update_lot():
     data = request.get_json()
-    editLot(data)
-    return jsonify({'status': 'success'}), 200
+    res = editLot(data)
+    if res:
+        return jsonify({'status': 'success'}), 200
+    else:
+        return jsonify({'status': 'Ошибка проверки лота'}), 400
 
 @app.route('/api/upload_lots', methods=['POST'])
 def upload_lots():

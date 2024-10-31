@@ -173,10 +173,10 @@ submitOrderBtn.addEventListener('click', function() {
         })
         .then(response => {
             if (!response.ok) {
-                alert("Ошибка со стороны базы данных");
+                alert("Ошибка в валидации введенных данных.");
             }
             else {
-                alert("Изменения загружены");
+                alert("Изменения загружены.");
             }
         })
         .catch(error => console.error("Error updating CSV data:", error));

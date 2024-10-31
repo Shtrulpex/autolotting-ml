@@ -325,7 +325,7 @@ class DataPipeline:
         '''
         return self._db_processor.get_df(query)
 
-    def get_requests_features(self, order_id: Union[int, List[int]], human_lots_essential: bool = True):
+    def get_requests_features(self, order_id: Union[int, List[int]], human_lots_essential: bool = False):
         """
         Выгружает все заявки по зад фильтрам (время + другие) в супер-расширенном формате с указанием всех
          поставщиков заявки

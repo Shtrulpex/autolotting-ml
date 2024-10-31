@@ -66,8 +66,18 @@ def getPacks(id=None, dates = False):
             orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
             orders_ids = orders_df['№ заказа'].to_list()
             request_features, human_lots = data_pipeline.get_requests_features(orders_ids)
+            #TEMPORARY
+            human_lots = pd.read_csv('./files/data.csv')
+            human_lots.rename(columns={'ID Лота': 'lot_id'}, inplace=True)
+            human_lots = human_lots[human_lots['Дата заказа'].astype('datetime64[ns]') <= pd.to_datetime('2020-01-31')]['lot_id'].copy()
+            human_lots.fillna(value=1, inplace=True)
+            human_lots.drop(columns=['lot_id'], inplace=True)
+            #TEMPORARY
             lots = data_pipeline.get_lots(id)
-            # make_dashboard(request_features, lots, human_lots, Scorer())
+            scorer = Scorer()
+            ms_score = scorer.ms_score(request_features, lots)
+            mq_score = scorer.mq_score(request_features, lots, human_lots)
+            # make_dashboard(request_features, lots, human_lots)
             return lots
         else:
             lots = data_pipeline.get_lots(id)
@@ -78,7 +88,12 @@ def getPacks(id=None, dates = False):
 
 def editLot(data):
     df = pd.DataFrame(data)
-    data_pipeline.update_lots(df)
+    try:
+        validator.validate_lots(df)
+        data_pipeline.update_lots(df)
+        return True
+    except:
+        return False
 
 def putPack(pack_name, lotting_algorytm, lots, from_date, to_date):
     from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
