@@ -199,11 +199,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const coefficient = coeffCheckBox.checked ? coeffInput.value : null;
         
         const countingMethod = document.querySelector("input[name='countingMethod']:checked").value;
-        const field1 = inputParam1.value;
+        var field1 = inputParam1.value;
         if (field1 === '') {
             field1 = null;
         }
-        const field2 = inputParam2.value;
+        var field2 = inputParam2.value;
         if (field2 === '') {
             field2 = null;
         }
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        // window.location.href=`/packs_page.html?id=${data.id}`;
+                        window.location.href=`/packs_page.html?id=${data.id}`;
                     })
                     .catch(error => console.error("Error:", error));
                 } else {

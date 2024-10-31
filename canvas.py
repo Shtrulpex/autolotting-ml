@@ -5,11 +5,117 @@ import plotly.graph_objects as go
 import plotly.express as px
 from scipy import stats
 import dash_bootstrap_components as dbc  # Bootstrap компоненты
-from DataResearch import Scorer
 
 # human_lots = pd.read_csv("data/human_lots_by_month_03-2020.csv")
 # lots = pd.read_csv("data/03-2020.csv")
 # requests = pd.read_csv("data/request_features_03-2020.csv")
+
+# ----------------------------------------Описание для графиков и таблиц-----------------------------------------
+scatter_plot_description = html.Div([
+    html.Span("График рассеяния показывает расположение грузополучателей и поставщиков в соответствии с их лотами.",
+              style={'display': 'block'}),
+    html.Span("На оси X представлена широта, а на оси Y — долгота.", style={'display': 'block'}),
+    html.Span(
+        "Каждая точка представляет отдельного грузополучателя или поставщиков, и цвет точки указывает на принадлежность к конкретному лоту.",
+        style={'display': 'block'}),
+    html.Span("[!] Вы можете выделять конкретные лоты, используя диапазонный ползунок или выпадающий список.",
+              style={'display': 'block'}),
+    html.Span("[!] При наведении на точки отображается дополнительная информация о грузополучателе.",
+              style={'display': 'block'}),
+    html.Span(
+        "[!] Также на легенде справа есть возможность выбирать грузополучателей (цифра) и поставщиков(цифра+'п') выбранного лота.",
+        style={'display': 'block'}),
+])
+
+cost_plot_description = html.Div([
+    html.Span("График стоимости (box plot) иллюстрирует распределение цен позиций в каждом из лотов.",
+              style={'display': 'block'}),
+    html.Span("Ось X представляет лоты, а ось Y — стоимость позиции.", style={'display': 'block'}),
+    html.Span("Каждый 'ящик' показывает медиану, квартиль и выбросы, что позволяет оценить вариативность цен в лотах.",
+              style={'display': 'block'}),
+    html.Span(
+        "[!] Вы можете взаимодействовать с графиком, выбирая определенные лоты через ползунок или выпадающий список.",
+        style={'display': 'block'}),
+])
+
+histogram_plot_description = html.Div([
+    html.Span("Гистограмма демонстрирует суммарную стоимость каждого лота.", style={'display': 'block'}),
+    html.Span("Ось X показывает идентификаторы лотов, а ось Y — общую стоимость позиций в этих лотах.",
+              style={'display': 'block'}),
+    html.Span("Этот график помогает быстро оценить, какие лоты имеют наибольшую суммарную стоимость.",
+              style={'display': 'block'}),
+    html.Span(
+        "[!] Вы можете использовать диапазонный ползунок или выпадающий список, чтобы сосредоточиться на определенных лотах.",
+        style={'display': 'block'}),
+])
+
+lot_stats_table_description = html.Div([
+    html.Span("Таблица сводной информации по лотам предоставляет основные статистические данные о выбранных лотах.",
+              style={'display': 'block'}),
+    html.Span(
+        "Она включает среднюю стоимость позиции, количество уникальных грузополучателей, заказов и классов для каждого лота.",
+        style={'display': 'block'}),
+    html.Span(
+        "Вы можете выделить строку таблицы, кликнув на любую ячейку, что поможет лучше проанализировать конкретный лот.",
+        style={'display': 'block'}),
+    html.Span(
+        "[!] Также таблица автоматически обновляется в зависимости от выбранных лотов через ползунок или выпадающий список.",
+        style={'display': 'block'}),
+])
+
+summary_statistics_description = html.Div([
+    html.Span(
+        "Эта секция содержит основные статистики о лотах, включая количество лотов и среднюю стоимость для человека и алгоритма.",
+        style={'display': 'block'}),
+    html.Span("Это позволяет быстро оценить эффективность алгоритма по сравнению с человеческим подходом.",
+              style={'display': 'block'}),
+])
+
+kde_plot_description = html.Div([
+    html.Span(
+        "График ядерной оценки плотности (KDE) показывает распределение количества заявок по лотам для человека и алгоритма.",
+        style={'display': 'block'}),
+    html.Span("Ось X представляет количество заявок, а ось Y — плотность распределения.", style={'display': 'block'}),
+    html.Span(
+        "Это полезно для визуализации того, как распределяются заявки между лотами и какие лоты имеют наибольшую плотность заявок.",
+        style={'display': 'block'}),
+])
+
+total_cost_plot_description = html.Div([
+    html.Span("График сравнения суммарных стоимостей лотов (box plot) показывает различия в стоимости между лотами,",
+              style={'display': 'block'}),
+    html.Span("обработанными человеком и алгоритмом.", style={'display': 'block'}),
+    html.Span("Это позволяет оценить, какой подход приводит к меньшим или большим затратам.",
+              style={'display': 'block'}),
+])
+
+# Пример использования
+descriptions = {
+    "scatter_plot": scatter_plot_description,
+    "cost_plot": cost_plot_description,
+    "histogram_plot": histogram_plot_description,
+    "lot_stats_table": lot_stats_table_description,
+    "summary_statistics": summary_statistics_description,
+    "kde_plot": kde_plot_description,
+    "total_cost_plot": total_cost_plot_description,
+}
+
+
+def make_popover(description_name, target_tooltip):
+    return dbc.Popover(
+        descriptions[description_name],
+        target=target_tooltip,
+        placement="right",
+        trigger="hover focus",
+        style={
+            'maxWidth': '700px',  # Ограничение ширины
+            'backgroundColor': '#303335',  # Темный фон
+            'color': '#f0f0f0',  # Светлый текст
+            'padding': '10px',  # Внутренние отступы для улучшенного восприятия
+            'borderRadius': '5px',  # Закругленные углы
+            'boxShadow': '0px 4px 8px rgba(0, 0, 0, 0.1)'  # Небольшая тень для глубины
+        }
+    )
 
 
 def merge_tables_for_canvas(req_fea, lots, df_human):
@@ -21,7 +127,6 @@ def merge_tables_for_canvas(req_fea, lots, df_human):
 
 
 def create_dashboard(df_for_visual, mq, ms):
-
     # Создаем приложение Dash с Bootstrap стилями
     app = Dash(__name__, external_stylesheets=[
         dbc.themes.BOOTSTRAP,
@@ -43,14 +148,11 @@ def create_dashboard(df_for_visual, mq, ms):
 
     # -------------------------------------------------DYNAMIC----------------------------------------------------
 
-
     # Define the range of lot_id
     lot_selection = html.Div([
         dbc.Row([
             dbc.Col([
-                html.P("Выберите отрезок лотов:", style={'font-weight': 'bold', 'font-size': '20px'}),
-
-                # RangeSlider for selecting a range of `lot_id`s
+                html.P("Выберите интервал лотов:", style={'font-weight': 'bold', 'font-size': '22px', 'color': '#333'}),
                 dcc.RangeSlider(
                     id='lot-id-range-slider',
                     min=int(df_for_visual['lot_id'].min()),
@@ -58,20 +160,20 @@ def create_dashboard(df_for_visual, mq, ms):
                     value=[int(df_for_visual['lot_id'].min()), int(df_for_visual['lot_id'].max())],
                     marks={i: str(i) for i in
                            range(int(df_for_visual['lot_id'].min()), int(df_for_visual['lot_id'].max()) + 1, 5)},
-                    tooltip={"placement": "bottom", "always_visible": True}
+                    tooltip={"placement": "bottom", "always_visible": True},
+                    pushable=5,
                 ),
             ], width=10),
             dbc.Col([
-                html.P("Отдельные лоты:", style={'font-weight': 'bold', 'font-size': '20px'}),
-                # Dropdown for selecting individual `lot_id`s
+                html.P("Отдельные лоты:", style={'font-weight': 'bold', 'font-size': '22px', 'color': '#333'}),
                 dcc.Dropdown(
                     id='lot-id-dropdown',
                     options=[{'label': str(lot), 'value': lot} for lot in unique_lot_ids],
                     multi=True,
-                    placeholder="Выберите отдельные лоты"
+                    placeholder="Выберите отдельные лоты",
+                    style={'border-color': '#007bff'}
                 )
             ], width=2)
-
         ], className="mb-4"),
     ])
 
@@ -79,17 +181,14 @@ def create_dashboard(df_for_visual, mq, ms):
         dbc.CardBody([
             dbc.Row([
                 html.Div([
-                    html.I(className="fas fa-question-circle", id="tooltip-scatter", style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+                    html.I(className="fas fa-question-circle", id="tooltip-scatter",
+                           style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
                     dcc.Graph(id='scatter-plot', style={'width': '100%'}),
-                    dbc.Tooltip("This is scatter plot", target="tooltip-scatter", placement="right")
+                    make_popover("scatter_plot", "tooltip-scatter")
                 ])
             ])
         ])
-    ])
-
-
-    # Tooltip setup
-    # tooltip =
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
 
     table = dbc.Card([
         dbc.CardBody([
@@ -104,32 +203,33 @@ def create_dashboard(df_for_visual, mq, ms):
                 style_cell={'textAlign': 'center'},
                 style_data_conditional=[]
             ),
-            dbc.Tooltip("This is table plot", target="tooltip-table", placement="right")
+            make_popover("lot_stats_table", "tooltip-table")
         ])
-    ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
 
     scatter_and_table = dbc.Card([
         dbc.CardBody([
             dbc.Row([
                 scatter
-            ], className="mb-4"),
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'}),
             dbc.Row([
                 table
-            ], className="mb-4")
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'})
         ])
-    ], style={'backgroundColor': '#7db1de'})
+    ], style={'backgroundColor': '#ffe8db'})
 
     lot_item_cost = dbc.Card([
         dbc.CardBody([
             dbc.Row([
                 html.Div([
-                    html.I(className="fas fa-question-circle", id="tooltip-lot_item_cost", style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+                    html.I(className="fas fa-question-circle", id="tooltip-lot_item_cost",
+                           style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
                     dcc.Graph(id='cost-plot', style={'width': '100%'}),
-                    dbc.Tooltip("This is lot_item_cost plot", target="tooltip-lot_item_cost", placement="right")
+                    make_popover("cost_plot", "tooltip-lot_item_cost")
                 ])
             ])
         ])
-    ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
 
     histogram = dbc.Card([
         dbc.CardBody([
@@ -138,22 +238,22 @@ def create_dashboard(df_for_visual, mq, ms):
                     html.I(className="fas fa-question-circle", id="tooltip-histogram",
                            style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
                     dcc.Graph(id='histogram-plot', style={'width': '100%'}),
-                    dbc.Tooltip("This is histogram plot", target="tooltip-histogram", placement="right")
+                    make_popover("histogram_plot", "tooltip-histogram")
                 ])
             ])
         ])
-    ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
 
     cost_plot = dbc.Card([
         dbc.CardBody([
             dbc.Row([
                 lot_item_cost
-            ], className="mb-4"),
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'}),
             dbc.Row([
                 histogram
-            ], className="mb-4")
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'})
         ])
-    ], style={'backgroundColor': '#7db1de'})
+    ], style={'backgroundColor': '#ffe8db'})
 
     selection_and_plots = dbc.Card([
         dbc.CardBody([
@@ -166,6 +266,7 @@ def create_dashboard(df_for_visual, mq, ms):
             ], className="mb-4"),
         ])
     ], style={'backgroundColor': '#E0F7FA'})
+    # E0F7FA
 
     # -------------------------------------------------STATIC----------------------------------------------------
 
@@ -186,14 +287,15 @@ def create_dashboard(df_for_visual, mq, ms):
             'x': 0.5,  # Center the title
         }
     )
+
     total_cost_card = dbc.Card([
         dbc.CardBody([
             html.I(className="fas fa-question-circle", id="tooltip-total_cost_card",
                    style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
             dcc.Graph(id='total-cost-plot', figure=total_cost_fig),
-            dbc.Tooltip("This is total_cost_card plot", target="tooltip-total_cost_card", placement="right")
+            make_popover("total_cost_plot", "tooltip-total_cost_card")
         ])
-    ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
 
     # KDE Curve
     kde_fig = go.Figure()
@@ -215,17 +317,28 @@ def create_dashboard(df_for_visual, mq, ms):
         name='Человек',
         line=dict(color='red')
     ))
-    kde_fig.update_layout(title='Ядерная оценка плотности количества заявок в лоте', xaxis_title='Количество заявок',
-                          yaxis_title='Плотность')
+    kde_fig.update_layout(
+        xaxis_title='Количество заявок',
+        yaxis_title='Плотность',
+        title={
+            'text': "<b>Ядерная оценка плотности кол-ва заявок в лоте</b>",
+            'font': {'size': 18},  # Adjust size as needed
+            'x': 0.5,  # Center the title
+        }
+    )
 
     kde_plot = dbc.Card([
         dbc.CardBody([
             html.I(className="fas fa-question-circle", id="tooltip-kde",
                    style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
             dcc.Graph(id='kde-plot', figure=kde_fig, style={'width': '100%'}),
-            dbc.Tooltip("This is kde plot", target="tooltip-kde", placement="right")
+            make_popover("kde_plot", "tooltip-kde")
         ])
-    ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+    if mq:
+        MQ_html = html.P(f"MQ Score: {mq:.2f}")
+    else:
+        MQ_html = ""
 
     summary_statistic = dbc.Card([
         dbc.CardBody([
@@ -235,8 +348,8 @@ def create_dashboard(df_for_visual, mq, ms):
             html.P(f"Количество лотов алгоритма: {unique_lot_count}"),
             html.P(f"Средняя стоимость лота алгоритма: {average_lot_cost:.2f}"),
             html.H5(f"Метрики", style={'textAlign': 'center', 'font-size': '18px'}),
-            html.P(f"MQ Score: {mq:.2f}"),
-            html.P(f"MS Score: {ms:.2f}")
+            html.P(f"MS Score: {ms:.2f}"),
+            MQ_html
         ])
     ], style={'backgroundColor': '#ffe8db'})
 
@@ -252,8 +365,6 @@ def create_dashboard(df_for_visual, mq, ms):
     )
 
     static_plots = dbc.Card([
-        html.P("Статичные графики для сравнения с человеческим лотированием (не зависят от выбора 'нужных лотов')",
-               style={'textAlign': 'center', 'font-size': '20px'}),
         dbc.CardBody([
             dbc.Row([
                 dbc.Col([kde_and_total], width=8),  # style={'height': '500px'}),
@@ -271,7 +382,7 @@ def create_dashboard(df_for_visual, mq, ms):
         dbc.Row([
             dbc.Col([static_plots], width=12)
         ], className="mb-4")
-    ], fluid=True, style={'backgroundColor': '#a6cbe6'})
+    ], fluid=True, style={'backgroundColor': '#c9e1ef'})
 
     # -------------------------------------------------CALLBACKS----------------------------------------------------
     @app.callback(
@@ -306,7 +417,7 @@ def create_dashboard(df_for_visual, mq, ms):
          Output('lot-stats-table', 'data'),
          Output('lot-stats-table', 'columns')],
         [Input('lot-id-range-slider', 'value'),
-        Input('lot-id-dropdown', 'value')]
+         Input('lot-id-dropdown', 'value')]
     )
     def update_output(selected_range, selected_individuals):
         # Merge selected lot_ids from range and dropdown
@@ -334,29 +445,61 @@ def create_dashboard(df_for_visual, mq, ms):
         scatter_fig = go.Figure()
         for lot_id in unique_lot_ids:
             subset = filtered_df[filtered_df['lot_id'] == lot_id]
-            scatter_fig.add_trace(go.Scatter(
-                x=subset['receiver_address_latitude'],
-                y=subset['receiver_address_longitude'],
+            scatter_fig.add_trace(go.Scattermapbox(
+                lat=subset['receiver_address_latitude'],
+                lon=subset['receiver_address_longitude'],
                 mode='markers',
                 name=str(lot_id),
                 hoverinfo='text',
                 text=subset['receiver_address'],
-                marker=dict(size=10, opacity=0.8 if lot_id in selected_lots else 0.3)
+                marker=dict(size=10, opacity=0.8)
             ))
 
+        # Для поставщиков
+        for lot_id in unique_lot_ids:
+            subset = filtered_df[filtered_df['lot_id'] == lot_id]
+            scatter_fig.add_trace(go.Scattermapbox(
+                lat=subset['supplier_address_latitude'],
+                lon=subset['supplier_address_longitude'],
+                mode='markers',
+                name=str(lot_id) + "п",
+                hoverinfo='text',
+                text=subset['supplier_address'],
+                marker=dict(size=10, opacity=0.8)
+            ))
+
+        center_lat = filtered_df['receiver_address_latitude'].mean()
+        center_lon = filtered_df['receiver_address_longitude'].mean()
+
         scatter_fig.update_layout(
-            title='Расположение грузополучателей в соответствии с лотамим',
+            mapbox=dict(
+                style="open-street-map",  # стиль карты, можно выбрать "carto-positron", "stamen-terrain" и другие
+                center=dict(lat=center_lat, lon=center_lon),
+                zoom=2  # регулирует степень масштабирования карты
+            ),
+            margin={"r": 0, "t": 25, "l": 0, "b": 0},
             xaxis_title='Широта',
             yaxis_title='Долгота',
             legend_title='lot_id',
-            hovermode='x unified'  # Crosshair spans entire graph
+            title={
+                'text': "<b>Расположение грузополучателей в соответствии с лотамим</b>",
+                'font': {'size': 18},  # Adjust size as needed
+                'x': 0.5,  # Center the title
+            }
 
         )
 
         # Cost Plot
-        cost_fig = px.box(filtered_df, x='lot_id', y='item_cost', title='Распределение цен позиций в каждом из лотов',
-                          color='lot_id')
-        cost_fig.update_layout(xaxis_title='Лот', yaxis_title='Цена позиции')
+        cost_fig = px.box(filtered_df, x='lot_id', y='item_cost', color='lot_id')
+        cost_fig.update_layout(
+            xaxis_title='Лот',
+            yaxis_title='Цена позиции',
+            title={
+                'text': "<b>Распределение цен позиций в каждом из лотов</b>",
+                'font': {'size': 18},  # Adjust size as needed
+                'x': 0.5,  # Center the title
+            }
+        )
 
         lot_totals = filtered_df.groupby('lot_id')['item_cost'].sum().reset_index()
         # Создание histogram
@@ -367,7 +510,11 @@ def create_dashboard(df_for_visual, mq, ms):
         )])
 
         histogram_fig.update_layout(
-            title='Суммарная стоимость лота',
+            title={
+                'text': "<b>Суммарная стоимость лота</b>",
+                'font': {'size': 18},  # Adjust size as needed
+                'x': 0.5,  # Center the title
+            },
             xaxis_title='Лот',
             yaxis_title='Стоимость',
             xaxis=dict(tickmode='linear')  # Установка линейного режима для оси X
@@ -377,21 +524,17 @@ def create_dashboard(df_for_visual, mq, ms):
                                                                                     lot_stats.columns]
 
     # Сохраняем всю страницу как HTML
-    with open('./templates/dashboard.html', 'w') as f:
+    with open('dashboard.html', 'w') as f:
         f.write(app.index())
 
     # Запуск приложения
-    # app.run_server(debug=True)
-
+    app.run_server(debug=True)
 
 
 # Пример использования
-def make_dashboard(requests, lots, human_lots, scorer: Scorer):
-    create_dashboard(merge_tables_for_canvas(requests, lots, human_lots),
-                         scorer.mq_score(requests, lots, human_lots), scorer.ms_score(requests, lots))
+def make_dashboard(requests, lots, human_lots, ms, mq=None):
+    if __name__ == '__main__':
+        create_dashboard(merge_tables_for_canvas(requests, lots, human_lots), mq, ms)
 
-# знаки после запятой в таблице
-# большой курсор
-# checklist заменить на че-то из bootstrap (например multy select)
-# html код
-# подсказка при наведении на вопросик
+
+# make_dashboard(requests, lots, human_lots, 0.6, 6)

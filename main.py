@@ -123,29 +123,30 @@ def upload_lots():
         count_method = True
     else:
         count_method = False
-    if data.get('param_1') == '':
+    if data.get('param_1') == None:
         param_1 = None
     else:
         param_1 = float(data.get('param_1'))
-    if data.get('param_2') == '':
+    if data.get('param_2') == None:
         param_2 = None
     else:
         param_2 = float(data.get('param_2'))
-    # df = pd.read_csv('./files/cold_lots.csv') #Времянка
     df = getForLots(start_date, end_date)
-    print(df)
-    if count_method:
+    useHumanSolver = False
+    if useHumanSolver:
+        print("There is nothing here")
+    solver = Solver()
+    if not count_method:
         solver = Solver(podgon=dist_coeff, find_optimal=count_method, min_lots_percent=param_1, min_ms=param_2)
     else:
         solver = Solver(prod_percent=param_1, prov_percent=param_2, podgon=dist_coeff, find_optimal=count_method)
     lots = solver.get_lots(df)
-    print(lots)
-    # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
-    # result_df = lotter.get_lots(df)
-    # print(result_df)
-    # pack_id = putPack(name, "count_method", df, start_date, end_date)
-    return jsonify({'id': 200}), 200
-    # return jsonify({'success': 1}), 200
+    if useHumanSolver:
+        human_pack_id = putPack(name, "count_method", human_lots, df, start_date, end_date)
+        pack_id = putPack(name, "count_method", lots, df, start_date, end_date, human_pack_id)
+    else:
+        pack_id = putPack(name, "count_method", lots, df, start_date, end_date)
+    return jsonify({'id': pack_id}), 200
 
 @app.route('/api/download', methods=['POST', 'GET'])
 def download_file():
