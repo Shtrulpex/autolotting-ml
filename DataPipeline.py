@@ -200,7 +200,7 @@ class DataPipeline:
         updateable_columns = ['lot_id']
 
         new_lots.rename(columns={
-            '№ лотировки': 'lotting_id',
+            '№ лоттировки': 'lotting_id',
             '№ лота': 'lot_id'
         }, inplace=True)
 
@@ -299,7 +299,7 @@ class DataPipeline:
 
         query = f'''
         SELECT DISTINCT
-            lottings.lotting_id AS '№ лотировки',
+            lottings.lotting_id AS '№ лоттировки',
             lottings.lot_id AS "№ лота",
             requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
@@ -341,14 +341,14 @@ class DataPipeline:
         else:
             order_condition = f"requests.order_id = {order_id}"
 
-        query_human_lots = f'''
-        SELECT DISTINCT
-            requests.request_id,
-            requests.human_lot_id
-        FROM requests
-        WHERE {order_condition}
-        {'AND human_lot_id IS NOT NULL' if human_lots_essential else ''}
-        '''
+        # query_human_lots = f'''
+        # SELECT DISTINCT
+        #     requests.request_id,
+        #     requests.human_lot_id
+        # FROM requests
+        # WHERE {order_condition}
+        # {'AND human_lot_id IS NOT NULL' if human_lots_essential else ''}
+        # '''
 
         query_request_features = f'''
         WITH t1 AS (
@@ -410,8 +410,11 @@ class DataPipeline:
                 '''
 
         request_features = self._db_processor.get_df(query_request_features)
-        human_lots = self._db_processor.get_df(query_human_lots)
-        return request_features, human_lots
+        request_features['order_dt'] = request_features['order_dt'].astype('datetime64[ns]')
+        request_features['delivery_dt'] = request_features['delivery_dt'].astype('datetime64[ns]')
+        # human_lots = self._db_processor.get_df(query_human_lots)
+        # return request_features, human_lots
+        return request_features
 
     def get_standard_shipping(self):
         """Возвращает стандартые сроки доставки для каждого уникального материала по его классу"""
