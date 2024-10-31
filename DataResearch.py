@@ -202,41 +202,26 @@ class Scorer:
 
         requests_lots = pd.merge(requests, lots, on='request_id', how='inner')
 
-        total_classes_per_lot = requests_lots.groupby('lot_id')['class_id'].nunique()
+        lot_scores = []
+        for _, lot_df in requests_lots.groupby('lot_id'):
+            supplier_coverage = lot_df.groupby('supplier_id')['class_id'].nunique() / lot_df['class_id'].nunique()
 
-        supplier_coverage = (requests_lots.groupby(['lot_id', 'supplier_id'])['class_id'].nunique()
-                             / requests_lots['lot_id'].map(total_classes_per_lot))
+            # Пропустим лот, если нет поставщиков
+            if supplier_coverage.empty:
+                continue
 
-        n_post50 = supplier_coverage.groupby('lot_id').apply(lambda x: (x > 0.5).sum())
-        n_post80 = supplier_coverage.groupby('lot_id').apply(lambda x: (x > 0.8).sum())
-        n_post100 = supplier_coverage.groupby('lot_id').apply(lambda x: (x == 1.0).sum())
+            # Подсчитаем количество поставщиков по категориям
+            n_post50 = (supplier_coverage > 0.5).sum()
+            n_post80 = (supplier_coverage > 0.8).sum()
+            n_post100 = (supplier_coverage == 1.0).sum()
 
-        n_post = supplier_coverage.groupby('lot_id').size()
+            n_post = len(supplier_coverage)
 
-        lot_ms_scores = (2 * n_post50 + 3 * n_post80 + 4 * n_post100) / n_post
+            lot_ms_score = (2 * n_post50 + 3 * n_post80 + 4 * n_post100) / n_post
+            lot_scores.append(lot_ms_score)
 
-        return lot_ms_scores.mean() if not lot_ms_scores.empty else 0.0
-
-        # lot_scores = []
-        # for _, lot_df in requests_lots.groupby('lot_id'):
-        #     supplier_coverage = lot_df.groupby('supplier_id')['class_id'].nunique() / lot_df['class_id'].nunique()
-        #
-        #     # Пропустим лот, если нет поставщиков
-        #     if supplier_coverage.empty:
-        #         continue
-        #
-        #     # Подсчитаем количество поставщиков по категориям
-        #     n_post50 = (supplier_coverage > 0.5).sum()
-        #     n_post80 = (supplier_coverage > 0.8).sum()
-        #     n_post100 = (supplier_coverage == 1.0).sum()
-        #
-        #     n_post = len(supplier_coverage)
-        #
-        #     lot_ms_score = (2 * n_post50 + 3 * n_post80 + 4 * n_post100) / n_post
-        #     lot_scores.append(lot_ms_score)
-        #
-        # # Возвращаем среднее значение, если есть оценки
-        # return np.array(lot_scores).mean() if lot_scores else 0.0
+        # Возвращаем среднее значение, если есть оценки
+        return np.array(lot_scores).mean() if lot_scores else 0.0
 
     def ml_score(self, requests: pd.DataFrame, lots: pd.DataFrame) -> float:
         """
