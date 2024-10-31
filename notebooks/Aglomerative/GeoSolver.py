@@ -58,7 +58,11 @@ class GeoSolver():
         #print(ans)
         if len(ans) > 0:
             for q in ans:
-                query = 'Россия' + ', ' + name + ' ' + q
+                query = ''
+                if name != 'г' and name != 'город':
+                    query = 'Россия' + ', ' + name + ' ' + q
+                else:
+                    query = 'Россия' + ', ' + q
                 #print(f'check: {query}')
                 ans = self.location_by_query(query)
                 if ans is not None:
@@ -135,7 +139,7 @@ class GeoSolver():
 
         #Давайте попытаемся разбить адрес на "слова"
         adr = adress.lower()
-        words = re.findall(r'\w+', adr)
+        words = re.findall('\w+', adr)
         #print(words)
 
         #Теперь погнали искать почтовый индекс РФ - 6 цифр
@@ -201,5 +205,5 @@ class GeoSolver():
         coords = pd.DataFrame(coords, columns = ['Код грузополучателя', 
                                                  'Адрес грузополучателя', 'Долгота', 
                                                  'Широта', 'Уверенность'])
-        coords.to_csv('./Data/coords_test.csv', index = False)
+        coords.to_csv('./Data/coords_v2.csv', index = False)
         return problematic
