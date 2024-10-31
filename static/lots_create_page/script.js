@@ -1,6 +1,28 @@
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
+const coeffCheckBox = document.getElementById("coefficientCheckbox")
+const inputDiv = document.getElementById("coefficientInputDiv");
+const coeffInput = document.getElementById("coefficientInput");
+const inputParam1 = document.getElementById("param-1");
+const inputParam2 = document.getElementById("param-2");
 
+coeffCheckBox.addEventListener("change", function() {
+    inputDiv.classList.toggle("hidden", !this.checked);
+});
+
+coeffInput.addEventListener("input", function() {
+    const value = this.value;
+    if (!Number.isInteger(Number(value)) || value.trim() === "") {
+        alert("Please provide an integer");
+    }
+});
+
+document.querySelectorAll("input[name='countingMethod']").forEach(radio => {
+    radio.addEventListener("change", function() {
+        inputParam1.value = "";
+        inputParam2.value = "";
+    });
+});
 
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
@@ -173,25 +195,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     formLotsBtn.addEventListener('click', () => {
-        if (startDate && endDate) {
-            if (inputName.value) {
-                fetch('/api/upload_lots', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ start_date: startDate, end_date: endDate, name: inputName.value })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    window.location.href=`/packs_page.html?id=${data.id}`;
-                })
-                .catch(error => console.error("Error:", error));
-            } else {
-                alert('Пожалуйста, впишите название пака.')
-            }
+
+        const coefficient = coeffCheckBox.checked ? coeffInput.value : null;
+        
+        const countingMethod = document.querySelector("input[name='countingMethod']:checked").value;
+        const field1 = inputParam1.value;
+        const field2 = inputParam2.value;
+
+        if (countingMethod === '1' & (field1 === '' | field2 === '')) {
+            alert('Введите параметры подсчета')
         } else {
-            alert("Пожалуйста, выберете даты заказов.");
+            if (startDate && endDate) {
+                if (inputName.value) {
+                    fetch('/api/upload_lots', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ start_date: startDate, end_date: endDate, name: inputName.value, dist_coeff: coefficient, count_method: countingMethod, param_1: field1, param_2: field2 })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // window.location.href=`/packs_page.html?id=${data.id}`;
+                    })
+                    .catch(error => console.error("Error:", error));
+                } else {
+                    alert('Пожалуйста, впишите название пака.')
+                }
+            } else {
+                alert("Пожалуйста, выберете даты заказов.");
+            }
         }
     })
 });

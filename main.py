@@ -109,7 +109,11 @@ def upload_lots():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     name = data.get('name')
-
+    dist_coeff = data.get('dist_coeff')
+    # if dist_coeff != None:
+    count_method = data.get('count_method')
+    param_1 = data.get('param_1')
+    param_2 = data.get('param_2')
     df = pd.read_csv('./files/cold_lots.csv') #Времянка
     # df = getOrders(start_date, end_date)
     # lotter = Solver() #ПОКА НЕ РАБОТАЕТ ФОРМИРОВАНИЕ ЛОТОВ
@@ -117,6 +121,7 @@ def upload_lots():
     # print(result_df)
     pack_id = putPack(name, "none_algorythm_yet", df, start_date, end_date)
     return jsonify({'id': pack_id}), 200
+    # return jsonify({'success': 1}), 200
 
 @app.route('/api/download', methods=['POST', 'GET'])
 def download_file():

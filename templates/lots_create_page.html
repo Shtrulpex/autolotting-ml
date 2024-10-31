@@ -41,6 +41,35 @@
             <h2>Количество позиций:</h2>
             <h2 id="number-of-positions"></h2>
         </div>
+
+
+        <div class="center-params">
+            <label>
+                <input type="checkbox" id="coefficientCheckbox"> Изменить коэффициент учета расстояния
+            </label>
+            <div id="coefficientInputDiv" class="hidden">
+                <input type="text" id="coefficientInput" placeholder="Введите свой коэффициент">
+            </div>
+        
+            <br><br>
+        
+            <label>Способ подсчета</label>
+            <div>
+                <label>
+                    <input type="radio" name="countingMethod" value="1" checked> 1
+                </label>
+                <label>
+                    <input type="radio" name="countingMethod" value="3"> 3
+                </label>
+            </div>
+        
+            <div id="inputFields">
+                <input type="text" id="param-1" placeholder="Параметр 1" required>
+                <input type="text" id="param-2" placeholder="Параметр 2" required>
+            </div>
+        </div>
+        
+
         <div class="center-buttons">
             <button id="form-lots-btn"">Сформировать лоты</button>
         </div>

@@ -90,7 +90,6 @@ body, html {
 
 .main-content {
     text-align: center;
-    margin-top: 100px;
     color: #FFFFFF;
 }
 
@@ -215,7 +214,7 @@ body:hover .sidebar {
     color: #555;
 }
 
-#input-name {
+#input-name, #coefficientInput, #param-1, #param-2 {
     font-family: sans-serif;
     padding: 1rem 1rem;
     border-radius: 0.2rem;
@@ -224,4 +223,25 @@ body:hover .sidebar {
     width: 240px;
     margin-left: 0px;
     outline: 1px solid #333;
+}
+
+.hidden {
+    display: none;
+}
+
+.center-params {
+    color: white;
+}
+
+#coefficientCheckbox {
+    content: "";
+    height: 1.15em;
+    width: 1.15em;
+    margin-right: 0.6em;
+    color: rgba(0, 0, 0, 0.275);
+    border: solid 0.06em;
+    box-shadow: 0 0 0.04em, 0 0.06em 0.16em -0.03em inset, 0 0 0 0.07em transparent inset;
+    border-radius: 0.2em;
+    background-size: 0;
+    transform: translate3d(0, 0, 0);
 }
