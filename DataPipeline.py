@@ -645,3 +645,4 @@ class DataPipeline:
 # #
 # #
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+
