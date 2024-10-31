@@ -146,10 +146,10 @@ def upload_lots():
         solver = Solver(prod_percent=param_1, prov_percent=param_2, podgon=dist_coeff, find_optimal=count_method)
     lots = solver.get_lots(df)
     if useHumanSolver:
-        human_pack_id = putPack(name, "count_method", human_lots, df, start_date, end_date)
-        pack_id = putPack(name, "count_method", lots, df, start_date, end_date, human_pack_id)
+        human_pack_id = putPack(name, "count_method", human_lots, start_date, end_date)
+        pack_id = putPack(name, "count_method", lots, start_date, end_date, human_pack_id)
     else:
-        pack_id = putPack(name, "count_method", lots, df, start_date, end_date)
+        pack_id = putPack(name, "count_method", lots, start_date, end_date)
     return jsonify({'id': pack_id}), 200
 
 @app.route('/api/download', methods=['POST', 'GET'])

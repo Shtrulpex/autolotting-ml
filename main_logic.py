@@ -67,6 +67,7 @@ def getPacks(id=None, dates = False):
     if id != None:
         if dates == True:
             packs = data_pipeline.get_packs()
+            print(packs)
             from_date = datetime.strptime(packs[packs['pack_id'] == id]['from_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
             to_date = datetime.strptime(packs[packs['pack_id'] == id]['to_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
             orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
@@ -99,6 +100,8 @@ def editLot(data):
         return False
 
 def putPack(pack_name, lotting_algorytm, lots, from_date, to_date, human_pack_id = None):
+    from_date = datetime.strptime(from_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
+    to_date = datetime.strptime(to_date, "%Y-%m-%dT%H:%M:%S.%fZ").strftime("%Y-%m-%d")
     pack_id = data_pipeline.put_pack(pack_name, lotting_algorytm, lots, from_date, to_date, human_pack_id)
     return pack_id
 
