@@ -136,7 +136,7 @@ class DataPipeline:
 
     def put_pack(self, pack_name: str, lotting_algorithm: str,
                  lots: pd.DataFrame, from_dt: str, to_dt: str,
-                 human_pack_id: int = None,) -> int:
+                 human_pack_id: int = None) -> int:
         """
             Загружает в БД пак лотов и обновляет зависимые таблицы (packs, lottings)
             Возвращает id пака в БД
@@ -294,6 +294,19 @@ class DataPipeline:
 
         return self._db_processor.get_df(query)
 
+    def get_lots_features(self, pack_id: int) -> pd.DataFrame:
+        query = f'''
+                SELECT DISTINCT
+                    lottings.lotting_id,
+                    lottings.lot_id,
+                    requests.request_id
+                FROM requests
+                INNER JOIN lottings
+                    ON lottings.request_id = requests.request_id
+                WHERE lottings.pack_id = "{pack_id}"
+                '''
+        return self._db_processor.get_df(query)
+
     def get_lots(self, pack_id: int) -> pd.DataFrame:
         """Выгружает лоты пака по id этого пака в формате выходного шаблона + request_id"""
 
@@ -432,55 +445,65 @@ class DataPipeline:
         return self._db_processor.get_df(query)
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ФОРМИРОВАНИЯ БД ИЗ CSV ФАЙЛОВ
-# id_columns = {
-#     'addresses': 'address_id',
-#     'classes': 'class_id',
-#     'materials': 'material_id',
-#     'classes_X_suppliers': 'connection_id',
-#     'suppliers': 'supplier_id',
-#     'receivers': 'receiver_id',
-#     'lottings': 'lotting_id',
-#     'requests': 'request_id',
-#     'items': 'item_id',
-#     'orders': 'order_id',
-#     'lots': 'lot_id',
-#     'packs': 'pack_id'
-# }
-#
-# db_proc = DBProcessor()
+id_columns = {
+    'addresses': 'address_id',
+    'classes': 'class_id',
+    'materials': 'material_id',
+    'classes_X_suppliers': 'connection_id',
+    'suppliers': 'supplier_id',
+    'receivers': 'receiver_id',
+    'lottings': 'lotting_id',
+    'requests': 'request_id',
+    'items': 'item_id',
+    'orders': 'order_id',
+    'lots': 'lot_id',
+    'packs': 'pack_id'
+}
+
+db_proc = DBProcessor()
 # for table_name in id_columns.keys():
 #     db_proc.run_query(f'DROP TABLE IF EXISTS {table_name};')
-#
-# dp = DataPipeline()
-# dp._db_processor = db_proc
-#
-# import os
-#
-# # Указываем путь к директории с CSV-файлами (9 файлов)
-# csv_folder = os.path.expanduser('~/Desktop/HakatonData')
-# for filename in os.listdir(csv_folder):
-#     if filename.endswith('.csv'):
-#         file_path = os.path.join(csv_folder, filename)
-#         df = pd.read_csv(file_path)
-#         table_name = os.path.splitext(filename)[0]
-#         if table_name == 'template_init_data_for_model_first_month':
-#             # human_lots = df['ID Лота']
-#             # df.drop(columns=['ID Лота'], inplace=True)
-#             # dp.put_requests(df, human_lots=human_lots)
-#             # df = dp.get_requests()
-#             # request_ids = df['№ заявки']
-#             # request_ids = request_ids.astype('Int64')
-#             # df.rename(columns={'№ заявки': 'request_id'}, inplace=True)
-#             # df = pd.DataFrame({
-#             #     'request_id': request_ids,
-#             #     'lot_id': lot_ids
-#             # })
-#             # dp.put_pack('z2020-2', df)
-#             continue
-#         elif table_name == 'z2020-2':
-#             # lot_ids = df['lot_id']
-#             continue
-#         db_proc.load_df(table_name, df, pk_column=id_columns.get(table_name, None))
+db_proc.run_query(f'DROP TABLE IF EXISTS addresses;')
+db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
+
+dp = DataPipeline()
+dp._db_processor = db_proc
+
+import os
+
+# Указываем путь к директории с CSV-файлами (9 файлов)
+csv_folder = os.path.expanduser('~/Desktop/HakatonData')
+for filename in os.listdir(csv_folder):
+    if filename.endswith('.csv'):
+        file_path = os.path.join(csv_folder, filename)
+        df = pd.read_csv(file_path)
+        table_name = os.path.splitext(filename)[0]
+        if table_name != 'addresses_coords':
+            continue
+        else:
+            table_name = 'addresses'
+            db_proc.load_df(table_name, df, pk_column='address_id')
+            print(1)
+        # if table_name == 'template_init_data_for_model_first_month':
+        #     # human_lots = df['ID Лота']
+        #     # df.drop(columns=['ID Лота'], inplace=True)
+        #     # dp.put_requests(df, human_lots=human_lots)
+        #     # df = dp.get_requests()
+        #     # request_ids = df['№ заявки']
+        #     # request_ids = request_ids.astype('Int64')
+        #     # df.rename(columns={'№ заявки': 'request_id'}, inplace=True)
+        #     # df = pd.DataFrame({
+        #     #     'request_id': request_ids,
+        #     #     'lot_id': lot_ids
+        #     # })
+        #     # dp.put_pack('z2020-2', df)
+        #     continue
+        # elif table_name == 'z2020-2':
+        #     # lot_ids = df['lot_id']
+        #     continue
+
 
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ПРОВЕРКИ РАБОТЫ DataPipeline
