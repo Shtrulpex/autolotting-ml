@@ -55,6 +55,10 @@ def lots():
 def lots_create():
     return render_template("lots_create_page.html")
 
+@app.route("/stats.html")
+def dash():
+    return render_template("Dash.html")
+
 @app.route("/packs_page.html")
 def packs_page():
     id = request.args.getlist('id')
