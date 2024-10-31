@@ -3,7 +3,7 @@ import os
 from DataResearch import *
 from DataPipeline import *
 from datetime import datetime
-from Canvas import make_dashboard
+from canvas import make_dashboard
 
 
 data_pipeline = DataPipeline()
@@ -75,6 +75,7 @@ def getPacks(id=None, dates = False):
             #TEMPORARY
             lots = data_pipeline.get_lots(id)
             scorer = Scorer()
+            # print(request_features, lots)
             ms_score = scorer.ms_score(request_features, lots)
             mq_score = scorer.mq_score(request_features, lots, human_lots)
             # make_dashboard(request_features, lots, human_lots)
