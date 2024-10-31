@@ -85,10 +85,10 @@ def getPacks(id=None, dates = False):
             return lots
     else:
         packs = data_pipeline.get_packs()
-        if packs == None:
-            return pd.DataFrame()
-        else:
+        if isinstance(packs, pd.DataFrame):
             return packs
+        else:
+            return pd.DataFrame()
 
 def editLot(data):
     df = pd.DataFrame(data)

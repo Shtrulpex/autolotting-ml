@@ -80,9 +80,11 @@ if (allDfDiv.textContent !== '') {
         allDfData.forEach(row => {
             const li = document.createElement("li");
             for (let key in row) {
-                const p = document.createElement("p");
-                p.textContent = idToReadable[key] + ": " + row[key];
-                li.appendChild(p);
+                if (key !== 'human_pack_id') {
+                    const p = document.createElement("p");
+                    p.textContent = idToReadable[key] + ": " + row[key];
+                    li.appendChild(p);
+                }
             }
             li.addEventListener('click', () => {
                 window.location.href = `/packs_page.html?id=${row['pack_id']}`;
@@ -231,9 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(Date.parse(row['formation_dttm']) < endDate & Date.parse(row['formation_dttm']) > startDate) {
                             const li = document.createElement("li");
                             for (let key in row) {
-                                const p = document.createElement("p");
-                                p.textContent = idToReadable[key] + ": " + row[key];
-                                li.appendChild(p);
+                                if (key !== 'human_pack_id') {
+                                    const p = document.createElement("p");
+                                    p.textContent = idToReadable[key] + ": " + row[key];
+                                    li.appendChild(p);
+                                }
                             }
                             li.addEventListener('click', () => {
                                 window.location.href = `/packs_page.html?id=${row['pack_id']}`;
