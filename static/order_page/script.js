@@ -315,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 const allDfData = JSON.parse(data);
+                ulSidebarAllDf.innerHTML = "";
                 if (allDfData.length > 0) {
-                    ulSidebarAllDf.innerHTML = "";
                     allDfData.forEach(row => {
                         const li = document.createElement("li");
                         for (let key in row) {

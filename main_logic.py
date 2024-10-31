@@ -66,7 +66,6 @@ def getPacks(id=None):
 
 def editLot(data):
     df = pd.DataFrame(data)
-    print(df)
     data_pipeline.update_lots(df)
 
 def putPack(pack_name, lotting_algorytm, lots, from_date, to_date):

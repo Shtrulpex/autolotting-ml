@@ -140,6 +140,7 @@ def submit_dates():
     start_date = data.get('start_date')
     end_date = data.get('end_date')
     df = getOrders(start_date, end_date).to_json(orient='records')
+    print(df)
     return jsonify(df), 200
 
 @app.route('/api/fetch-dates', methods=['POST'])

@@ -197,6 +197,7 @@ class DataPipeline:
         updateable_columns = ['lot_id']
 
         new_lots.rename(columns={
+            '№ лотировки': 'lotting_id',
             '№ лота': 'lot_id'
         }, inplace=True)
 
