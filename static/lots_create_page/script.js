@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        // window.location.href=`/packs_page.html?id=${data.id}`;
+                        window.location.href=`/packs_page.html?id=${data.id}`;
                     })
                     .catch(error => console.error("Error:", error));
                 } else {
