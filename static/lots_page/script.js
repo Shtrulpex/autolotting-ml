@@ -210,7 +210,7 @@ downloadBtn.addEventListener('click', function() {
     const lot_id = document.getElementById('lot_id').textContent;
     var data;
     if (lot_id === '') {
-        data = {'id':id};
+        data = {'id':id, 'lot_id':''};
     } else {
         data = {'id':id, 'lot_id':lot_id};
     }
