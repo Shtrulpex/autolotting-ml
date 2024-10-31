@@ -17,12 +17,18 @@ body, html {
 .header {
     display: flex;
     background-color: rgba(244, 244, 244, 0.5);
-    position: relative;
+    position: fixed;
     width: 100%;
     top: 0;
     left: 0;
     z-index: 2;
     box-shadow: 0 4px 2px -2px gray;
+}
+
+.header-fill {
+    width: 100%;
+    opacity: 0;
+    height: 100px;
 }
 
 .header h2 {

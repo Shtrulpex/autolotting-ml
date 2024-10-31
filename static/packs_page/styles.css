@@ -26,9 +26,10 @@ body, html {
     box-shadow: 0 4px 2px -2px gray;
 }
 
-.header {
-    position: relative;
-    z-index: 2;
+.header-fill {
+    width: 100%;
+    opacity: 0;
+    height: 100px;
 }
 
 .header h2 a {
@@ -101,7 +102,7 @@ body:hover .sidebar {
 }
 
 .sidebar-orders {
-    position: absolute;
+    position: fixed;
     left: -300px;
     top: 100px;
     width: 300px;

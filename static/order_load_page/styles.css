@@ -26,6 +26,12 @@ body, html {
     box-shadow: 0 4px 2px -2px gray;
 }
 
+.header-fill {
+    width: 100%;
+    opacity: 0;
+    height: 100px;
+}
+
 .header h2 a {
     color: var(--dark-text-color);
     text-decoration: none;
@@ -152,18 +158,13 @@ body:hover .sidebar {
     opacity: 1;
 }
 
-.header {
-    position: relative;
-    z-index: 2;
-}
-
 .header h2 {
     margin: auto;
 }
 
 
 .sidebar-orders {
-    position: absolute;
+    position: fixed;
     left: -300px;
     top: 100px;
     width: 300px;

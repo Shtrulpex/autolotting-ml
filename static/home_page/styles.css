@@ -27,6 +27,12 @@ body, html {
     box-shadow: 0 4px 2px -2px var(--header-shadow-color);
 }
 
+.header-fill {
+    width: 100%;
+    opacity: 0;
+    height: 100px;
+}
+
 .header-text {
     margin-left: 80px;
 }
@@ -122,9 +128,4 @@ body:hover .sidebar {
     background-color: var(--menu-color);
     color: var(--bright-text-color);
     opacity: 1;
-}
-
-.header {
-    position: relative;
-    z-index: 2;
 }
