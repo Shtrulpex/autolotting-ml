@@ -5,9 +5,6 @@ const ordersBtn = document.getElementById("ordersBtn");
 const filterInput = document.getElementById("filters");
 const filtersDiv = document.getElementById("filters-box");
 const filtersUl = document.getElementById("filters-ul");
-const dfDataDiv = document.getElementById("dataDiv");
-const tableSection = document.getElementById("tableSection");
-const tableBody = document.getElementById("tableBody");
 const allDfDiv = document.getElementById("all-data-div");
 const ulSidebarAllDf = document.getElementById("all-orders-ul");
 
@@ -92,31 +89,6 @@ if (allDfDiv.textContent !== '') {
             });
             ulSidebarAllDf.appendChild(li);
         })
-    }
-}
-
-if (dfDataDiv.textContent !== '') {
-    document.getElementById('btn-to-lots').style.display = '';
-    const dfData = JSON.parse(dfDataDiv.textContent);
-    if (dfData.length > 0) {
-        tableSection.style.display = 'block';
-        tableBody.innerHTML = '';
-        const headerRow = document.createElement("tr");
-        Object.keys(dfData[0]).forEach(header => {
-            const th = document.createElement("th");
-            th.textContent = header;
-            headerRow.appendChild(th);
-        })
-        tableBody.appendChild(headerRow);
-        dfData.forEach(row => {
-            const tr = document.createElement("tr");
-            Object.values(row).forEach(cellData => {
-                const td = document.createElement("td");
-                td.textContent = cellData;
-                tr.appendChild(td);
-            });
-            tableBody.appendChild(tr);
-        });
     }
 }
 

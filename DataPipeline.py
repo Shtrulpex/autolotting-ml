@@ -447,47 +447,47 @@ class DataPipeline:
         return self._db_processor.get_df(query)
 
 # КОД ДАЛЕЕ НУЖЕН ТОЛЬКО ДЛЯ ФОРМИРОВАНИЯ БД ИЗ CSV ФАЙЛОВ
-id_columns = {
-    'addresses': 'address_id',
-    'classes': 'class_id',
-    'materials': 'material_id',
-    'classes_X_suppliers': 'connection_id',
-    'suppliers': 'supplier_id',
-    'receivers': 'receiver_id',
-    'lottings': 'lotting_id',
-    'requests': 'request_id',
-    'items': 'item_id',
-    'orders': 'order_id',
-    'lots': 'lot_id',
-    'packs': 'pack_id'
-}
+# id_columns = {
+#     'addresses': 'address_id',
+#     'classes': 'class_id',
+#     'materials': 'material_id',
+#     'classes_X_suppliers': 'connection_id',
+#     'suppliers': 'supplier_id',
+#     'receivers': 'receiver_id',
+#     'lottings': 'lotting_id',
+#     'requests': 'request_id',
+#     'items': 'item_id',
+#     'orders': 'order_id',
+#     'lots': 'lot_id',
+#     'packs': 'pack_id'
+# }
 
-db_proc = DBProcessor()
-# for table_name in id_columns.keys():
-#     db_proc.run_query(f'DROP TABLE IF EXISTS {table_name};')
-db_proc.run_query(f'DROP TABLE IF EXISTS addresses;')
-db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
-db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
-db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
+# db_proc = DBProcessor()
+# # for table_name in id_columns.keys():
+# #     db_proc.run_query(f'DROP TABLE IF EXISTS {table_name};')
+# db_proc.run_query(f'DROP TABLE IF EXISTS addresses;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
 
-dp = DataPipeline()
-dp._db_processor = db_proc
+# dp = DataPipeline()
+# dp._db_processor = db_proc
 
-import os
+# import os
 
-# Указываем путь к директории с CSV-файлами (9 файлов)
-csv_folder = os.path.expanduser('~/Desktop/HakatonData')
-for filename in os.listdir(csv_folder):
-    if filename.endswith('.csv'):
-        file_path = os.path.join(csv_folder, filename)
-        df = pd.read_csv(file_path)
-        table_name = os.path.splitext(filename)[0]
-        if table_name != 'addresses_coords':
-            continue
-        else:
-            table_name = 'addresses'
-            db_proc.load_df(table_name, df, pk_column='address_id')
-            print(1)
+# # Указываем путь к директории с CSV-файлами (9 файлов)
+# csv_folder = os.path.expanduser('~/Desktop/HakatonData')
+# for filename in os.listdir(csv_folder):
+#     if filename.endswith('.csv'):
+#         file_path = os.path.join(csv_folder, filename)
+#         df = pd.read_csv(file_path)
+#         table_name = os.path.splitext(filename)[0]
+#         if table_name != 'addresses_coords':
+#             continue
+#         else:
+#             table_name = 'addresses'
+#             db_proc.load_df(table_name, df, pk_column='address_id')
+#             print(1)
         # if table_name == 'template_init_data_for_model_first_month':
         #     # human_lots = df['ID Лота']
         #     # df.drop(columns=['ID Лота'], inplace=True)
