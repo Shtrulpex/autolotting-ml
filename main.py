@@ -58,12 +58,10 @@ def lots_create():
 @app.route("/packs_page.html")
 def packs_page():
     id = request.args.getlist('id')
-    start_date = request.args.getlist('start_date')
-    end_date = request.args.getlist('end_date')
     df_packs = getPacks().to_json(orient='records')
     if(id != []):
         id = list(map(int, id[0].split(',')))
-        dfdata = getPacks(id[0]).to_json(orient='records')
+        dfdata = getPacks(id[0], True).to_json(orient='records')
         return render_template("packs_page.html", all_packs=df_packs, data=dfdata, id=id[0])
     else:
         return render_template("packs_page.html", all_packs=df_packs)

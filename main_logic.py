@@ -3,6 +3,7 @@ import os
 from DataResearch import *
 from DataPipeline import *
 from datetime import datetime
+from Canvas import make_dashboard
 
 
 data_pipeline = DataPipeline()
@@ -56,10 +57,21 @@ def editOrder(data):
     df = pd.DataFrame(data)
     data_pipeline.update_requests(df)
 
-def getPacks(id=None):
+def getPacks(id=None, dates = False):
     if id != None:
-        lots = data_pipeline.get_lots(id)
-        return lots
+        if dates == True:
+            packs = data_pipeline.get_packs()
+            from_date = datetime.strptime(packs[packs['pack_id'] == id]['from_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
+            to_date = datetime.strptime(packs[packs['pack_id'] == id]['to_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
+            orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
+            request_features, human_lots = data_pipeline.get_requests_features(orders_df)
+            lots = data_pipeline.get_lots(id)
+            print(request_features, human_lots, lots)
+            make_dashboard(request_features, lots, human_lots, Scorer())
+            return lots
+        else:
+            lots = data_pipeline.get_lots(id)
+            return lots
     else:
         packs = data_pipeline.get_packs()
         return packs
