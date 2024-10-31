@@ -134,7 +134,9 @@ class DataPipeline:
         order_ids = pd.Series(np.array(self._db_processor.run_query(query_new_ids).fetchall()).flatten(), name='order_id')
         return order_ids
 
-    def put_pack(self, pack_name: str, lotting_algorithm: str, lots: pd.DataFrame, from_dt: str, to_dt: str) -> int:
+    def put_pack(self, pack_name: str, lotting_algorithm: str,
+                 lots: pd.DataFrame, from_dt: str, to_dt: str,
+                 human_pack_id: int = None,) -> int:
         """
             Загружает в БД пак лотов и обновляет зависимые таблицы (packs, lottings)
             Возвращает id пака в БД
@@ -147,7 +149,8 @@ class DataPipeline:
             'lotting_algorithm': [lotting_algorithm],
             'formation_dttm': [formation_dttm],
             'from_dt': [from_dt],
-            'to_dt': [to_dt]
+            'to_dt': [to_dt],
+            'human_pack_id': [human_pack_id]
         })
         packs_df['formation_dttm'] = packs_df['formation_dttm'].astype('datetime64[ns]')
         packs_df['from_dt'] = packs_df['from_dt'].astype('datetime64[ns]')
@@ -274,12 +277,13 @@ class DataPipeline:
             packs.lotting_algorithm,
             packs.formation_dttm,
             packs.from_dt,
-            packs.to_dt
+            packs.to_dt,
+            packs.human_pack_id
         FROM packs
         '''
         conditions = []
         if formation_from_dttm:
-            conditions.append(f'DATETIME(packs.formation_dttm) >=DATETIME( "{formation_from_dttm}")')
+            conditions.append(f'DATETIME(packs.formation_dttm) >= DATETIME("{formation_from_dttm}")')
         if formation_to_dttm:
             conditions.append(f'DATETIME(packs.formation_dttm) <= DATETIME("{formation_to_dttm}")')
         if algorithm:
@@ -295,7 +299,7 @@ class DataPipeline:
 
         query = f'''
         SELECT DISTINCT
-            lottings.lotting_id AS '№ лоттировки',
+            lottings.lotting_id AS '№ лотировки',
             lottings.lot_id AS "№ лота",
             requests.request_id AS "№ заявки",
             requests.client_id AS "Клиент",
@@ -581,10 +585,16 @@ class DataPipeline:
 # lots.columns = ['lot_id', 'request_id']
 # print("After renaming:", lots.columns)
 # print(lots.info())
+# lots.to_csv(f'~/Desktop/cold_lots.csv', mode='w', index=False)
 #
 #
-# pack_id = dp.put_pack('human_lots_example', lots)
+# pack_id = dp.put_pack('example', 'human_lotting', lots, from_dt='2020-01-01', to_dt='2020-01-31')
 # lots = dp.get_lots(pack_id)
+# print(lots.iloc[:2])
+# lots['№ лота'][0] = 234
+# print(lots.iloc[:2])
+# dp.update_lots(lots)
+# print(dp.get_lots(pack_id))
 # lots.to_csv(f'~/Desktop/lots.csv', mode='w', index=False)
 # #
 #
@@ -607,9 +617,10 @@ class DataPipeline:
 # df.to_csv('requests_features.csv', mode='w', index=False)
 # print(df)
 # print(len(df.columns))
-
+#
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
-
+# db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
+# db_proc.run_query(f'DROP TABLE IF EXISTS lottings;')
 
 ## ДАЛЕЕ КОД ТОЛЬКО ДЛЯ СОЗДАНИЯ МЕСЯЧНОГО ТРЕНИРОВОЧНОГО ДАТАСЕТА
 #
@@ -645,3 +656,4 @@ class DataPipeline:
 # #
 # #
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
+
