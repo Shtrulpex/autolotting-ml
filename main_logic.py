@@ -67,18 +67,19 @@ def getPacks(id=None, dates = False):
     if id != None:
         if dates == True:
             packs = data_pipeline.get_packs()
-            print(packs)
+            # print(packs)
             from_date = datetime.strptime(packs[packs['pack_id'] == id]['from_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
             to_date = datetime.strptime(packs[packs['pack_id'] == id]['to_dt'].reset_index(drop=True)[0], "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d")
             orders_df = data_pipeline.get_orders(from_dt=from_date, to_dt=to_date)
             orders_ids = orders_df['№ заказа'].to_list()
             request_features = data_pipeline.get_requests_features(orders_ids)
             lots = data_pipeline.get_lots_features(id)
+            # print(lots)
             scorer = Scorer()
             ms_score = scorer.ms_score(request_features, lots)
-            print(ms_score)
+            # print(ms_score)
             # mq_score = scorer.mq_score(request_features, lots, human_lots)
-            # make_dashboard(request_features, lots, human_lots)
+            make_dashboard(request_features, lots, None, ms_score)
             return lots
         else:
             lots = data_pipeline.get_lots(id)

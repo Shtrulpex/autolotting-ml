@@ -533,8 +533,7 @@ def create_dashboard(df_for_visual, mq, ms):
 
 # Пример использования
 def make_dashboard(requests, lots, human_lots, ms, mq=None):
-    if __name__ == '__main__':
-        create_dashboard(merge_tables_for_canvas(requests, lots, human_lots), mq, ms)
+    create_dashboard(merge_tables_for_canvas(requests, lots, human_lots), mq, ms)
 
 
 # make_dashboard(requests, lots, human_lots, 0.6, 6)

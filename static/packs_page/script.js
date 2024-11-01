@@ -7,6 +7,14 @@ const filtersDiv = document.getElementById("filters-box");
 const filtersUl = document.getElementById("filters-ul");
 const allDfDiv = document.getElementById("all-data-div");
 const ulSidebarAllDf = document.getElementById("all-orders-ul");
+const btnToStats = document.getElementById("includeContent");
+const idDiv = document.getElementById("id-div");
+const btnToLots = document.getElementById("btn-to-lots");
+
+if (idDiv.textContent !== '') {
+    btnToStats.style.display = '';
+    btnToLots.style.display = '';
+}
 
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
