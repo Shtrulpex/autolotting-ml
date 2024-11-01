@@ -14,8 +14,7 @@ class HumanLottingSolver:
                                 'receiver_address_longitude', 'receiver_address_coords_geo_confidence', 
                                 'class_name', 'standard_shipping', 'material_name', 'material_name', 'measure_unit',
                                 'materials_amount', 'material_price', 'item_cost', 'purchase_method', 'order_id', 
-                                'item_id', 'client_id', 'supplier_id', 'supplier_address_id', 'supplier_address', 
-                                'supplier_address_coords_geo_confidence'])
+                                'item_id', 'client_id', 'supplier_id', 'supplier_address_id', 'supplier_address'])
         preds = self.__model.predict(df.drop(columns=['request_id']))
         df = df.drop(columns=['material_id', 'class_id',
                               'supplier_address_latitude',
@@ -24,4 +23,4 @@ class HumanLottingSolver:
         for i in np.unique(df['request_id']):
             cnts = df.loc[df['request_id'] == i, 'lot_id'].value_counts()
             request_to_lot[i] = cnts.keys()[cnts.argmax()]
-        return pd.DataFrame({'request_id': list(request_to_lot.keys()), 'human_lot_id': list(request_to_lot.values())})
+        return pd.DataFrame({'request_id': list(request_to_lot.keys()), 'lot_id': list(request_to_lot.values())})

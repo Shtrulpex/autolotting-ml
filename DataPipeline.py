@@ -4,7 +4,6 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import datetime
 from typing import Optional, Union, List
-from tqdm import tqdm
 
 
 class DBProcessor:

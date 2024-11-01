@@ -3,11 +3,11 @@ import os
 from DataResearch import *
 from DataPipeline import *
 from datetime import datetime
-from Canvas import make_dashboard
+# from Canvas import make_dashboard
 
 
 data_pipeline = DataPipeline()
-
+variable = data_pipeline._db_processor
 # db_proc = data_pipeline._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS requests;')
 # db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
@@ -76,7 +76,7 @@ def getPacks(id=None, dates = False):
             scorer = Scorer()
             ms_score = scorer.ms_score(request_features, lots)
             # mq_score = scorer.mq_score(request_features, lots, human_lots)
-            make_dashboard(request_features, lots, None, ms_score, None)
+            #make_dashboard(request_features, lots, None, ms_score, None)
             return lots
         else:
             lots = data_pipeline.get_lots(id)

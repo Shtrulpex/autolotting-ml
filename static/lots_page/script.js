@@ -89,9 +89,9 @@ if (allDfDiv.textContent !== '') {
     if (allDfData.length > 0) {
         allDfData.forEach(row => {
             const li = document.createElement("li");
-            li.textContent = "№ лоттировки: " + row['№ лоттировки'];
+            li.textContent = "№ лота: " + row['№ лота'];
             li.addEventListener('click', () => {
-                window.location.href = `/lots_page.html?id=${id}&lot_id=${row['№ лоттировки']}`;
+                window.location.href = `/lots_page.html?id=${id}&lot_id=${row['№ лота']}`;
             });
             ulSidebarAllDf.appendChild(li);
         });

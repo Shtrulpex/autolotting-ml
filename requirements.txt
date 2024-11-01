@@ -1,0 +1,13 @@
+numpy==2.1.2
+pandas==2.2.2
+haversine==2.8.1
+geopy==2.4.1
+pgeocode==0.5.0
+flask==3.0.3
+openpyxl==3.1.5
+xlrd==2.0.1
+SQLAlchemy==2.0.36
+dash==2.18.1
+dash_bootstrap_components==1.6.0
+plotly==5.6.0
+scikit-learn==1.4.2
