@@ -45,8 +45,6 @@ def lots():
         lot_id = request.args.getlist('lot_id')
         if(lot_id != []):
             lot_id = list(map(int, lot_id[0].split(',')))
-            for i in range(len(lot_id)):
-                lot_id[i] = lot_id[i] - 1
             return render_template("lots_page.html", lots_data=lots_data, data=dfdata, id=int(id[0]), lot_id=lot_id)
         else:
             return render_template("lots_page.html", lots_data=lots_data, data=dfdata, id=int(id[0]))

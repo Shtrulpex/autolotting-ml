@@ -108,14 +108,17 @@ if (allDfDiv.textContent !== '') {
                 headerRow.appendChild(th);
             })
             tableBody.appendChild(headerRow);
-            lot_ids.forEach(lot_id => {
-                const tr = document.createElement("tr");
-                Object.values(allDfData[lot_id]).forEach(cellData => {
-                    const td = document.createElement("td");
-                    td.textContent = cellData;
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
+            let lot_id = lot_ids[0];
+            allDfData.forEach(row => {
+                if (row['№ лота'] === lot_id) {
+                    const tr = document.createElement("tr");
+                    Object.values(row).forEach(cellData => {
+                        const td = document.createElement("td");
+                        td.textContent = cellData;
+                        tr.appendChild(td);
+                    });
+                    tableBody.appendChild(tr);
+                }
             });
         }
     }
