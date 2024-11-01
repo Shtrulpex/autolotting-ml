@@ -26,9 +26,10 @@ def xlxsToDf(filepath):
     except ValidationError as ve:
         response = ve
         request_validation = False
-        
-    request_validation = True #ДЛЯ ТОГО, ЧТОБЫ РАБОТАЛО, УБРАТЬ В ПРОДАКШЕНЕ
-
+    except:
+        response = ValidationError
+        request_validation = False
+    print(request_validation)
     if request_validation:
         response = data_pipeline.put_requests(df)
         return True, response

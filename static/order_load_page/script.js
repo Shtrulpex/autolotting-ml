@@ -89,14 +89,21 @@ async function uploadFile(file) {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then((response, reject) => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                alert("Ошибка в содержании файла");
+                return Promise.reject(reject)
+            }
+        })
         .then(data => {
             alert(data.message);
             window.location.href = `/order_page.html?id=${data.ids}`;
         })
         .catch(error => console.error("Ошибка:", error));
     } catch (error) {
-        alert('Неизвестная ошибка.');
+        alert('Ошибка:', error);
     }
 }
 
