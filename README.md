@@ -1,9 +1,9 @@
 # autolotting
 
 ## документы по проеку (не все, неполные, мы работаем)
-* https://app.weeek.net/s/Документация_общая-project-document-NTg5NTU2fDlkNDMwMjRiLTUzMzItNDQ3MS05ZjI2LWVhZDUxNGFlMGZmMA==
-* https://app.weeek.net/s/Документация_DataResearch-project-document-NTg5NTU2fDlkNDMwMWZhLTg5YzgtNDQxMC1hZDE5LWI4YTkzMjY0YmM2Nw==
-* https://app.weeek.net/s/Документация_WebApp-project-document-NTg5NTU2fDlkNDMwMjVmLTdhNzMtNGNlYS1iM2FjLTI1ZWUzMjhlOTkwOQ==
+* [Документация общая](https://app.weeek.net/s/Документация_общая-project-document-NTg5NTU2fDlkNDMwMjRiLTUzMzItNDQ3MS05ZjI2LWVhZDUxNGFlMGZmMA==)
+* [Документация DataResearch](https://app.weeek.net/s/Документация_DataResearch-project-document-NTg5NTU2fDlkNDMwMWZhLTg5YzgtNDQxMC1hZDE5LWI4YTkzMjY0YmM2Nw==)
+* [Документация WebApp](https://app.weeek.net/s/Документация_WebApp-project-document-NTg5NTU2fDlkNDMwMjVmLTdhNzMtNGNlYS1iM2FjLTI1ZWUzMjhlOTkwOQ==)
 
 ## Проделанные работы, полученные результаты и планы на будущее
 ### Общее
@@ -24,23 +24,16 @@
   * Analyzer (дата анализ входных данных, работы алгоритма, анализа уверенности работы алгоритма и т.п.)
   * Canvas (отрисовка метрик, дашбордов и т.п.)
 ### autolotting-ml
-* Был апробирован алгоритм K-means (подробнее: https://app.weeek.net/s/Описание_KMeans_v1-project-document-NTg5NTU2fDlkNDMwYWFjLWJjZDctNDBkOS05ZTE1LTg4MTJlNTMxNTA5Mw==)
+* Был апробирован алгоритм K-means ([подробнее](https://app.weeek.net/s/Описание_KMeans_v1-project-document-NTg5NTU2fDlkNDMwYWFjLWJjZDctNDBkOS05ZTE1LTg4MTJlNTMxNTA5Mw==))
 * Как base-line выбрали метод агломеративной кластеризации
 * Написан соответствующий класс автолоттирования, который учитывает расстояние между заказчиками и количество совпадающих поставщиков заказанных товаров.
 * Алгоритм протестирован и грубо подобраны гиперпараметры, основываясь на метрике MQ, равная 0.78 на итоговой версии
 
 ## Как запустить прототип?
-### Зависимости:
-- numpy
-- pandas
-- geopy
-- pgeocode
-- flask
-- openpyxl
-### Работа с прототипом
-1. Запускается web-сервис через файл main, в командную строку выводится адрес для подключения.
-2. На странице сервиса нажать ***Сделать заказ***.
-3. Выбрать xlsx файл, примеры для тестирования (Example_1.xlsx и Example_2.xlsx) прилагаются.
-4. Нажать на кнопку ***Обработать .xlsx файл***.
-5. Перейти на страницу лотов нажав на кнопку ***Страница лотов***.
-6. Нажать на кнопку ***Создать лоты*** и подождать, когда скачается файл ***lots.csv***.
+Надо вставить файл **data.db** в папку **data** и достать файл **HumanClassifier.pkl** из [HumanClassifier.zip](https://disk.yandex.ru/d/e4wQ3e2iq8F0Ew) в папку **HumanLotting** 
+Команды, чтобы запустить (FALT-machine можно заменить на что угодно, 8888 — порт, который можно задать свой):
+
+    docker build -t FALT-machine . 
+    docker run -p 8888:5000 FALT-machine
+
+Дальше заходим на http://127.0.0.1:8888/
