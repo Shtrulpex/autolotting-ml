@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XLSX Uploader</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/order_load_page/styles.css') }}">
+    <div id="all-data-div" style="display: none;">{{all_orders}}</div>
+</head>
+<body>
+
+    <div class="header">
+        <button class="menu-btn" id="menuBtn">☰ Главное меню</button>
+        <button class="menu-btn" id="ordersBtn"><<</button>
+        <h2><a href="/order_page.html"><u>Заказы</u></a></h2>
+        <h2><a href="/lots_create_page.html">Сформировать</a></h2>
+        <h2><a href="/packs_page.html">Лоты</a></h2>
+    </div>
+
+    <div class="header-fill"></div>
+
+    <div class="file-upload-section">
+        <label for="xml-file" class="file-drop-zone" id="dropZone">Кликните или перетащите XLSX файл</label>
+        <input type="file" id="xml-file" accept=".xlsx" style="display: none;">
+        <button id="loadBtn" onclick="checkFile()">Обработать .xlsx файл</button>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <ul>
+            <li><a href="/home.html">Главная страница</a></li>
+            <li><a href="/order_page.html">Страница заказов</a></li>
+            <li><a href="/lots_create_page.html">Страница формирования лотов</a></li>
+            <li><a href="/packs_page.html">Страница паков</a></li>
+        </ul>
+    </div>
+
+    <div id="sidebar-orders" class="sidebar-orders">
+        <ul>
+            <li>
+                <h2>Фильтры</h2>
+                <button id="calendarBtn">Открыть календарь</button>
+            </li>
+            <li><a href="/order_load_page.html"><strong>Загрузить заказ</strong></a></li>
+            <li><div><h2>Все заказы</h2></div>
+                <input type="text" id="filters" placeholder="Поиск заказа">
+                <div><ul class="sidebar-orders-menu-scroll" id="all-orders-ul">
+                </ul></div></li>
+        </ul>
+    </div>
+
+    <div id="calendarMenu" class="hidden-calendar">
+        <div id="calendarHeader">
+            <select id="yearSelector"></select>
+            <button id="prevMonth">&lt;</button>
+            <span id="monthYear"></span>
+            <button id="nextMonth">&gt;</button>
+            <button id="closeCalendar" class="close-btn">✕</button>
+        </div>
+        <div id="calendar"></div>
+        <button id="submitDatesBtn">Выбрать даты</button>
+    </div>
+
+    <script src="{{ url_for('static',filename='/order_load_page/script.js') }}"></script>
+</body>
+</html>

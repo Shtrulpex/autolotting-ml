@@ -3,32 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XML Uploader</title>
-    <link rel="stylesheet" href="{{ url_for('static',filename='/static3/styles.css') }}">
+    <title>Страница заказов</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='/lots_page/styles.css') }}">
+    <div id="data" style="display: none;">{{data}}</div>
+    <div id="id_pack" style="display: none;">{{id}}</div>
+    <div id="lot_id" style="display: none;">{{lot_id}}</div>
+    <div id="lots_datas" style="display: none;">{{lots_data}}</div>
 </head>
 <body>
-
     <div class="header">
-        <button class="menu-btn" id="menuBtn">☰ Меню лотов</button>
-        <h2 class="header-page"><strong>Сервис лотирования</strong></h2>
-        <div class="header-buttons">
-            <a href="/home.html">Главная страница</a>
-            <a href="/orders_page.html">Страница заказов</a>
-        </div>
+        <button class="menu-btn" id="menuBtn">☰ Главное меню</button>
+        <button class="menu-btn" id="ordersBtn"><<</button>
+        <h2><a href="/order_page.html">Заказы</a></h2>
+        <h2><a href="/lots_create_page.html">Сформировать</a></h2>
+        <h2><a href="/packs_page.html"><u>Лоты</u></a></h2>
     </div>
+
+    <div class="header-fill"></div>
 
     <div id="sidebar" class="sidebar">
         <ul>
             <li><a href="/home.html">Главная страница</a></li>
-            <li><a href="/orders_page.html">Страница заказов</a></li>
-            <li><a href="/lots_page.html"><strong>Страница лотов</strong></a></li>
+            <li><a href="/order_page.html">Страница заказов</a></li>
+            <li><a href="/lots_create_page.html">Страница формирования лотов</a></li>
+            <li><a href="/packs_page.html">Страница паков</a></li>
         </ul>
     </div>
 
-    <div class="file-upload-section">
-        <button id="loadBtn">Создать лоты</button>
+    <div id="sidebar-orders" class="sidebar-orders">
+        <ul>
+            <li><div><h2>Сформированные лоты</h2></div>
+                <input type="text" id="filters" placeholder="Поиск лота">
+                <button id="all-lots-btn">Все лоты</button>
+                <div><ul class="sidebar-orders-menu-scroll" id="all-orders-ul">
+                </ul></div></li>
+        </ul>
     </div>
 
-    <script src="{{ url_for('static',filename='/static3/script.js') }}"></script>
+    <div class="btn-section">
+        <button id="submitOrderBtn">Редактировать</button>
+        <button id="downloadBtn">Выгрузить</button>
+    </div>
+
+    <div class="table-section" id="tableSection">
+        <table>
+            <thead>
+                <tr>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script src="{{ url_for('static',filename='/lots_page/script.js') }}"></script>
 </body>
 </html>
