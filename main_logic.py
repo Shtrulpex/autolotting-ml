@@ -13,7 +13,6 @@ variable = data_pipeline._db_processor
 # db_proc.run_query(f'DROP TABLE IF EXISTS packs;')
 # db_proc.run_query(f'DROP TABLE IF EXISTS lottings;') 
 # С ПОМОЩЬЮ ЭТОГО МОЖНО ДРОПНУТЬ ВСЕ ТАБЛИЦЫ ПЕРЕД ЗАПУСКОМ
-
 validator = Validator(delivery_standards=data_pipeline.get_standard_shipping())
 
 
@@ -25,11 +24,8 @@ def xlxsToDf(filepath):
         request_validation = validator.validate_requests(df)
     except ValidationError as ve:
         response = ve
+        print(ve)
         request_validation = False
-    except:
-        response = ValidationError
-        request_validation = False
-    print(request_validation)
     if request_validation:
         response = data_pipeline.put_requests(df)
         return True, response
