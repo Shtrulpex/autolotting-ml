@@ -118,15 +118,18 @@ def make_popover(description_name, target_tooltip):
     )
 
 
-def merge_tables_for_canvas(req_fea, lots, df_human):
+def merge_tables_for_canvas(req_fea, lots, df_human, flag):
     req_fea.drop_duplicates(subset="request_id", inplace=True)
     mr1 = req_fea.merge(lots, on="request_id", how='inner')
-    df0 = mr1.merge(df_human, on="request_id", how='inner')
-    df0["human_lot_id"], uni = pd.factorize(df0["human_lot_id"])
-    return df0
+    if flag:
+        return mr1
+    else:
+        df0 = mr1.merge(df_human, on="request_id", how='inner')
+        df0["human_lot_id"], uni = pd.factorize(df0["human_lot_id"])
+        return df0
 
 
-def create_dashboard(df_for_visual, mq, ms):
+def create_dashboard_with_human(df_for_visual, mq, ms):
     # Создаем приложение Dash с Bootstrap стилями
     app = Dash(__name__, external_stylesheets=[
         dbc.themes.BOOTSTRAP,
@@ -530,10 +533,407 @@ def create_dashboard(df_for_visual, mq, ms):
     # Запуск приложения
     app.run_server(debug=True)
 
+def create_dashboard(df_for_visual, ms):
+    # Создаем приложение Dash с Bootstrap стилями
+    app = Dash(__name__, external_stylesheets=[
+        dbc.themes.BOOTSTRAP,
+        "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"  # Font Awesome
+    ])
+
+    # Подготовка данных
+    df_for_visual['request_quantity'] = df_for_visual.groupby('lot_id')['request_id'].transform(lambda x: x.nunique())
+
+    # Основная статистика
+    unique_lot_count = df_for_visual['lot_id'].nunique()
+    average_lot_cost = df_for_visual.groupby('lot_id')['item_cost'].sum().mean()
+
+    unique_lot_ids = df_for_visual['lot_id'].unique()
+
+    # -------------------------------------------------DYNAMIC----------------------------------------------------
+
+    # Define the range of lot_id
+    lot_selection = html.Div([
+        dbc.Row([
+            dbc.Col([
+                html.P("Выберите интервал лотов:", style={'font-weight': 'bold', 'font-size': '22px', 'color': '#333'}),
+                dcc.RangeSlider(
+                    id='lot-id-range-slider',
+                    min=int(df_for_visual['lot_id'].min()),
+                    max=int(df_for_visual['lot_id'].max()),
+                    value=[int(df_for_visual['lot_id'].min()), int(df_for_visual['lot_id'].max())],
+                    marks={i: str(i) for i in
+                           range(int(df_for_visual['lot_id'].min()), int(df_for_visual['lot_id'].max()) + 1, 5)},
+                    tooltip={"placement": "bottom", "always_visible": True},
+                    pushable=5,
+                ),
+            ], width=10),
+            dbc.Col([
+                html.P("Отдельные лоты:", style={'font-weight': 'bold', 'font-size': '22px', 'color': '#333'}),
+                dcc.Dropdown(
+                    id='lot-id-dropdown',
+                    options=[{'label': str(lot), 'value': lot} for lot in unique_lot_ids],
+                    multi=True,
+                    placeholder="Выберите отдельные лоты",
+                    style={'border-color': '#007bff'}
+                )
+            ], width=2)
+        ], className="mb-4"),
+    ])
+
+    scatter = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                html.Div([
+                    html.I(className="fas fa-question-circle", id="tooltip-scatter",
+                           style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+                    dcc.Graph(id='scatter-plot', style={'width': '100%'}),
+                    make_popover("scatter_plot", "tooltip-scatter")
+                ])
+            ])
+        ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+
+    table = dbc.Card([
+        dbc.CardBody([
+            html.I(className="fas fa-question-circle", id="tooltip-table",
+                   style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+            html.H4("Сводная таблица по лотам", style={'textAlign': 'center'}),
+            dash_table.DataTable(
+                id='lot-stats-table',
+                columns=[],
+                data=[],
+                style_table={'height': '414px', 'overflowY': 'auto'},
+                style_cell={'textAlign': 'center'},
+                style_data_conditional=[]
+            ),
+            make_popover("lot_stats_table", "tooltip-table")
+        ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+
+    scatter_and_table = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                scatter
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'}),
+            dbc.Row([
+                table
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'})
+        ])
+    ], style={'backgroundColor': '#ffe8db'})
+
+    lot_item_cost = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                html.Div([
+                    html.I(className="fas fa-question-circle", id="tooltip-lot_item_cost",
+                           style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+                    dcc.Graph(id='cost-plot', style={'width': '100%'}),
+                    make_popover("cost_plot", "tooltip-lot_item_cost")
+                ])
+            ])
+        ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+
+    histogram = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                html.Div([
+                    html.I(className="fas fa-question-circle", id="tooltip-histogram",
+                           style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+                    dcc.Graph(id='histogram-plot', style={'width': '100%'}),
+                    make_popover("histogram_plot", "tooltip-histogram")
+                ])
+            ])
+        ])
+    ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+
+    cost_plot = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                lot_item_cost
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'}),
+            dbc.Row([
+                histogram
+            ], className="mb-4", style={'padding-left': '15px', 'padding-right': '15px'})
+        ])
+    ], style={'backgroundColor': '#ffe8db'})
+
+    selection_and_plots = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                lot_selection
+            ], className="mb-4"),
+            dbc.Row([
+                dbc.Col([scatter_and_table], width=6),  # style={'height': '500px'}),
+                dbc.Col([cost_plot], width=6)  # , style={'height': '440px'})
+            ], className="mb-4"),
+        ])
+    ], style={'backgroundColor': '#E0F7FA'})
+    # E0F7FA
+
+    # -------------------------------------------------STATIC----------------------------------------------------
+
+    # lot_totals = df_for_visual.groupby('lot_id')['item_cost'].sum().reset_index()
+    # lot_totals['type'] = 'Алгоритм'  # Добавляем колонку для обозначения типа
+    #
+    # human_lot_totals = df_for_visual.groupby('human_lot_id')['item_cost'].sum().reset_index()
+    # human_lot_totals['type'] = 'Человек'  # Добавляем колонку для обозначения типа
+    # total_costs = pd.concat([lot_totals[['type', 'item_cost']], human_lot_totals[['type', 'item_cost']]])
+    #
+    # total_cost_fig = px.box(total_costs, x='type', y='item_cost')
+    # total_cost_fig.update_layout(
+    #     xaxis_title='',
+    #     yaxis_title='Стоимость',
+    #     title={
+    #         'text': "<b>Сравнение суммарных стоимостей лотов</b>",
+    #         'font': {'size': 18},  # Adjust size as needed
+    #         'x': 0.5,  # Center the title
+    #     }
+    # )
+    #
+    # total_cost_card = dbc.Card([
+    #     dbc.CardBody([
+    #         html.I(className="fas fa-question-circle", id="tooltip-total_cost_card",
+    #                style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+    #         dcc.Graph(id='total-cost-plot', figure=total_cost_fig),
+    #         make_popover("total_cost_plot", "tooltip-total_cost_card")
+    #     ])
+    # ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+    #
+    # # KDE Curve
+    # kde_fig = go.Figure()
+    # x1 = np.linspace(df_for_visual['request_quantity'].min(), df_for_visual['request_quantity'].max(), 100)
+    # kde1 = stats.gaussian_kde(df_for_visual['request_quantity'])
+    # kde_fig.add_trace(go.Scatter(
+    #     x=x1,
+    #     y=kde1(x1),
+    #     mode='lines',
+    #     name='Алгоритм',
+    #     line=dict(color='blue')
+    # ))
+    # x2 = np.linspace(df_for_visual['human_request_quantity'].min(), df_for_visual['human_request_quantity'].max(), 100)
+    # kde2 = stats.gaussian_kde(df_for_visual['human_request_quantity'])
+    # kde_fig.add_trace(go.Scatter(
+    #     x=x2,
+    #     y=kde2(x2),
+    #     mode='lines',
+    #     name='Человек',
+    #     line=dict(color='red')
+    # ))
+    # kde_fig.update_layout(
+    #     xaxis_title='Количество заявок',
+    #     yaxis_title='Плотность',
+    #     title={
+    #         'text': "<b>Ядерная оценка плотности кол-ва заявок в лоте</b>",
+    #         'font': {'size': 18},  # Adjust size as needed
+    #         'x': 0.5,  # Center the title
+    #     }
+    # )
+    #
+    # kde_plot = dbc.Card([
+    #     dbc.CardBody([
+    #         html.I(className="fas fa-question-circle", id="tooltip-kde",
+    #                style={'cursor': 'pointer', 'margin-left': '10px', 'color': '#007bff'}),
+    #         dcc.Graph(id='kde-plot', figure=kde_fig, style={'width': '100%'}),
+    #         make_popover("kde_plot", "tooltip-kde")
+    #     ])
+    # ], style={'border': '1px solid #22262a', 'borderRadius': '10px', 'padding': '15px'})
+
+    summary_statistic = dbc.Card([
+        dbc.CardBody([
+            html.H4("Основные статистики", style={'textAlign': 'center'}),
+            html.P(f"Количество лотов алгоритма: {unique_lot_count}"),
+            html.P(f"Средняя стоимость лота алгоритма: {average_lot_cost:.2f}"),
+            html.H5(f"Метрики", style={'textAlign': 'center', 'font-size': '18px'}),
+            html.P(f"MS Score: {ms:.2f}"),
+        ])
+    ], style={'backgroundColor': '#ffe8db'})
+
+    # kde_and_total = dbc.Card(
+    #     dbc.CardBody([
+    #         dbc.Row(
+    #             [
+    #                 dbc.Col([kde_plot], width=6),
+    #                 dbc.Col([total_cost_card], width=6),
+    #             ]
+    #         )
+    #     ]), style={'backgroundColor': '#ffe8db'}
+    # )
+
+    static_plots = dbc.Card([
+        dbc.CardBody([
+            dbc.Row([
+                # dbc.Col([kde_and_total], width=8),  # style={'height': '500px'}),
+                dbc.Col([summary_statistic], width=4)  # , style={'height': '440px'})
+            ], className="mb-4"),
+        ])
+    ], style={'backgroundColor': '#E0F7FA'})
+
+    # -------------------------------------------------FINAL_DASHBOARD----------------------------------------------------
+    app.layout = dbc.Container([
+        html.H1("Визуальный анализ по PackOfLots", style={'textAlign': 'center', 'margin-bottom': '25px'}),
+        dbc.Row([
+            dbc.Col([selection_and_plots], width=12)
+        ], className="mb-4"),
+        dbc.Row([
+            dbc.Col([static_plots], width=12)
+        ], className="mb-4")
+    ], fluid=True, style={'backgroundColor': '#c9e1ef'})
+
+    # -------------------------------------------------CALLBACKS----------------------------------------------------
+    @app.callback(
+        Output('lot-stats-table', 'style_data_conditional'),
+        Input('lot-stats-table', 'active_cell')
+    )
+    def update_table_style(selected_cell):
+        # Обновление стиля таблицы
+        style_data_conditional = [
+            {'if': {'column_id': 'unique_recipients'}, 'width': '80px'},
+            {'if': {'column_id': 'unique_classes'}, 'width': '80px'},
+            {'if': {'column_id': 'unique_orders'}, 'width': '80px'}
+        ]
+
+        if selected_cell:
+            row_index = selected_cell['row']
+            style_data_conditional.append(
+                {
+                    'if': {'row_index': row_index},
+                    'backgroundColor': '#D2F3FF',
+                    'color': 'black'
+                }
+            )
+
+        return style_data_conditional
+
+    # Объединенный callback для обновления графиков и стиля таблицы
+    @app.callback(
+        [Output('scatter-plot', 'figure'),
+         Output('cost-plot', 'figure'),
+         Output('histogram-plot', 'figure'),
+         Output('lot-stats-table', 'data'),
+         Output('lot-stats-table', 'columns')],
+        [Input('lot-id-range-slider', 'value'),
+         Input('lot-id-dropdown', 'value')]
+    )
+    def update_output(selected_range, selected_individuals):
+        # Merge selected lot_ids from range and dropdown
+        if selected_range:
+            range_lots = list(range(int(selected_range[0]), int(selected_range[1]) + 1))
+        else:
+            range_lots = []
+        selected_lots = set(range_lots + (selected_individuals if selected_individuals else []))
+
+        # if not selected_lots:
+        #     selected_lots = unique_lot_ids.tolist()
+
+        # Фильтруем данные по выбранным lot_id
+        filtered_df = df_for_visual[df_for_visual['lot_id'].isin(selected_lots)]
+
+        # Статистики для таблицы lot_id
+        lot_stats = filtered_df.groupby('lot_id').agg(
+            средняя_стоимость_позиции=('item_cost', lambda x: round(x.mean(), 2)),
+            уникальные_грузополучатели=('receiver_id', 'nunique'),
+            уникальные_заказы=('order_id', 'nunique'),
+            уникальные_классы=('class_id', 'nunique'),
+        ).reset_index()
+
+        # Scatter Plot
+        scatter_fig = go.Figure()
+        for lot_id in unique_lot_ids:
+            subset = filtered_df[filtered_df['lot_id'] == lot_id]
+            scatter_fig.add_trace(go.Scattermapbox(
+                lat=subset['receiver_address_latitude'],
+                lon=subset['receiver_address_longitude'],
+                mode='markers',
+                name=str(lot_id),
+                hoverinfo='text',
+                text=subset['receiver_address'],
+                marker=dict(size=10, opacity=0.8)
+            ))
+
+        # Для поставщиков
+        for lot_id in unique_lot_ids:
+            subset = filtered_df[filtered_df['lot_id'] == lot_id]
+            scatter_fig.add_trace(go.Scattermapbox(
+                lat=subset['supplier_address_latitude'],
+                lon=subset['supplier_address_longitude'],
+                mode='markers',
+                name=str(lot_id) + "п",
+                hoverinfo='text',
+                text=subset['supplier_address'],
+                marker=dict(size=10, opacity=0.8)
+            ))
+
+        center_lat = filtered_df['receiver_address_latitude'].mean()
+        center_lon = filtered_df['receiver_address_longitude'].mean()
+
+        scatter_fig.update_layout(
+            mapbox=dict(
+                style="open-street-map",  # стиль карты, можно выбрать "carto-positron", "stamen-terrain" и другие
+                center=dict(lat=center_lat, lon=center_lon),
+                zoom=2  # регулирует степень масштабирования карты
+            ),
+            margin={"r": 0, "t": 25, "l": 0, "b": 0},
+            xaxis_title='Широта',
+            yaxis_title='Долгота',
+            legend_title='lot_id',
+            title={
+                'text': "<b>Расположение грузополучателей в соответствии с лотамим</b>",
+                'font': {'size': 18},  # Adjust size as needed
+                'x': 0.5,  # Center the title
+            }
+
+        )
+
+        # Cost Plot
+        cost_fig = px.box(filtered_df, x='lot_id', y='item_cost', color='lot_id')
+        cost_fig.update_layout(
+            xaxis_title='Лот',
+            yaxis_title='Цена позиции',
+            title={
+                'text': "<b>Распределение цен позиций в каждом из лотов</b>",
+                'font': {'size': 18},  # Adjust size as needed
+                'x': 0.5,  # Center the title
+            }
+        )
+
+        lot_totals = filtered_df.groupby('lot_id')['item_cost'].sum().reset_index()
+        # Создание histogram
+        histogram_fig = go.Figure(data=[go.Bar(
+            x=lot_totals['lot_id'],
+            y=lot_totals['item_cost'],
+            marker=dict(color='royalblue')
+        )])
+
+        histogram_fig.update_layout(
+            title={
+                'text': "<b>Суммарная стоимость лота</b>",
+                'font': {'size': 18},  # Adjust size as needed
+                'x': 0.5,  # Center the title
+            },
+            xaxis_title='Лот',
+            yaxis_title='Стоимость',
+            xaxis=dict(tickmode='linear')  # Установка линейного режима для оси X
+        )
+
+        return scatter_fig, cost_fig, histogram_fig, lot_stats.to_dict('records'), [{"name": i, "id": i} for i in
+                                                                                    lot_stats.columns]
+
+    # Сохраняем всю страницу как HTML
+    with open('dashboard.html', 'w') as f:
+        f.write(app.index())
+
+    # Запуск приложения
+    app.run_server(host='127.0.0.1', port=5000, debug=True)
 
 # Пример использования
-def make_dashboard(requests, lots, human_lots, ms, mq=None):
-    create_dashboard(merge_tables_for_canvas(requests, lots, human_lots), mq, ms)
+def make_dashboard(requests, lots, human_lots, ms, mq):
+    if mq == None:
+        create_dashboard(merge_tables_for_canvas(requests, lots, human_lots, True), ms)
+    else:
+        create_dashboard_with_human(merge_tables_for_canvas(requests, lots, human_lots, False), mq, ms)
 
 
-# make_dashboard(requests, lots, human_lots, 0.6, 6)
+# make_dashboard(requests, lots, human_lots, 6, 0.6)
+# make_dashboard(requests, lots, None, 6, None)
+

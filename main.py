@@ -2,6 +2,7 @@ from flask import Flask, redirect, url_for, render_template, jsonify, request, s
 import os
 from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks, editLot, getForLots
 from Aglomerative.AgglomerativeCluster import Solver
+from HumanLotting import HumanLotting
 import pandas as pd
 
 app = Flask(__name__)
@@ -117,6 +118,7 @@ def upload_lots():
     end_date = data.get('end_date')
     name = data.get('name')
     dist_coeff = data.get('dist_coeff')
+    useHumanSolver = data.get('useHumanSolver')
     if dist_coeff != None:
         dist_coeff = int(dist_coeff)
     else:
@@ -136,20 +138,23 @@ def upload_lots():
     else:
         param_2 = float(data.get('param_2'))
     df = getForLots(start_date, end_date)
-    useHumanSolver = False
-    if useHumanSolver:
-        print("There is nothing here")
     solver = Solver()
     if not count_method:
         solver = Solver(podgon=dist_coeff, find_optimal=count_method, min_lots_percent=param_1, min_ms=param_2)
+        count_method = 2
     else:
         solver = Solver(prod_percent=param_1, prov_percent=param_2, podgon=dist_coeff, find_optimal=count_method)
+        count_method = 1
     lots = solver.get_lots(df)
+    print(useHumanSolver)
     if useHumanSolver:
-        human_pack_id = putPack(name, "count_method", human_lots, start_date, end_date)
-        pack_id = putPack(name, "count_method", lots, start_date, end_date, human_pack_id)
+        solver_human = HumanLotting()
+        human_lots = solver_human.solve(df)
+        print(human_lots)
+        human_pack_id = putPack(name, count_method, human_lots, start_date, end_date)
+        pack_id = putPack(name, count_method, lots, start_date, end_date, human_pack_id)
     else:
-        pack_id = putPack(name, "count_method", lots, start_date, end_date)
+        pack_id = putPack(name, count_method, lots, start_date, end_date)
     return jsonify({'id': pack_id}), 200
 
 @app.route('/api/download', methods=['POST', 'GET'])

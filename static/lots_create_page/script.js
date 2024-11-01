@@ -1,6 +1,7 @@
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 const coeffCheckBox = document.getElementById("coefficientCheckbox")
+const useHumanInput = document.getElementById("humanCheckbox");
 const inputDiv = document.getElementById("coefficientInputDiv");
 const coeffInput = document.getElementById("coefficientInput");
 const inputParam1 = document.getElementById("param-1");
@@ -197,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formLotsBtn.addEventListener('click', () => {
 
         const coefficient = coeffCheckBox.checked ? coeffInput.value : null;
+        const useHumanSolverBool = useHumanInput.checked ? true : false;
         
         const countingMethod = document.querySelector("input[name='countingMethod']:checked").value;
         var field1 = inputParam1.value;
@@ -217,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({ start_date: startDate, end_date: endDate, name: inputName.value, dist_coeff: coefficient, count_method: countingMethod, param_1: field1, param_2: field2 })
+                        body: JSON.stringify({ start_date: startDate, end_date: endDate, name: inputName.value, dist_coeff: coefficient, count_method: countingMethod, param_1: field1, param_2: field2, useHumanSolver: useHumanSolverBool })
                     })
                     .then(response => response.json())
                     .then(data => {
