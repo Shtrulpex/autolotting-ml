@@ -12,6 +12,7 @@ const tableBody = document.getElementById("tableBody");
 const submitOrderBtn = document.getElementById("submitOrderBtn");
 const allLotsBtn = document.getElementById('all-lots-btn');
 const downloadBtn = document.getElementById('downloadBtn');
+const lotsDataDiv = document.getElementById('lots_datas');
 
 menuBtn.addEventListener('click', function() {
     if (sidebar.style.left === "0px") {
@@ -84,14 +85,15 @@ if (document.getElementById('lot_id').textContent === '') {
 
 if (allDfDiv.textContent !== '') {
     const allDfData = JSON.parse(allDfDiv.textContent);
+    const lotsData = JSON.parse(lotsDataDiv.textContent);
     const id = document.getElementById('id_pack').textContent;  
 
-    if (allDfData.length > 0) {
-        allDfData.forEach(row => {
+    if (lotsData.length > 0) {
+        lotsData.forEach(row => {
             const li = document.createElement("li");
-            li.textContent = "№ лота: " + row['№ лота'];
+            li.textContent = "№ лота: " + row[0];
             li.addEventListener('click', () => {
-                window.location.href = `/lots_page.html?id=${id}&lot_id=${row['№ лота']}`;
+                window.location.href = `/lots_page.html?id=${id}&lot_id=${row[0]}`;
             });
             ulSidebarAllDf.appendChild(li);
         });
@@ -197,7 +199,7 @@ allLotsBtn.addEventListener('click', function() {
         var resultLotsId = '';
         if (allDfData.length > 0) {
             allDfData.forEach(row => {
-                resultLotsId = resultLotsId + row['№ лоттировки'] + ',';
+                resultLotsId = resultLotsId + row['№ лота'] + ',';
             });
             resultLotsId = resultLotsId.slice(0, -1);
             window.location.href = `/lots_page.html?id=${id}&lot_id=${resultLotsId}`

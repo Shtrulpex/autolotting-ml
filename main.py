@@ -41,14 +41,15 @@ def lots():
     id = request.args.getlist('id')
     if(id != []):
         dfdata = getPacks(id[0]).to_json(orient='records')
+        lots_data = pd.DataFrame(list(set(getPacks(id[0])['№ лота'].to_list()))).to_json(orient='records')
         lot_id = request.args.getlist('lot_id')
         if(lot_id != []):
             lot_id = list(map(int, lot_id[0].split(',')))
             for i in range(len(lot_id)):
                 lot_id[i] = lot_id[i] - 1
-            return render_template("lots_page.html", data=dfdata, id=int(id[0]), lot_id=lot_id)
+            return render_template("lots_page.html", lots_data=lots_data, data=dfdata, id=int(id[0]), lot_id=lot_id)
         else:
-            return render_template("lots_page.html", data=dfdata, id=int(id[0]))
+            return render_template("lots_page.html", lots_data=lots_data, data=dfdata, id=int(id[0]))
     else:
         return render_template("lots_page.html")
 
