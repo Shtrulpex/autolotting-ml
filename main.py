@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for, render_template, jsonify, request, s
 import os
 from main_logic import xlxsToDf, getOrders, editOrder, dfToXlxs, getRequests, putPack, getPacks, editLot, getForLots
 from Aglomerative.AgglomerativeCluster import Solver
-from HumanLotting import HumanLotting
+from HumanLotting.HumanLotting import HumanLottingSolver
 import pandas as pd
 
 app = Flask(__name__)
@@ -148,7 +148,7 @@ def upload_lots():
     lots = solver.get_lots(df)
     print(useHumanSolver)
     if useHumanSolver:
-        solver_human = HumanLotting()
+        solver_human = HumanLottingSolver()
         human_lots = solver_human.solve(df)
         print(human_lots)
         human_pack_id = putPack(name, count_method, human_lots, start_date, end_date)

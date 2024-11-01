@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 
 
-class HumanLotting:
+class HumanLottingSolver:
     def __init__(self, path='./HumanLotting/HumanClassifier.pkl'):
         with open(path, 'rb') as file:
             self.__model = pickle.load(file)
 
     def solve(self, data):
-        df = data.drop(columns=['request_id', 'order_dt', 'delivery_dt', 'receiver_id', 'receiver_address_id', 
+        df = data.drop(columns=['order_dt', 'delivery_dt', 'receiver_id', 'receiver_address_id', 
                                 'receiver_address', 'receiver_address_latitude', 'receiver_address_latitude', 
                                 'receiver_address_longitude', 'receiver_address_coords_geo_confidence', 
                                 'class_name', 'standard_shipping', 'material_name', 'material_name', 'measure_unit',
